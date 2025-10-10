@@ -1,0 +1,14 @@
+@import "tailwindcss";
+@import "tailwindcss-primeui";
+
+:root {
+  height: 100vh;
+}
+
+html {
+  height: 100vh;
+}
+
+body {
+  min-height: 100%;
+}
