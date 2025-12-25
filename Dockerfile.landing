@@ -1,0 +1,21 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Копируем package файлы
+COPY package*.json ./
+COPY apps/landing/package.json ./apps/landing/
+COPY packages/*/package.json ./packages/*/
+
+# Устанавливаем зависимости
+RUN npm install
+
+# Копируем исходный код
+COPY . .
+
+WORKDIR /app/apps/landing
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]
+
