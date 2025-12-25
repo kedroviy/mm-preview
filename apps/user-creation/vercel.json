@@ -1,0 +1,6 @@
+{
+  "buildCommand": "cd ../.. && npm install && turbo run build --filter=@mm-preview/user-creation",
+  "installCommand": "cd ../.. && npm install",
+  "framework": "nextjs"
+}
+

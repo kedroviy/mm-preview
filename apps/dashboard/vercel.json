@@ -1,0 +1,6 @@
+{
+  "buildCommand": "cd ../.. && npm install && turbo run build --filter=@mm-preview/dashboard",
+  "installCommand": "cd ../.. && npm install",
+  "framework": "nextjs"
+}
+
