@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "primereact/card";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 type CustomCardContainer = {
   children: ReactNode;

@@ -9,56 +9,60 @@ const meta = {
   },
   tags: ["autodocs"],
   argTypes: {
-    variant: {
-      control: "select",
-      options: ["filled", "outlined", "text"],
-    },
     severity: {
       control: "select",
       options: ["primary", "secondary", "success", "info", "warning", "danger"],
     },
-    size: {
-      control: "select",
-      options: ["small", "large"],
+    outlined: {
+      control: "boolean",
+    },
+    text: {
+      control: "boolean",
+    },
+    rounded: {
+      control: "boolean",
+    },
+    disabled: {
+      control: "boolean",
     },
   },
 } satisfies Meta<typeof Button>;
 
 export default meta;
+
 type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
   args: {
     children: "Button",
-    variant: "filled",
   },
 };
 
 export const Outlined: Story = {
   args: {
     children: "Button",
-    variant: "outlined",
+    outlined: true,
   },
 };
 
 export const Text: Story = {
   args: {
     children: "Button",
-    variant: "text",
+    text: true,
   },
 };
 
 export const Large: Story = {
   args: {
     children: "Large Button",
-    size: "large",
+    className: "text-lg px-6 py-3",
   },
 };
 
 export const Small: Story = {
   args: {
     children: "Small Button",
-    size: "small",
+    className: "text-sm px-3 py-1",
   },
 };
 
@@ -75,5 +79,3 @@ export const Disabled: Story = {
     disabled: true,
   },
 };
-
-

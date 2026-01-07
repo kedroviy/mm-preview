@@ -1,4 +1,7 @@
-import { useCreateUser as useSDKCreateUser, type CreateUserRequest } from "@mm-preview/sdk";
+import {
+  type CreateUserRequest,
+  useCreateUser as useSDKCreateUser,
+} from "@mm-preview/sdk";
 import { APP_URLS } from "@/src/shared/config/constants";
 
 export function useCreateUser() {
@@ -18,4 +21,3 @@ export function useCreateUser() {
     mutate,
   };
 }
-

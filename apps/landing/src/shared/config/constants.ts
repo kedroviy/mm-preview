@@ -3,4 +3,3 @@ export const APP_URLS = {
   USER_CREATION: "http://user-creation.local",
   DASHBOARD: "http://dashboard.local",
 } as const;
-

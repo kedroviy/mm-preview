@@ -5,7 +5,9 @@ import { Button } from "./Button";
 describe("Button", () => {
   it("renders button with text", () => {
     render(<Button>Click me</Button>);
-    expect(screen.getByRole("button", { name: /click me/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /click me/i }),
+    ).toBeInTheDocument();
   });
 
   it("renders disabled button", () => {
@@ -24,12 +26,11 @@ describe("Button", () => {
     const handleClick = vi.fn();
     const { default: userEvent } = await import("@testing-library/user-event");
     const user = userEvent.setup();
-    
+
     render(<Button onClick={handleClick}>Click</Button>);
     const button = screen.getByRole("button", { name: /click/i });
-    
+
     await user.click(button);
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 });
-

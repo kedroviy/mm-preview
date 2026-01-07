@@ -1,11 +1,11 @@
 "use client";
 
-import BasicContainer from "@/src/shared/ui/containers/card-container";
 import Link from "next/link";
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { InputText } from "primereact/inputtext";
 import { Label } from "primereact/label";
+import BasicContainer from "@/src/shared/ui/containers/card-container";
 
 export const Login = () => {
   return (

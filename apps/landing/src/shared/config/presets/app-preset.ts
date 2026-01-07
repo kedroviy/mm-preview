@@ -48,5 +48,3 @@ export const AppPreset = definePreset(Aura, {
     },
   },
 });
-
-

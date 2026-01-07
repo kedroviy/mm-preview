@@ -6,6 +6,7 @@
   "types": "./src/index.ts",
   "scripts": {
     "lint": "biome check",
+    "type-check": "tsc --noEmit",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "storybook": "storybook dev -p 6006",
@@ -43,4 +44,3 @@
     "react-dom": "^19.2.3"
   }
 }
-

@@ -1,10 +1,10 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { InputText } from "primereact/inputtext";
-import { Password } from "primereact/password";
-import { Message } from "primereact/message";
 import { Button } from "@mm-preview/ui";
+import { InputText } from "primereact/inputtext";
+import { Message } from "primereact/message";
+import { Password } from "primereact/password";
+import { useForm } from "react-hook-form";
 import { useCreateUser } from "../hooks/useCreateUser";
 
 interface UserFormData {
@@ -38,9 +38,13 @@ export function UserCreationForm() {
     <div className="flex items-center justify-center min-h-screen p-4">
       <div className="card w-full max-w-md">
         <h1 className="text-3xl font-bold mb-6 text-center">Create Account</h1>
-        
+
         {isError && (
-          <Message severity="error" text="Failed to create account. Please try again." className="mb-4" />
+          <Message
+            severity="error"
+            text="Failed to create account. Please try again."
+            className="mb-4"
+          />
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -136,8 +140,7 @@ export function UserCreationForm() {
           <Button
             type="submit"
             disabled={isPending}
-            className="w-full"
-            size="large"
+            className="w-full text-lg px-6 py-3"
           >
             {isPending ? "Creating..." : "Create Account"}
           </Button>
@@ -146,5 +149,3 @@ export function UserCreationForm() {
     </div>
   );
 }
-
-

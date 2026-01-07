@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Create Account - Movie match",
   description: "Create your account",
   icons: {
-    icon: './favicon.ico',
+    icon: "./favicon.ico",
   },
 };
 
@@ -28,5 +28,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-

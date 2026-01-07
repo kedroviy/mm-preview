@@ -54,4 +54,3 @@ export const usersApi = {
     return api.delete<void>(`/users/${id}`);
   },
 };
-

@@ -3,5 +3,3 @@ import { UserCreationForm } from "@/src/features/user-creation/components/UserCr
 export default function UserCreationPage() {
   return <UserCreationForm />;
 }
-
-

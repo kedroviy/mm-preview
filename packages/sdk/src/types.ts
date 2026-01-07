@@ -15,4 +15,3 @@ export interface RequestConfig extends RequestInit {
   params?: Record<string, string | number | boolean | null | undefined>;
   timeout?: number;
 }
-

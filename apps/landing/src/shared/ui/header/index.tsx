@@ -1,12 +1,9 @@
 "use client";
 
 import { Button } from "@mm-preview/ui";
-import { useRouter } from "next/navigation";
 import { APP_URLS } from "@/src/shared/config/constants";
 
 export function Header() {
-  const router = useRouter();
-
   const handleStart = () => {
     window.location.href = APP_URLS.USER_CREATION;
   };
@@ -20,9 +17,8 @@ export function Header() {
           </div>
           <div className="flex items-center gap-4">
             <Button
-              rounded
               onClick={handleStart}
-              className="px-6 py-2 text-base"
+              className="px-6 py-2 text-base rounded"
             >
               Начать
             </Button>
@@ -32,4 +28,3 @@ export function Header() {
     </header>
   );
 }
-

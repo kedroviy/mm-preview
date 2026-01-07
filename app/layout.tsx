@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Movie match Application",
   description: "Choose rour movie!",
   icons: {
-    icon: './favicon.ico',
+    icon: "./favicon.ico",
   },
 };
 
@@ -22,7 +22,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={font.className}>
-    
       <body>
         <Provider>{children}</Provider>
       </body>

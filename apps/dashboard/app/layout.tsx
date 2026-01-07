@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Dashboard - Movie match",
   description: "Your dashboard",
   icons: {
-    icon: './favicon.ico',
+    icon: "./favicon.ico",
   },
 };
 
@@ -28,5 +28,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-

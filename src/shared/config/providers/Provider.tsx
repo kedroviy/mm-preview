@@ -1,8 +1,8 @@
 "use client";
 
-import { PropsWithChildren, ReactNode } from "react";
-import QueryProvider from "./QueryProvider";
+import type { PropsWithChildren, ReactNode } from "react";
 import PrimeSSRProvider from "./PrimeReactProvider";
+import QueryProvider from "./QueryProvider";
 
 type Props = {
   children: ReactNode;

@@ -1,9 +1,9 @@
 "use client";
 
-import { PropsWithChildren } from "react";
+import { defaultQueryClient } from "@mm-preview/sdk";
 
 import { QueryClientProvider } from "@tanstack/react-query";
-import { defaultQueryClient } from "@mm-preview/sdk";
+import type { PropsWithChildren } from "react";
 
 export default function QueryProvider({ children }: PropsWithChildren) {
   return (
@@ -12,4 +12,3 @@ export default function QueryProvider({ children }: PropsWithChildren) {
     </QueryClientProvider>
   );
 }
-

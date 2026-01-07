@@ -1,11 +1,27 @@
 "use client";
 
-import { Button as PrimeButton, ButtonProps as PrimeButtonProps } from "primereact/button";
-import { forwardRef } from "react";
+import { Button as PrimeButton } from "primereact/button";
+import {
+  type ButtonHTMLAttributes,
+  type ComponentProps,
+  forwardRef,
+} from "react";
 
-export interface ButtonProps extends PrimeButtonProps {
+export interface ButtonProps
+  extends Omit<ComponentProps<typeof PrimeButton>, "children">,
+    ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   className?: string;
+  outlined?: boolean;
+  text?: boolean;
+  rounded?: boolean;
+  severity?:
+    | "primary"
+    | "secondary"
+    | "success"
+    | "info"
+    | "warning"
+    | "danger";
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -15,9 +31,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {children}
       </PrimeButton>
     );
-  }
+  },
 );
 
 Button.displayName = "Button";
-
-

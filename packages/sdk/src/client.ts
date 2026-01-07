@@ -5,7 +5,11 @@ class ApiClient {
   private defaultHeaders: HeadersInit;
   private timeout: number;
 
-  constructor(config?: { baseURL?: string; timeout?: number; headers?: HeadersInit }) {
+  constructor(config?: {
+    baseURL?: string;
+    timeout?: number;
+    headers?: HeadersInit;
+  }) {
     this.baseURL = config?.baseURL || "http://localhost:3000/api";
     this.timeout = config?.timeout || 30000;
     this.defaultHeaders = {
@@ -16,7 +20,7 @@ class ApiClient {
 
   private buildURL(url: string, params?: RequestConfig["params"]): string {
     const fullURL = url.startsWith("http") ? url : `${this.baseURL}${url}`;
-    
+
     if (!params || Object.keys(params).length === 0) {
       return fullURL;
     }
@@ -34,10 +38,10 @@ class ApiClient {
 
   private async request<T>(
     url: string,
-    config: RequestConfig = {}
+    config: RequestConfig = {},
   ): Promise<ApiResponse<T>> {
     const { params, timeout = this.timeout, ...fetchConfig } = config;
-    
+
     const fullURL = this.buildURL(url, params);
     const headers = {
       ...this.defaultHeaders,
@@ -107,7 +111,7 @@ class ApiClient {
   async post<T>(
     url: string,
     data?: unknown,
-    config?: RequestConfig
+    config?: RequestConfig,
   ): Promise<ApiResponse<T>> {
     return this.request<T>(url, {
       ...config,
@@ -119,7 +123,7 @@ class ApiClient {
   async put<T>(
     url: string,
     data?: unknown,
-    config?: RequestConfig
+    config?: RequestConfig,
   ): Promise<ApiResponse<T>> {
     return this.request<T>(url, {
       ...config,
@@ -131,7 +135,7 @@ class ApiClient {
   async patch<T>(
     url: string,
     data?: unknown,
-    config?: RequestConfig
+    config?: RequestConfig,
   ): Promise<ApiResponse<T>> {
     return this.request<T>(url, {
       ...config,
@@ -140,7 +144,10 @@ class ApiClient {
     });
   }
 
-  async delete<T>(url: string, config?: RequestConfig): Promise<ApiResponse<T>> {
+  async delete<T>(
+    url: string,
+    config?: RequestConfig,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(url, { ...config, method: "DELETE" });
   }
 }
@@ -154,4 +161,3 @@ export function createApiClient(config?: {
 }
 
 export const api = createApiClient();
-

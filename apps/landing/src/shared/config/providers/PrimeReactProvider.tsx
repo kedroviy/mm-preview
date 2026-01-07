@@ -1,7 +1,7 @@
 "use client";
-import * as React from "react";
 import { PrimeReactProvider, PrimeReactStyleSheet } from "@primereact/core";
 import { useServerInsertedHTML } from "next/navigation";
+import type * as React from "react";
 import { AppPreset } from "../presets/app-preset";
 
 const styledStyleSheet = new PrimeReactStyleSheet();
@@ -31,5 +31,3 @@ export default function PrimeSSRProvider({
     </PrimeReactProvider>
   );
 }
-
-
