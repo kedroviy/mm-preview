@@ -63,20 +63,27 @@
 - Каждый push в `main` ветку будет автоматически деплоить все 3 проекта
 - Или можно настроить разные ветки для каждого проекта
 
-## Обновление констант после деплоя
+## Настройка переменных окружения
 
-После получения URL от Vercel, обновите константы в каждом приложении:
+После получения URL от Vercel, настройте переменные окружения для каждого проекта:
 
-**apps/landing/src/shared/config/constants.ts:**
-```typescript
-export const APP_URLS = {
-  LANDING: "https://mm-preview-landing.vercel.app",
-  USER_CREATION: "https://mm-preview-user-creation.vercel.app",
-  DASHBOARD: "https://mm-preview-dashboard.vercel.app",
-} as const;
+1. Перейдите в **Settings** → **Environment Variables** для каждого проекта
+2. Добавьте следующие переменные:
+
+**Для всех проектов:**
+```
+NEXT_PUBLIC_LANDING_URL=https://mm-preview-landing.vercel.app
+NEXT_PUBLIC_USER_CREATION_URL=https://mm-preview-user-creation.vercel.app
+NEXT_PUBLIC_DASHBOARD_URL=https://mm-preview-dashboard.vercel.app
 ```
 
-И аналогично в `apps/user-creation/src/shared/config/constants.ts`
+3. Выберите **Environment**: `Production`, `Preview`, `Development` (или все)
+4. Нажмите **Save**
+5. Перезапустите деплой
+
+**Важно:** Используйте реальные URL ваших проектов в Vercel!
+
+Подробнее см. `ENV-VARIABLES-SETUP.md`
 
 ## Как это работает
 
