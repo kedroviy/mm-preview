@@ -51,3 +51,4 @@ Write-Host "`nПроверка источника:" -ForegroundColor Cyan
 Write-Host "Убедитесь, что скачали с: https://nginx.org/en/download.html" -ForegroundColor Yellow
 Write-Host "Раздел: Stable version -> nginx/Windows-X.X.X" -ForegroundColor Yellow
 
+

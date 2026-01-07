@@ -15,10 +15,12 @@
    - **Project Name:** `mm-preview-landing` (или любое другое имя)
    - **Framework Preset:** `Next.js`
    - **Root Directory:** `apps/landing` ⚠️ **ВАЖНО!**
-   - **Build Command:** `cd ../.. && turbo run build --filter=@mm-preview/landing`
+   - **Build Command:** Оставьте пустым (Vercel автоматически подхватит `turbo run build` из `vercel.json`)
    - **Output Directory:** `.next` (оставьте по умолчанию)
-   - **Install Command:** `cd ../.. && npm install`
+   - **Install Command:** Оставьте по умолчанию (Vercel автоматически установит зависимости)
 5. Нажмите **"Deploy"**
+
+**Примечание:** Vercel автоматически определит Turborepo и настроит фильтр на основе Root Directory. Фильтр указывать не нужно!
 
 ### 2. User Creation приложение
 
@@ -28,9 +30,9 @@
    - **Project Name:** `mm-preview-user-creation`
    - **Framework Preset:** `Next.js`
    - **Root Directory:** `apps/user-creation` ⚠️ **ВАЖНО!**
-   - **Build Command:** `cd ../.. && turbo run build --filter=@mm-preview/user-creation`
-   - **Output Directory:** `.next`
-   - **Install Command:** `cd ../.. && npm install`
+   - **Build Command:** Оставьте пустым (Vercel автоматически подхватит из `vercel.json`)
+   - **Output Directory:** `.next` (по умолчанию)
+   - **Install Command:** Оставьте по умолчанию
 4. Нажмите **"Deploy"**
 
 ### 3. Dashboard приложение
@@ -41,9 +43,9 @@
    - **Project Name:** `mm-preview-dashboard`
    - **Framework Preset:** `Next.js`
    - **Root Directory:** `apps/dashboard` ⚠️ **ВАЖНО!**
-   - **Build Command:** `cd ../.. && turbo run build --filter=@mm-preview/dashboard`
-   - **Output Directory:** `.next`
-   - **Install Command:** `cd ../.. && npm install`
+   - **Build Command:** Оставьте пустым (Vercel автоматически подхватит из `vercel.json`)
+   - **Output Directory:** `.next` (по умолчанию)
+   - **Install Command:** Оставьте по умолчанию
 4. Нажмите **"Deploy"**
 
 ## Результат
@@ -76,9 +78,18 @@ export const APP_URLS = {
 
 И аналогично в `apps/user-creation/src/shared/config/constants.ts`
 
+## Как это работает
+
+Согласно [официальной документации Vercel](https://vercel.com/docs/monorepos/turborepo):
+
+1. **Vercel автоматически определяет Turborepo** - если в проекте есть `turbo.json`, Vercel автоматически настраивает сборку
+2. **Turborepo доступен глобально** - не нужно добавлять как зависимость, Vercel предоставляет его автоматически
+3. **Фильтр определяется автоматически** - на основе Root Directory Vercel автоматически определяет, какое приложение собирать
+4. **Упрощенный build command** - достаточно просто `turbo run build`, фильтр добавляется автоматически
+
 ## Альтернатива: Использование vercel.json
 
-Если хотите автоматизировать, можно использовать файлы `vercel.json` в каждой папке `apps/`, которые я уже создал. Vercel автоматически подхватит настройки при импорте проекта.
+Файлы `vercel.json` в каждой папке `apps/` уже созданы и настроены. Vercel автоматически подхватит настройки при импорте проекта. Вы можете оставить Build Command пустым в Dashboard - Vercel возьмет его из `vercel.json`.
 
 ## Проверка
 
