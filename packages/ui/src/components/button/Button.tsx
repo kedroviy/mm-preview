@@ -5,12 +5,13 @@ import { forwardRef } from "react";
 
 export interface ButtonProps extends PrimeButtonProps {
   children: React.ReactNode;
+  className?: string;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ children, ...props }, ref) => {
+  ({ children, className, ...props }, ref) => {
     return (
-      <PrimeButton ref={ref} {...props}>
+      <PrimeButton ref={ref} className={className} {...props}>
         {children}
       </PrimeButton>
     );
