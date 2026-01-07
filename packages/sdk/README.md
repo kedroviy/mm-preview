@@ -86,7 +86,7 @@ function App() {
 import { createApiClient } from "@mm-preview/sdk";
 
 const customApi = createApiClient({
-  baseURL: "http://localhost:3000/api",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000",
   timeout: 5000,
   headers: {
     Authorization: "Bearer token",
@@ -123,9 +123,11 @@ try {
 ## Конфигурация
 
 По умолчанию клиент использует:
-- `baseURL`: `http://localhost:3000/api`
+- `baseURL`: из переменной окружения `NEXT_PUBLIC_API_URL` (fallback: `http://localhost:4000` для локальной разработки)
 - `timeout`: 30000ms (30 секунд)
 - `Content-Type`: `application/json`
+
+**Важно:** Для продакшена обязательно установите переменную окружения `NEXT_PUBLIC_API_URL` в настройках Vercel или через `.env.local`.
 
 ## API
 

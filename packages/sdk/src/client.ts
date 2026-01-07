@@ -14,7 +14,7 @@ class ApiClient {
     this.baseURL =
       config?.baseURL ||
       process.env.NEXT_PUBLIC_API_URL ||
-      "http://localhost:4000";
+      "http://localhost:4000"; // Fallback для локальной разработки
     this.timeout = config?.timeout || 30000;
     this.defaultHeaders = {
       "Content-Type": "application/json",
