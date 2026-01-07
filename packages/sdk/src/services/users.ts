@@ -1,21 +1,19 @@
 import { api } from "../client";
 
 export interface User {
-  id: string;
+  userId: string;
   name: string;
-  email: string;
-  createdAt: string;
+  lastActive: number;
+  role: "user" | "admin";
 }
 
 export interface CreateUserRequest {
   name: string;
-  email: string;
-  password: string;
+  userId?: string;
 }
 
 export interface UpdateUserRequest {
   name?: string;
-  email?: string;
 }
 
 export const usersApi = {
@@ -29,28 +27,22 @@ export const usersApi = {
   /**
    * Получить пользователя по ID
    */
-  getUserById: async (id: string) => {
-    return api.get<User>(`/users/${id}`);
+  getUserById: async (userId: string) => {
+    return api.get<User>(`/users/${userId}`);
   },
 
   /**
    * Создать нового пользователя
+   * Токен автоматически устанавливается в куки через Set-Cookie заголовок
    */
   createUser: async (data: CreateUserRequest) => {
     return api.post<User>("/users", data);
   },
 
   /**
-   * Обновить пользователя
+   * Обновить имя пользователя
    */
-  updateUser: async (id: string, data: UpdateUserRequest) => {
-    return api.put<User>(`/users/${id}`, data);
-  },
-
-  /**
-   * Удалить пользователя
-   */
-  deleteUser: async (id: string) => {
-    return api.delete<void>(`/users/${id}`);
+  updateUserName: async (userId: string, name: string) => {
+    return api.patch<User>(`/users/${userId}/name`, { name });
   },
 };

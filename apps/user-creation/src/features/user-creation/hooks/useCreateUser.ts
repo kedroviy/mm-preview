@@ -2,19 +2,16 @@ import {
   type CreateUserRequest,
   useCreateUser as useSDKCreateUser,
 } from "@mm-preview/sdk";
-import { getAppUrls } from "@/src/shared/config/constants";
+import type { UseMutationOptions } from "@tanstack/react-query";
 
 export function useCreateUser() {
   const mutation = useSDKCreateUser();
 
-  const mutate = (data: CreateUserRequest) => {
-    mutation.mutate(data, {
-      onSuccess: () => {
-        // Redirect to dashboard after successful user creation
-        const urls = getAppUrls();
-        window.location.href = urls.DASHBOARD;
-      },
-    });
+  const mutate = (
+    data: CreateUserRequest,
+    options?: UseMutationOptions<unknown, unknown, CreateUserRequest>,
+  ) => {
+    mutation.mutate(data, options);
   };
 
   return {

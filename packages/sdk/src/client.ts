@@ -1,4 +1,5 @@
 import type { ApiError, ApiResponse, RequestConfig } from "./types";
+import { getAccessToken } from "./utils/cookies";
 
 class ApiClient {
   private baseURL: string;
@@ -10,7 +11,10 @@ class ApiClient {
     timeout?: number;
     headers?: HeadersInit;
   }) {
-    this.baseURL = config?.baseURL || "http://localhost:3000/api";
+    this.baseURL =
+      config?.baseURL ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      "http://localhost:4000";
     this.timeout = config?.timeout || 30000;
     this.defaultHeaders = {
       "Content-Type": "application/json",
@@ -43,10 +47,16 @@ class ApiClient {
     const { params, timeout = this.timeout, ...fetchConfig } = config;
 
     const fullURL = this.buildURL(url, params);
-    const headers = {
-      ...this.defaultHeaders,
-      ...fetchConfig.headers,
+    const token = getAccessToken();
+    const headers: Record<string, string> = {
+      ...(this.defaultHeaders as Record<string, string>),
+      ...(fetchConfig.headers as Record<string, string>),
     };
+
+    // Добавляем токен в заголовок Authorization, если он есть
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -56,6 +66,7 @@ class ApiClient {
         ...fetchConfig,
         headers,
         signal: controller.signal,
+        credentials: "include", // Включаем отправку кук
       });
 
       clearTimeout(timeoutId);

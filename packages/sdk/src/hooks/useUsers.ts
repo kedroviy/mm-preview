@@ -1,9 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  type CreateUserRequest,
-  type UpdateUserRequest,
-  usersApi,
-} from "../services/users";
+import { type CreateUserRequest, usersApi } from "../services/users";
 
 export const userKeys = {
   all: ["users"] as const,
@@ -49,37 +45,18 @@ export function useCreateUser() {
   });
 }
 
-export function useUpdateUser() {
+export function useUpdateUserName() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      id,
-      data,
-    }: {
-      id: string;
-      data: UpdateUserRequest;
-    }) => {
-      const response = await usersApi.updateUser(id, data);
+    mutationFn: async ({ userId, name }: { userId: string; name: string }) => {
+      const response = await usersApi.updateUserName(userId, name);
       return response.data;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: userKeys.detail(variables.id),
+        queryKey: userKeys.detail(variables.userId),
       });
-      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
-    },
-  });
-}
-
-export function useDeleteUser() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (id: string) => {
-      await usersApi.deleteUser(id);
-    },
-    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
     },
   });
