@@ -3,11 +3,12 @@
 import { Button } from "@mm-preview/ui";
 import { AnimateOnScroll } from "primereact/animateonscroll";
 import { Avatar } from "primereact/avatar";
-import { APP_URLS } from "@/src/shared/config/constants";
+import { getAppUrls } from "@/src/shared/config/constants";
 
 export default function MainBlock() {
   const handleCreateUser = () => {
-    window.location.href = APP_URLS.USER_CREATION;
+    const urls = getAppUrls();
+    window.location.href = urls.USER_CREATION;
   };
 
   return (

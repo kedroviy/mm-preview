@@ -2,7 +2,7 @@ import {
   type CreateUserRequest,
   useCreateUser as useSDKCreateUser,
 } from "@mm-preview/sdk";
-import { APP_URLS } from "@/src/shared/config/constants";
+import { getAppUrls } from "@/src/shared/config/constants";
 
 export function useCreateUser() {
   const mutation = useSDKCreateUser();
@@ -11,7 +11,8 @@ export function useCreateUser() {
     mutation.mutate(data, {
       onSuccess: () => {
         // Redirect to dashboard after successful user creation
-        window.location.href = APP_URLS.DASHBOARD;
+        const urls = getAppUrls();
+        window.location.href = urls.DASHBOARD;
       },
     });
   };

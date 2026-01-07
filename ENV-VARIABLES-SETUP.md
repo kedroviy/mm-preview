@@ -1,4 +1,4 @@
-# Настройка переменных окружения для URL приложений
+# Настройка URL приложений для переходов между приложениями
 
 ## Проблема
 
@@ -6,7 +6,15 @@
 
 ## Решение
 
-Используются переменные окружения с fallback на локальные значения для разработки.
+Используется **динамическое определение URL** на основе текущего домена:
+1. Сначала проверяются переменные окружения (если установлены)
+2. Затем определяется URL на основе текущего домена (автоматически для Vercel)
+3. Fallback на локальные URL для разработки
+
+**Преимущества:**
+- ✅ Работает автоматически на Vercel без настройки переменных окружения
+- ✅ Работает локально с Nginx
+- ✅ Можно переопределить через переменные окружения при необходимости
 
 ## Локальная разработка
 
@@ -89,33 +97,28 @@ NEXT_PUBLIC_DASHBOARD_URL=https://dashboard.yourdomain.com
 
 ## Как это работает
 
-В файле `src/shared/config/constants.ts` каждого приложения:
+В файле `src/shared/config/constants.ts` каждого приложения используется динамическое определение URL:
+
+1. **Проверка переменных окружения** - если установлены `NEXT_PUBLIC_*_URL`, используются они
+2. **Автоматическое определение для Vercel** - если домен содержит `vercel.app`, URL строятся автоматически:
+   - `mm-preview-landing.vercel.app` → `mm-preview-user-creation.vercel.app`
+   - `mm-preview-landing.vercel.app` → `mm-preview-dashboard.vercel.app`
+3. **Автоматическое определение для локальной разработки** - если домен содержит `.local`:
+   - `landing.local` → `user-creation.local`
+   - `landing.local` → `dashboard.local`
+4. **Fallback** - если ничего не подошло, используются локальные URL
+
+**Использование:**
 
 ```typescript
-function getAppUrl(key: "LANDING" | "USER_CREATION" | "DASHBOARD"): string {
-  const envKey = `NEXT_PUBLIC_${key}_URL`;
-  const envValue = process.env[envKey];
+import { getAppUrls } from "@/src/shared/config/constants";
 
-  if (envValue) {
-    return envValue; // Используется значение из .env
-  }
-
-  // Fallback на локальные URL для разработки
-  const localUrls = {
-    LANDING: "http://landing.local",
-    USER_CREATION: "http://user-creation.local",
-    DASHBOARD: "http://dashboard.local",
-  };
-
-  return localUrls[key];
-}
-
-export const APP_URLS = {
-  LANDING: getAppUrl("LANDING"),
-  USER_CREATION: getAppUrl("USER_CREATION"),
-  DASHBOARD: getAppUrl("DASHBOARD"),
-} as const;
+// В клиентском компоненте
+const urls = getAppUrls();
+window.location.href = urls.USER_CREATION;
 ```
+
+**Важно:** Используйте функцию `getAppUrls()` вместо константы `APP_URLS` для динамического определения URL в runtime.
 
 ## Проверка
 

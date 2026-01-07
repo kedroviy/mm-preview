@@ -1,11 +1,12 @@
 "use client";
 
 import { Button } from "@mm-preview/ui";
-import { APP_URLS } from "@/src/shared/config/constants";
+import { getAppUrls } from "@/src/shared/config/constants";
 
 export function Header() {
   const handleStart = () => {
-    window.location.href = APP_URLS.USER_CREATION;
+    const urls = getAppUrls();
+    window.location.href = urls.USER_CREATION;
   };
 
   return (
