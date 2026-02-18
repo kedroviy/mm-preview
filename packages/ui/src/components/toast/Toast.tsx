@@ -4,6 +4,7 @@ import { Toast as PrimeToast } from "primereact/toast";
 import { useEffect, useRef } from "react";
 import type { ToastMessage } from "../../services/notification";
 import { notificationService } from "../../services/notification";
+import "./Toast.css";
 
 export function Toast() {
   // biome-ignore lint/suspicious/noExplicitAny: PrimeReact 10 Toast type is not fully typed yet
@@ -24,5 +25,9 @@ export function Toast() {
   }, []);
 
   // biome-ignore lint/suspicious/noExplicitAny: PrimeReact 10 Toast type is not fully typed yet
-  return <PrimeToast ref={toastRef as any} />;
+  return (
+    <div className="mm-toast">
+      <PrimeToast ref={toastRef as any} />
+    </div>
+  );
 }

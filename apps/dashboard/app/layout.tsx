@@ -24,8 +24,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={font.className}>
-      <body className="font-sans antialiased">
+    <html lang="en" className={font.className} suppressHydrationWarning>
+      <body className="font-sans antialiased" suppressHydrationWarning>
         <Provider>
           <ClientPageTransition>{children}</ClientPageTransition>
         </Provider>

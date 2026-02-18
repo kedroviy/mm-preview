@@ -65,7 +65,6 @@ export { roomsApi } from "./services/rooms";
 // Use direct fetch in server components instead
 
 // Generated exports (will be available after running generate:all)
-// Uncomment after first generation:
-// export * from "./generated/types";
-// export * from "./generated/requests";
-// export * from "./generated/hooks";
+export * from "./generated/types";
+export * from "./generated/requests";
+export * from "./generated/hooks";

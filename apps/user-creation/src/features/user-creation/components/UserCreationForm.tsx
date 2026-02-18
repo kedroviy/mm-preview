@@ -43,7 +43,7 @@ export function UserCreationForm() {
     console.log("Hostname:", window.location.hostname);
     console.log("Port:", window.location.port);
     console.log("Dashboard URL:", urls.DASHBOARD);
-    window.location.href = `${urls.DASHBOARD}?userId=${createdUser.userId}`;
+    window.location.href = `${urls.DASHBOARD}/${createdUser.userId}`;
   };
 
   const onSubmit = (data: UserFormData) => {

@@ -177,7 +177,7 @@ export function useAutoLogin() {
   useEffect(() => {
     if (user && shouldRedirect && !isUserLoading) {
       const urls = getAppUrls();
-      router.push(`${urls.DASHBOARD}?userId=${user.userId}`);
+      router.push(`${urls.DASHBOARD}/${user.userId}`);
     }
   }, [user, shouldRedirect, isUserLoading, router]);
 

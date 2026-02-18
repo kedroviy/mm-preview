@@ -1,30 +1,39 @@
 "use client";
 
-import { useUser } from "@mm-preview/sdk";
+import { useUsersController_getProfile } from "@mm-preview/sdk";
 import { Button } from "@mm-preview/ui";
-import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
 import { useViewTransition, ViewTransition } from "@/src/shared/components/ViewTransition";
 import { useWebSocketMyRooms } from "@/src/shared/hooks/useWebSocketMyRooms";
 
-function DashboardContent() {
-  const searchParams = useSearchParams();
-  const userId = searchParams?.get("userId") || "";
-  const { data: user, isLoading, error } = useUser(userId);
-  const { rooms: myRooms, isLoading: isMyRoomsLoading } = useWebSocketMyRooms(userId, !!userId);
+interface DashboardClientProps {
+  userId: string;
+  initialProfile?: {
+    userId: string;
+    name: string;
+    role?: string;
+    lastActive?: number;
+    recentRooms?: string[];
+    rooms?: unknown[];
+  } | null;
+}
+
+export function DashboardClient({ userId, initialProfile }: DashboardClientProps) {
+  // Если есть initialProfile, отключаем запрос через хук
+  // Иначе используем хук для запроса
+  // queryKey устанавливается внутри хука, поэтому используем as any для обхода проверки типов
+  const queryResult = useUsersController_getProfile(
+    initialProfile ? ({ enabled: false } as any) : undefined
+  );
+  
+  // Используем initialProfile если есть, иначе данные из запроса
+  const profile = initialProfile || queryResult.data;
+  const isLoading = initialProfile ? false : queryResult.isLoading;
+  const error = initialProfile ? null : queryResult.error;
+  const profileUserId = profile?.userId || userId;
+  const { rooms: myRooms, isLoading: isMyRoomsLoading } = useWebSocketMyRooms(profileUserId, !!profileUserId);
   const { navigate, isPending } = useViewTransition();
 
-  if (!userId) {
-    return (
-      <div className="min-h-screen p-8 flex items-center justify-center" suppressHydrationWarning>
-        <div className="text-center" suppressHydrationWarning>
-          <p className="text-lg text-muted-color">User ID is required</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isLoading) {
+  if (isLoading && !initialProfile) {
     return (
       <div className="min-h-screen p-8 flex items-center justify-center" suppressHydrationWarning>
         <div className="text-center" suppressHydrationWarning>
@@ -34,15 +43,17 @@ function DashboardContent() {
     );
   }
 
-  if (error || !user) {
+  if (error || !profile) {
     return (
       <div className="min-h-screen p-8 flex items-center justify-center" suppressHydrationWarning>
         <div className="text-center" suppressHydrationWarning>
-          <p className="text-lg text-red-600">Failed to load user data</p>
+          <p className="text-lg text-red-600">Failed to load user profile</p>
         </div>
       </div>
     );
   }
+
+  const user = profile;
 
   return (
     <ViewTransition name="page">
@@ -66,7 +77,7 @@ function DashboardContent() {
                 tooltip="Создайте комнату, присоединитесь к существующей или вернитесь в недавнюю комнату"
                 tooltipOptions={{ position: "bottom" }}
                 onClick={() => {
-                  navigate(`/rooms?userId=${user.userId}`);
+                  navigate(`/${user.userId}/rooms`);
                 }}
                 disabled={isPending}
               />
@@ -96,14 +107,6 @@ function DashboardContent() {
         </div>
       </div>
     </ViewTransition>
-  );
-}
-
-export default function DashboardPage() {
-  return (
-    <Suspense fallback={null}>
-      <DashboardContent />
-    </Suspense>
   );
 }
 

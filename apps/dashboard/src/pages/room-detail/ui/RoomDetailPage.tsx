@@ -2,7 +2,7 @@
 
 import {
   useRoom,
-  useUser,
+  useUsersController_getProfile,
   useLeaveRoom,
   useRoomMembers,
 } from "@mm-preview/sdk";
@@ -22,14 +22,14 @@ type ViewConfig = {
   render: () => React.ReactElement | null;
 };
 
-function RoomContent() {
-  const params = useParams();
-  const searchParams = useSearchParams();
-  const roomId = (params?.roomId as string) || "";
-  const userId = searchParams?.get("userId") || "";
+interface RoomDetailPageProps {
+  userId: string;
+  roomId: string;
+}
 
+function RoomContent({ userId, roomId }: RoomDetailPageProps) {
   const { data: room, isLoading: roomLoading } = useRoom(roomId);
-  const { data: user } = useUser(userId);
+  const { data: profile } = useUsersController_getProfile();
   const { data: members } = useRoomMembers(roomId);
   const leaveRoom = useLeaveRoom();
   const { navigate, isPending } = useViewTransition();
@@ -52,13 +52,13 @@ function RoomContent() {
     try {
       await leaveRoom.mutateAsync({ roomId, userId });
       notificationService.showSuccess("Вы покинули комнату");
-      navigate(`/rooms?userId=${userId}`);
+      navigate(`/${userId}/rooms`);
     } catch (error) {
       notificationService.showError("Не удалось покинуть комнату");
     }
   }, [userId, roomId, leaveRoom, navigate]);
 
-  const handleBack = useCallback(() => navigate(`/rooms?userId=${userId}`), [navigate, userId]);
+  const handleBack = useCallback(() => navigate(`/${userId}/rooms`), [navigate, userId]);
   const handleRemoveMember = useCallback((memberUserId: string) => {
     notificationService.showInfo("Функция удаления участника будет добавлена");
   }, []);
@@ -167,9 +167,9 @@ function RoomContent() {
                 />
                 <RoomChoices room={room} currentUserId={userId} />
               </div>
-              {user && (
+              {profile && (
                 <ChatWindow
-                  userId={userId}
+                  userId={profile.userId}
                   messages={chatMessages}
                   onSendMessage={sendChatMessage}
                   isLoading={!isChatConnected}
@@ -186,7 +186,7 @@ function RoomContent() {
     roomLoading,
     room,
     members,
-    user,
+    profile,
     chatMessages,
     isChatConnected,
     isMuted,
@@ -202,10 +202,10 @@ function RoomContent() {
   return viewConfig.render();
 }
 
-export default function RoomDetailPage() {
+export function RoomDetailPage({ userId, roomId }: RoomDetailPageProps) {
   return (
     <Suspense fallback={null}>
-      <RoomContent />
+      <RoomContent userId={userId} roomId={roomId} />
     </Suspense>
   );
 }

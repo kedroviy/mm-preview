@@ -29,6 +29,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
       style={{
         viewTransitionName: transitionName,
       }}
+      suppressHydrationWarning
     >
       {children}
     </div>

@@ -1,6 +1,5 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { decodeJWT } from "@mm-preview/sdk";
 
 function getDashboardUrl(request: NextRequest): string {
   const envValue = process.env.NEXT_PUBLIC_DASHBOARD_URL;
@@ -32,92 +31,185 @@ function getDashboardUrl(request: NextRequest): string {
 }
 
 export async function middleware(request: NextRequest) {
+  // Проверяем, что мы на странице user-creation (корневой путь)
+  const pathname = request.nextUrl.pathname;
+  const isUserCreationPage = pathname === "/";
+
+  // Если не на странице создания пользователя, пропускаем
+  if (!isUserCreationPage) {
+    return NextResponse.next();
+  }
+
   const accessToken = request.cookies.get("access_token");
   const refreshToken = request.cookies.get("refresh_token");
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-  // Если есть access_token, декодируем его и редиректим
-  if (accessToken?.value) {
-    const decoded = decodeJWT(accessToken.value);
-    if (decoded?.userId) {
-      const dashboardUrl = getDashboardUrl(request);
-      return NextResponse.redirect(new URL(`${dashboardUrl}?userId=${decoded.userId}`));
+  // Формируем строку кук только из нужных токенов
+  function buildCookieString(token?: { name: string; value: string }): string {
+    const cookies: string[] = [];
+    if (token) {
+      cookies.push(`${token.name}=${token.value}`);
     }
+    if (refreshToken?.value) {
+      cookies.push(`refresh_token=${refreshToken.value}`);
+    }
+    return cookies.join("; ");
+  }
+
+  // Функция для получения профиля и редиректа
+  async function fetchProfileAndRedirect(token?: { name: string; value: string }): Promise<NextResponse | null> {
+    try {
+      const cookieString = buildCookieString(token);
+      const tokenValue = token?.value;
+      
+      console.log("[user-creation middleware] Fetching profile:");
+      console.log("  - Cookie string:", cookieString || "missing");
+      console.log("  - Token value:", tokenValue ? `${tokenValue.substring(0, 20)}...` : "missing");
+      console.log("  - API URL:", apiUrl);
+      
+      // Бэкенд может требовать токен и в заголовке Authorization, и в куках
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      
+      // Добавляем Cookie заголовок
+      if (cookieString) {
+        headers.Cookie = cookieString;
+      }
+      
+      // Добавляем Authorization заголовок, если есть токен
+      if (tokenValue) {
+        headers.Authorization = `Bearer ${tokenValue}`;
+        console.log("  - Authorization header: Bearer <token>");
+      }
+      
+      console.log("  - Final headers:", JSON.stringify(Object.keys(headers)));
+      
+      const userResponse = await fetch(`${apiUrl}/users/profile`, {
+        method: "GET",
+        headers: {
+          ...headers,
+          Origin: request.headers.get("origin") || request.url.split("/").slice(0, 3).join("/"),
+        },
+        credentials: "include",
+        cache: "no-store",
+      });
+
+      console.log("[user-creation middleware] Profile response status:", userResponse.status);
+
+      if (userResponse.ok) {
+        const user = await userResponse.json();
+        if (user?.userId) {
+          console.log("[user-creation middleware] Profile fetched, redirecting to dashboard with userId:", user.userId);
+          const dashboardUrl = getDashboardUrl(request);
+          return NextResponse.redirect(new URL(`${dashboardUrl}/${user.userId}`));
+        }
+      } else {
+        const errorText = await userResponse.text().catch(() => "");
+        console.error("[user-creation middleware] Profile fetch failed:", userResponse.status, errorText);
+      }
+    } catch (error) {
+      console.error("[user-creation middleware] Error fetching profile:", error);
+    }
+    return null;
+  }
+
+  // Если есть access_token, проверяем его валидность через запрос к профилю
+  if (accessToken?.value) {
+    const redirectResponse = await fetchProfileAndRedirect(accessToken);
+    if (redirectResponse) {
+      return redirectResponse;
+    }
+    // Если запрос не удался (401/403), продолжаем к refresh_token логике
   }
 
   // Если есть refresh_token, пытаемся обновить access_token
-  if (refreshToken?.value && !accessToken?.value) {
+  if (refreshToken?.value) {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+      // Для refresh используем только refresh_token
+      const refreshCookieString = refreshToken?.value 
+        ? `refresh_token=${refreshToken.value}` 
+        : "";
+      
       const response = await fetch(`${apiUrl}/auth/refresh`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Cookie: request.headers.get("cookie") || "",
+          Cookie: refreshCookieString,
+          Origin: request.headers.get("origin") || request.url.split("/").slice(0, 3).join("/"),
         },
         credentials: "include",
+        cache: "no-store",
       });
 
       if (response.ok) {
         // Refresh успешен, получаем новый access_token из Set-Cookie
         const setCookieHeaders = response.headers.getSetCookie();
         let newAccessToken: string | null = null;
-        let refreshTokenValue: string | null = null;
         
-        // Парсим Set-Cookie заголовки и извлекаем значения токенов
+        // Парсим Set-Cookie заголовки и извлекаем access_token
         for (const cookie of setCookieHeaders) {
-          // Парсим access_token
           const accessMatch = cookie.match(/access_token=([^;]+)/);
           if (accessMatch) {
             newAccessToken = accessMatch[1];
-          }
-          
-          // Парсим refresh_token (может быть обновлен)
-          const refreshMatch = cookie.match(/refresh_token=([^;]+)/);
-          if (refreshMatch) {
-            refreshTokenValue = refreshMatch[1];
+            break;
           }
         }
         
         if (newAccessToken) {
-          const decoded = decodeJWT(newAccessToken);
-          if (decoded?.userId) {
-            const dashboardUrl = getDashboardUrl(request);
-            const redirectResponse = NextResponse.redirect(
-              new URL(`${dashboardUrl}?userId=${decoded.userId}`),
-            );
-            
-            // Устанавливаем куки из Set-Cookie заголовков
-            // Парсим каждый Set-Cookie заголовок и устанавливаем куки через Next.js API
-            for (const cookieHeader of setCookieHeaders) {
-              // Парсим имя куки и значение
-              const nameMatch = cookieHeader.match(/^([^=]+)=([^;]+)/);
-              if (nameMatch) {
-                const cookieName = nameMatch[1];
-                const cookieValue = nameMatch[2];
-                
-                // Парсим дополнительные атрибуты (Path, Domain, Max-Age, HttpOnly, Secure, SameSite)
-                const pathMatch = cookieHeader.match(/Path=([^;]+)/);
-                const domainMatch = cookieHeader.match(/Domain=([^;]+)/);
-                const maxAgeMatch = cookieHeader.match(/Max-Age=([^;]+)/);
-                const httpOnlyMatch = cookieHeader.match(/HttpOnly/);
-                const secureMatch = cookieHeader.match(/Secure/);
-                const sameSiteMatch = cookieHeader.match(/SameSite=([^;]+)/);
-                
-                // Устанавливаем куку через Next.js API
-                redirectResponse.cookies.set(cookieName, cookieValue, {
-                  path: pathMatch ? pathMatch[1] : "/",
-                  domain: domainMatch ? domainMatch[1] : undefined,
-                  maxAge: maxAgeMatch ? parseInt(maxAgeMatch[1], 10) : undefined,
-                  httpOnly: !!httpOnlyMatch,
-                  secure: !!secureMatch,
-                  sameSite: sameSiteMatch 
-                    ? (sameSiteMatch[1].toLowerCase() as "strict" | "lax" | "none")
-                    : "lax",
-                });
+          // Формируем строку кук с новым access_token из refresh ответа
+          const updatedCookieString = buildCookieString({ name: "access_token", value: newAccessToken });
+          
+          // Делаем запрос к профилю с новым токеном (передаем и в Authorization, и в Cookie)
+          const userResponse = await fetch(`${apiUrl}/users/profile`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${newAccessToken}`,
+              Cookie: updatedCookieString,
+              Origin: request.headers.get("origin") || request.url.split("/").slice(0, 3).join("/"),
+            },
+            credentials: "include",
+            cache: "no-store",
+          });
+
+          if (userResponse.ok) {
+            const user = await userResponse.json();
+            if (user?.userId) {
+              const dashboardUrl = getDashboardUrl(request);
+              const redirectResponse = NextResponse.redirect(
+                new URL(`${dashboardUrl}/${user.userId}`),
+              );
+              
+              // Устанавливаем куки из Set-Cookie заголовков
+              for (const cookieHeader of setCookieHeaders) {
+                const nameMatch = cookieHeader.match(/^([^=]+)=([^;]+)/);
+                if (nameMatch) {
+                  const cookieName = nameMatch[1];
+                  const cookieValue = nameMatch[2];
+                  
+                  const pathMatch = cookieHeader.match(/Path=([^;]+)/);
+                  const domainMatch = cookieHeader.match(/Domain=([^;]+)/);
+                  const maxAgeMatch = cookieHeader.match(/Max-Age=([^;]+)/);
+                  const httpOnlyMatch = cookieHeader.match(/HttpOnly/);
+                  const secureMatch = cookieHeader.match(/Secure/);
+                  const sameSiteMatch = cookieHeader.match(/SameSite=([^;]+)/);
+                  
+                  redirectResponse.cookies.set(cookieName, cookieValue, {
+                    path: pathMatch ? pathMatch[1] : "/",
+                    domain: domainMatch ? domainMatch[1] : undefined,
+                    maxAge: maxAgeMatch ? parseInt(maxAgeMatch[1], 10) : undefined,
+                    httpOnly: !!httpOnlyMatch,
+                    secure: !!secureMatch,
+                    sameSite: sameSiteMatch 
+                      ? (sameSiteMatch[1].toLowerCase() as "strict" | "lax" | "none")
+                      : "lax",
+                  });
+                }
               }
+              
+              return redirectResponse;
             }
-            
-            return redirectResponse;
           }
         }
       } else if (response.status === 401 || response.status === 403) {
@@ -129,7 +221,7 @@ export async function middleware(request: NextRequest) {
       }
     } catch (error) {
       // Если refresh не удался, продолжаем показывать форму создания
-      console.error("Error refreshing token in middleware:", error);
+      console.error("[user-creation middleware] Error refreshing token:", error);
     }
   }
 

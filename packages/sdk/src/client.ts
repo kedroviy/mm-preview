@@ -53,7 +53,8 @@ class ApiClient {
       ...(fetchConfig.headers as Record<string, string>),
     };
 
-    // Добавляем токен в заголовок Authorization, если он есть
+    // Добавляем токен в заголовок Authorization, если он доступен через document.cookie
+    // Если токен HttpOnly, он недоступен через document.cookie, но браузер отправит его автоматически в куках
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
@@ -69,10 +70,14 @@ class ApiClient {
         ...restFetchConfig,
         headers,
         signal: controller.signal,
-        credentials: "include", // Включаем отправку кук для CORS
+        credentials: "include", // Включаем отправку кук для CORS (браузер автоматически отправит HttpOnly куки)
       });
 
       clearTimeout(timeoutId);
+
+      // Браузер автоматически устанавливает куки из Set-Cookie заголовков
+      // Если сервер обновил access_token в Set-Cookie, браузер установит его автоматически
+      // HttpOnly куки недоступны через document.cookie, но браузер отправит их в следующих запросах
 
       if (!response.ok) {
         let errorMessage = `HTTP Error: ${response.status} ${response.statusText}`;

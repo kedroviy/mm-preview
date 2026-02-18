@@ -76,18 +76,15 @@ export async function middleware(request: NextRequest) {
 
   // Если нет валидного access_token, проверяем refresh_token
   if (refreshToken?.value) {
-    // Сначала проверяем валидность refresh_token
+    // Проверяем валидность refresh_token
     let isRefreshTokenValid = false;
     try {
       const { decodeJWT } = await import("@mm-preview/sdk");
       const decoded = decodeJWT(refreshToken.value);
-      
-      // Если refresh_token валидный, пытаемся обновить access_token
       if (decoded?.userId) {
         isRefreshTokenValid = true;
       }
     } catch (error) {
-      // Refresh_token невалидный
       console.error("Invalid refresh token:", error);
     }
 
@@ -108,25 +105,24 @@ export async function middleware(request: NextRequest) {
         headers: {
           "Content-Type": "application/json",
           Cookie: request.headers.get("cookie") || "",
+          Origin: request.headers.get("origin") || request.url.split("/").slice(0, 3).join("/"),
         },
         credentials: "include",
       });
 
       if (response.ok) {
-        // Refresh успешен, получаем новый access_token из Set-Cookie
+        // Получаем Set-Cookie заголовки и устанавливаем куки
         const setCookieHeaders = response.headers.getSetCookie();
         const responseWithCookies = NextResponse.next();
         
         // Устанавливаем куки из Set-Cookie заголовков
-        // Парсим каждый Set-Cookie заголовок и устанавливаем куки через Next.js API
         for (const cookieHeader of setCookieHeaders) {
-          // Парсим имя куки и значение
           const nameMatch = cookieHeader.match(/^([^=]+)=([^;]+)/);
           if (nameMatch) {
             const cookieName = nameMatch[1];
             const cookieValue = nameMatch[2];
             
-            // Парсим дополнительные атрибуты (Path, Domain, Max-Age, HttpOnly, Secure, SameSite)
+            // Парсим атрибуты куки
             const pathMatch = cookieHeader.match(/Path=([^;]+)/);
             const domainMatch = cookieHeader.match(/Domain=([^;]+)/);
             const maxAgeMatch = cookieHeader.match(/Max-Age=([^;]+)/);
@@ -134,7 +130,6 @@ export async function middleware(request: NextRequest) {
             const secureMatch = cookieHeader.match(/Secure/);
             const sameSiteMatch = cookieHeader.match(/SameSite=([^;]+)/);
             
-            // Устанавливаем куку через Next.js API
             responseWithCookies.cookies.set(cookieName, cookieValue, {
               path: pathMatch ? pathMatch[1] : "/",
               domain: domainMatch ? domainMatch[1] : undefined,
@@ -149,8 +144,8 @@ export async function middleware(request: NextRequest) {
         }
         
         return responseWithCookies;
-      } else if (response.status === 401 || response.status === 403) {
-        // Токен невалидный на сервере - очищаем куки и редиректим на страницу входа
+      } else {
+        // Refresh не удался - очищаем куки и редиректим
         const userCreationUrl = getUserCreationUrl(request);
         const redirectResponse = NextResponse.redirect(new URL(userCreationUrl));
         redirectResponse.cookies.delete("access_token");
@@ -158,7 +153,6 @@ export async function middleware(request: NextRequest) {
         return redirectResponse;
       }
     } catch (error) {
-      // Если refresh не удался, редиректим на страницу входа
       console.error("Error refreshing token in middleware:", error);
       const userCreationUrl = getUserCreationUrl(request);
       const redirectResponse = NextResponse.redirect(new URL(userCreationUrl));
@@ -166,13 +160,6 @@ export async function middleware(request: NextRequest) {
       redirectResponse.cookies.delete("refresh_token");
       return redirectResponse;
     }
-    
-    // Если refresh не удался по другой причине, редиректим на страницу входа
-    const userCreationUrl = getUserCreationUrl(request);
-    const redirectResponse = NextResponse.redirect(new URL(userCreationUrl));
-    redirectResponse.cookies.delete("access_token");
-    redirectResponse.cookies.delete("refresh_token");
-    return redirectResponse;
   }
 
   // Если нет refresh_token, редиректим на страницу создания пользователя

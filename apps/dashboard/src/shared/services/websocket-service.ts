@@ -173,14 +173,17 @@ class WebSocketService {
       }
     });
 
-    // Token refresh
-    this.socket.on("tokenRefreshed", (data: { accessToken: string; message?: string }) => {
-      console.log("🔄 Токен обновлен через WebSocket:", data.message || "Новый access token получен");
-      if (data.accessToken) {
-        setAccessToken(data.accessToken);
-      }
-      this.emit("tokenRefreshed", data);
-    });
+          // Token refresh
+          this.socket.on("tokenRefreshed", (data: { accessToken: string; message?: string }) => {
+            console.log("🔄 Токен обновлен через WebSocket:", data.message || "Новый access token получен");
+            if (data.accessToken) {
+              setAccessToken(data.accessToken);
+              // Сбрасываем флаги ошибок аутентификации при успешном обновлении токена
+              this.authErrorCount = 0;
+              this.shouldStopReconnecting = false;
+            }
+            this.emit("tokenRefreshed", data);
+          });
 
     // My rooms
     this.socket.on("myRooms", (data: { rooms: Room[] }) => {
@@ -263,11 +266,35 @@ class WebSocketService {
   private async handleAuthFailure(): Promise<void> {
     const { removeAllAuthTokens } = await import("@mm-preview/sdk");
     removeAllAuthTokens();
-    const userCreationUrl = process.env.NEXT_PUBLIC_USER_CREATION_URL;
+    
+    // Определяем URL для user-creation динамически
+    let userCreationUrl: string | null = null;
+    
+    // Проверяем переменную окружения
+    if (process.env.NEXT_PUBLIC_USER_CREATION_URL) {
+      userCreationUrl = process.env.NEXT_PUBLIC_USER_CREATION_URL;
+    } else if (typeof window !== "undefined") {
+      // Динамическое определение URL
+      const hostname = window.location.hostname;
+      const protocol = window.location.protocol;
+      
+      // Production - Vercel
+      if (hostname.includes("vercel.app")) {
+        const parts = hostname.split(".");
+        const baseDomain = parts.length >= 2 ? parts.slice(-2).join(".") : "vercel.app";
+        userCreationUrl = `https://mm-preview-user-creation.${baseDomain}`;
+      }
+      // Dev mode - IP address or localhost
+      else if (/^(\d{1,3}\.){3}\d{1,3}$/.test(hostname) || hostname === "localhost" || hostname === "127.0.0.1") {
+        userCreationUrl = `${protocol}//${hostname}:3001`;
+      }
+    }
+    
     if (!userCreationUrl) {
-      console.error("❌ NEXT_PUBLIC_USER_CREATION_URL is not set");
+      console.error("❌ Could not determine user creation URL");
       return;
     }
+    
     console.error("🔴 Перенаправление на страницу входа из-за ошибок аутентификации");
     window.location.href = userCreationUrl;
   }

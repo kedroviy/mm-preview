@@ -15,12 +15,11 @@ import type { Room } from "@/src/entities/room";
 type ViewMode = "menu" | "create" | "join";
 
 interface RoomsPageClientProps {
+  userId: string;
   initialRooms: Room[];
 }
 
-export function RoomsPageClient({ initialRooms }: RoomsPageClientProps) {
-  const searchParams = useSearchParams();
-  const userId = searchParams?.get("userId") || "";
+export function RoomsPageClient({ userId, initialRooms }: RoomsPageClientProps) {
   const { rooms: myRooms, isLoading: isMyRoomsLoading, refreshRooms } = useWebSocketMyRooms(userId, !!userId);
   const [viewMode, setViewMode] = useState<ViewMode>("menu");
   const { navigate, isPending } = useViewTransition();
@@ -29,16 +28,16 @@ export function RoomsPageClient({ initialRooms }: RoomsPageClientProps) {
 
   const handleCreateSuccess = (result: any) => {
     refreshRooms();
-    navigate(`/rooms/${result.roomId}?userId=${userId}`);
+    navigate(`/${userId}/rooms/${result.roomId}`);
   };
 
   const handleJoinSuccess = (result: any) => {
     refreshRooms();
-    navigate(`/rooms/${result.roomId}?userId=${userId}`);
+    navigate(`/${userId}/rooms/${result.roomId}`);
   };
 
   const handleConnect = (roomId: string) => {
-    navigate(`/rooms/${roomId}?userId=${userId}`);
+    navigate(`/${userId}/rooms/${roomId}`);
   };
 
   const handleDelete = (roomId: string) => {
@@ -63,7 +62,7 @@ export function RoomsPageClient({ initialRooms }: RoomsPageClientProps) {
           <div className="max-w-4xl mx-auto">
             <div className="mb-6">
               <Button
-                onClick={() => navigate(`/?userId=${userId}`)}
+                onClick={() => navigate(`/${userId}`)}
                 text
                 className="mb-4"
                 disabled={isPending}

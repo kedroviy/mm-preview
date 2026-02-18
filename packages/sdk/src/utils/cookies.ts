@@ -57,7 +57,8 @@ export function deleteCookie(name: string): void {
 }
 
 export function getAccessToken(): string | null {
-  return getCookie(COOKIE_NAME);
+  const token = getCookie(COOKIE_NAME);
+  return token;
 }
 
 export function setAccessToken(token: string): void {
@@ -82,3 +83,4 @@ export function removeAllAuthTokens(): void {
   removeAccessToken();
   removeRefreshToken();
 }
+

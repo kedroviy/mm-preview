@@ -12,7 +12,7 @@ function getAppUrl(key: "LANDING" | "USER_CREATION" | "DASHBOARD"): string {
     return envValue;
   }
 
-  // Dynamic URL detection based on current domain
+  // Dynamic URL detection based on current domain (только на клиенте)
   if (typeof window !== "undefined") {
     const hostname = window.location.hostname;
     const protocol = window.location.protocol;
@@ -46,6 +46,19 @@ function getAppUrl(key: "LANDING" | "USER_CREATION" | "DASHBOARD"): string {
       };
       return `${protocol}//${hostname}:${devPorts[key]}`;
     }
+  }
+  
+  // На сервере используем fallback для dev режима
+  // Если это не клиент и не установлена env переменная, предполагаем dev режим
+  const isDevMode = process.env.NODE_ENV === "development" || !process.env.NODE_ENV;
+  if (isDevMode) {
+    const devPorts: Record<string, string> = {
+      LANDING: "3000",
+      USER_CREATION: "3001",
+      DASHBOARD: "3002",
+    };
+    // На сервере в dev режиме используем localhost
+    return `http://localhost:${devPorts[key]}`;
   }
 
   // If no environment variable and not in dev/production mode, throw error
