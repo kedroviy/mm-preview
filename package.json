@@ -16,7 +16,8 @@
     "format:imports": "biome check --write",
     "format:all": "biome check --write",
     "test": "turbo run test",
-    "storybook": "turbo run storybook"
+    "storybook": "turbo run storybook",
+    "sdk:generate": "npm run generate:all --workspace=@mm-preview/sdk"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",

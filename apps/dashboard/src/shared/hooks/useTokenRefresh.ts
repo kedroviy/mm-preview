@@ -1,0 +1,77 @@
+"use client";
+
+import { useEffect, useCallback } from "react";
+import {
+  getAccessToken,
+  getRefreshToken,
+  authApi,
+  setAccessToken,
+  removeAllAuthTokens,
+  getUserIdFromToken,
+} from "@mm-preview/sdk";
+
+/**
+ * Хук для проверки и обновления токена на клиенте
+ * Используется на страницах где нужно убедиться что токен актуален
+ */
+export function useTokenRefresh() {
+  const checkAndRefreshToken = useCallback(async () => {
+    try {
+      // Проверяем access_token
+      let accessToken = getAccessToken();
+      
+      // Если access_token есть, проверяем его валидность (простая проверка структуры)
+      if (accessToken) {
+        const userId = getUserIdFromToken(accessToken);
+        if (userId) {
+          // Токен выглядит валидным
+          return;
+        }
+      }
+
+      // Если access_token нет или невалидный, проверяем refresh_token
+      const refreshToken = getRefreshToken();
+      
+      if (!refreshToken) {
+        // Нет refresh_token, возможно он HTTP-only
+        // Пытаемся обновить токен через API (браузер отправит HTTP-only cookie автоматически)
+        try {
+          const response = await authApi.refreshToken();
+          if (response.data?.accessToken) {
+            setAccessToken(response.data.accessToken);
+            console.log("✅ Token refreshed via API");
+          }
+        } catch (error) {
+          console.error("❌ Failed to refresh token:", error);
+          // Если refresh не удался, очищаем токены
+          removeAllAuthTokens();
+        }
+        return;
+      }
+
+      // Если refresh_token есть, пытаемся обновить
+      try {
+        const response = await authApi.refreshToken();
+        if (response.data?.accessToken) {
+          setAccessToken(response.data.accessToken);
+          console.log("✅ Token refreshed via API");
+        }
+      } catch (error) {
+        console.error("❌ Failed to refresh token:", error);
+        removeAllAuthTokens();
+      }
+    } catch (error) {
+      console.error("Error in token refresh check:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Проверяем токен при монтировании компонента
+    checkAndRefreshToken();
+  }, [checkAndRefreshToken]);
+
+  return {
+    refreshToken: checkAndRefreshToken,
+  };
+}
+

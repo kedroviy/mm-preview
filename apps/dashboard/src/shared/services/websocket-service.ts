@@ -1,0 +1,404 @@
+"use client";
+
+import { io, Socket } from "socket.io-client";
+import { getAccessToken, setAccessToken, getRefreshToken } from "@mm-preview/sdk";
+import type { Room, ChatMessage } from "@mm-preview/sdk";
+
+export interface WebSocketServiceEvents {
+  connect: () => void;
+  disconnect: (reason: string) => void;
+  error: (error: { message: string; code: string; event?: string }) => void;
+  tokenRefreshed: (data: { accessToken: string; message?: string }) => void;
+  myRooms: (data: { rooms: Room[] }) => void;
+  joinedRoom: (data: { roomId: string; publicCode: string; room: Room }) => void;
+  leftRoom: (data: { roomId: string }) => void;
+  chatHistory: (data: { roomId: string; messages: ChatMessage[] }) => void;
+  newMessage: (data: { roomId: string; message: ChatMessage }) => void;
+  roomUpdate: (data: { roomId: string; room: Room; event: string; userId?: string }) => void;
+}
+
+type EventListener<T extends keyof WebSocketServiceEvents> = WebSocketServiceEvents[T];
+
+class WebSocketService {
+  private socket: Socket | null = null;
+  private listeners: Map<keyof WebSocketServiceEvents, Set<EventListener<any>>> = new Map();
+  private currentRoomId: string | null = null;
+  private reconnectAttempts = 0;
+  private maxReconnectAttempts = 5;
+  private isConnecting = false;
+
+  /**
+   * Получить URL для WebSocket соединения
+   */
+  private getSocketUrl(): string {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    const wsUrl = apiUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
+    const wsProtocol = apiUrl.startsWith("https") ? "wss:" : "ws:";
+    return `${wsProtocol}//${wsUrl}/rooms`;
+  }
+
+  /**
+   * Подключиться к WebSocket серверу
+   */
+  connect(): void {
+    if (this.socket?.connected || this.isConnecting) {
+      console.log("WebSocket уже подключен или подключение в процессе");
+      return;
+    }
+
+    this.isConnecting = true;
+
+    try {
+      const token = getAccessToken();
+      const socketUrl = this.getSocketUrl();
+
+      console.log("🔌 Подключение к WebSocket:", socketUrl);
+
+      const socketConfig: any = {
+        transports: ["websocket"],
+        reconnection: true,
+        reconnectionDelay: 1000,
+        reconnectionAttempts: this.maxReconnectAttempts,
+        withCredentials: true,
+      };
+
+      if (token) {
+        socketConfig.auth = { token };
+      }
+
+      this.socket = io(socketUrl, socketConfig);
+      this.setupEventHandlers();
+    } catch (error) {
+      console.error("❌ Ошибка создания WebSocket соединения:", error);
+      this.isConnecting = false;
+      this.emit("error", {
+        message: "Ошибка создания соединения",
+        code: "CONNECTION_ERROR",
+      });
+    }
+  }
+
+  /**
+   * Настроить обработчики событий Socket.IO
+   */
+  private setupEventHandlers(): void {
+    if (!this.socket) return;
+
+    this.socket.on("connect", () => {
+      console.log("✅ WebSocket подключен");
+      this.isConnecting = false;
+      this.reconnectAttempts = 0;
+      this.emit("connect");
+    });
+
+    this.socket.on("disconnect", (reason) => {
+      console.log("❌ WebSocket отключен:", reason);
+      this.isConnecting = false;
+      this.emit("disconnect", reason);
+      
+      if (reason === "io server disconnect") {
+        // Сервер принудительно отключил, не переподключаемся автоматически
+        this.socket?.connect();
+      }
+    });
+
+    this.socket.on("connect_error", (error) => {
+      console.error("❌ Ошибка подключения WebSocket:", error.message);
+      this.isConnecting = false;
+      this.reconnectAttempts++;
+      
+      if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+        this.emit("error", {
+          message: `Не удалось подключиться после ${this.maxReconnectAttempts} попыток`,
+          code: "MAX_RECONNECT_ATTEMPTS",
+        });
+      } else {
+        this.emit("error", {
+          message: `Ошибка подключения: ${error.message}`,
+          code: "CONNECTION_ERROR",
+        });
+      }
+    });
+
+    // Token refresh
+    this.socket.on("tokenRefreshed", (data: { accessToken: string; message?: string }) => {
+      console.log("🔄 Токен обновлен через WebSocket:", data.message || "Новый access token получен");
+      if (data.accessToken) {
+        setAccessToken(data.accessToken);
+      }
+      this.emit("tokenRefreshed", data);
+    });
+
+    // My rooms
+    this.socket.on("myRooms", (data: { rooms: Room[] }) => {
+      console.log("📋 Мои комнаты получены:", data.rooms.length, "комнат");
+      this.emit("myRooms", data);
+    });
+
+    // Room events
+    this.socket.on("joinedRoom", (data: { roomId: string; publicCode: string; room: Room }) => {
+      this.currentRoomId = data.roomId;
+      console.log("✅ Присоединились к комнате:", data.roomId);
+      this.emit("joinedRoom", data);
+    });
+
+    this.socket.on("leftRoom", (data: { roomId: string }) => {
+      if (this.currentRoomId === data.roomId) {
+        this.currentRoomId = null;
+      }
+      console.log("👋 Покинули комнату:", data.roomId);
+      this.emit("leftRoom", data);
+    });
+
+    // Chat events
+    this.socket.on("chatHistory", (data: { roomId: string; messages: ChatMessage[] }) => {
+      console.log("📜 История чата получена:", data.messages.length, "сообщений");
+      this.emit("chatHistory", data);
+    });
+
+    this.socket.on("newMessage", (data: { roomId: string; message: ChatMessage }) => {
+      console.log("💬 Новое сообщение:", data.message);
+      this.emit("newMessage", data);
+    });
+
+    // Room updates
+    this.socket.on("roomUpdate", (data: {
+      roomId: string;
+      room: Room;
+      event: string;
+      userId?: string;
+    }) => {
+      console.log("🔄 Обновление комнаты:", data.event);
+      this.emit("roomUpdate", data);
+    });
+
+    // Error handling
+    this.socket.on("error", (error: { message: string; code: string; event?: string }) => {
+      console.error("❌ Ошибка WebSocket:", error.message, error.code);
+      this.emit("error", error);
+    });
+  }
+
+  /**
+   * Отключиться от WebSocket сервера
+   */
+  disconnect(): void {
+    if (this.socket) {
+      this.socket.disconnect();
+      this.socket = null;
+      this.currentRoomId = null;
+      this.isConnecting = false;
+      this.reconnectAttempts = 0;
+      console.log("🔌 WebSocket отключен");
+    }
+  }
+
+  /**
+   * Подписаться на событие
+   */
+  on<T extends keyof WebSocketServiceEvents>(
+    event: T,
+    listener: EventListener<T>
+  ): () => void {
+    if (!this.listeners.has(event)) {
+      this.listeners.set(event, new Set());
+    }
+    this.listeners.get(event)!.add(listener);
+
+    // Возвращаем функцию для отписки
+    return () => {
+      this.off(event, listener);
+    };
+  }
+
+  /**
+   * Отписаться от события
+   */
+  off<T extends keyof WebSocketServiceEvents>(
+    event: T,
+    listener: EventListener<T>
+  ): void {
+    const eventListeners = this.listeners.get(event);
+    if (eventListeners) {
+      eventListeners.delete(listener);
+    }
+  }
+
+  /**
+   * Вызвать событие для всех подписчиков
+   */
+  private emit<T extends keyof WebSocketServiceEvents>(
+    event: T,
+    ...args: Parameters<WebSocketServiceEvents[T]>
+  ): void {
+    const eventListeners = this.listeners.get(event);
+    if (eventListeners) {
+      eventListeners.forEach((listener) => {
+        try {
+          (listener as any)(...args);
+        } catch (error) {
+          console.error(`Ошибка в обработчике события ${event}:`, error);
+        }
+      });
+    }
+  }
+
+  /**
+   * Получить список моих комнат
+   */
+  getMyRooms(): void {
+    if (!this.socket?.connected) {
+      this.emit("error", {
+        message: "WebSocket не подключен",
+        code: "NOT_CONNECTED",
+        event: "getMyRooms",
+      });
+      return;
+    }
+
+    console.log("📋 Запрос моих комнат...");
+    this.socket.emit("getMyRooms", {});
+  }
+
+  /**
+   * Присоединиться к комнате
+   */
+  joinRoom(publicCode: string, userId: string): void {
+    if (!this.socket?.connected) {
+      this.emit("error", {
+        message: "WebSocket не подключен",
+        code: "NOT_CONNECTED",
+        event: "joinRoom",
+      });
+      return;
+    }
+
+    if (!publicCode || !userId) {
+      this.emit("error", {
+        message: "publicCode и userId обязательны",
+        code: "BAD_REQUEST",
+        event: "joinRoom",
+      });
+      return;
+    }
+
+    console.log("🚪 Присоединение к комнате:", publicCode);
+    this.socket.emit("joinRoom", { publicCode, userId });
+  }
+
+  /**
+   * Покинуть комнату
+   */
+  leaveRoom(roomId: string, userId: string): void {
+    if (!this.socket?.connected) {
+      this.emit("error", {
+        message: "WebSocket не подключен",
+        code: "NOT_CONNECTED",
+        event: "leaveRoom",
+      });
+      return;
+    }
+
+    if (!roomId || !userId) {
+      this.emit("error", {
+        message: "roomId и userId обязательны",
+        code: "BAD_REQUEST",
+        event: "leaveRoom",
+      });
+      return;
+    }
+
+    console.log("👋 Выход из комнаты:", roomId);
+    this.socket.emit("leaveRoom", { roomId, userId });
+  }
+
+  /**
+   * Отправить сообщение в чат
+   */
+  sendMessage(roomId: string, message: string): void {
+    if (!this.socket?.connected) {
+      this.emit("error", {
+        message: "WebSocket не подключен",
+        code: "NOT_CONNECTED",
+        event: "sendMessage",
+      });
+      return;
+    }
+
+    if (!roomId || !message || message.trim().length === 0) {
+      this.emit("error", {
+        message: "roomId и message обязательны",
+        code: "BAD_REQUEST",
+        event: "sendMessage",
+      });
+      return;
+    }
+
+    if (message.length > 1000) {
+      this.emit("error", {
+        message: "Сообщение слишком длинное (максимум 1000 символов)",
+        code: "BAD_REQUEST",
+        event: "sendMessage",
+      });
+      return;
+    }
+
+    console.log("💬 Отправка сообщения в комнату:", roomId);
+    this.socket.emit("sendMessage", { roomId, message: message.trim() });
+  }
+
+  /**
+   * Переподключиться к комнате
+   */
+  reconnectToRoom(roomId: string, publicCode: string, userId: string): void {
+    this.joinRoom(publicCode, userId);
+  }
+
+  /**
+   * Проверить, подключен ли WebSocket
+   */
+  isConnected(): boolean {
+    return this.socket?.connected || false;
+  }
+
+  /**
+   * Получить текущий roomId
+   */
+  getCurrentRoomId(): string | null {
+    return this.currentRoomId;
+  }
+
+  /**
+   * Обновить токен и переподключиться
+   */
+  async refreshTokenAndReconnect(): Promise<void> {
+    try {
+      const refreshToken = getRefreshToken();
+      if (!refreshToken) {
+        // Пытаемся обновить через API (HTTP-only cookie)
+        const { authApi } = await import("@mm-preview/sdk");
+        const response = await authApi.refreshToken();
+        if (response.data?.accessToken) {
+          setAccessToken(response.data.accessToken);
+          // Переподключаемся с новым токеном
+          this.disconnect();
+          this.connect();
+        }
+      } else {
+        // Если refresh_token доступен, просто переподключаемся
+        this.disconnect();
+        this.connect();
+      }
+    } catch (error) {
+      console.error("❌ Ошибка обновления токена:", error);
+      this.emit("error", {
+        message: "Не удалось обновить токен",
+        code: "TOKEN_REFRESH_ERROR",
+      });
+    }
+  }
+}
+
+// Singleton instance
+export const webSocketService = new WebSocketService();
+

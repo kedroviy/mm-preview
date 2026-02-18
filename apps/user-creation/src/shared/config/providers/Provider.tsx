@@ -1,8 +1,7 @@
 "use client";
 
-import { Toast } from "@mm-preview/ui";
+import { Toast, PrimeReactProviderWrapper } from "@mm-preview/ui";
 import type { PropsWithChildren, ReactNode } from "react";
-import PrimeSSRProvider from "./PrimeReactProvider";
 import QueryProvider from "./QueryProvider";
 
 type Props = {
@@ -12,10 +11,10 @@ type Props = {
 export const Provider = ({ children }: PropsWithChildren<Props>) => {
   return (
     <QueryProvider>
-      <PrimeSSRProvider>
+      <PrimeReactProviderWrapper>
         <Toast />
         {children}
-      </PrimeSSRProvider>
+      </PrimeReactProviderWrapper>
     </QueryProvider>
   );
 };

@@ -5,6 +5,7 @@ export interface User {
   name: string;
   lastActive: number;
   role: "user" | "admin";
+  recentRooms?: string[];
 }
 
 export interface CreateUserRequest {

@@ -1,8 +1,9 @@
 "use client";
 
 import type { PropsWithChildren, ReactNode } from "react";
-import PrimeSSRProvider from "./PrimeReactProvider";
+import { PrimeReactProviderWrapper } from "@mm-preview/ui";
 import QueryProvider from "./QueryProvider";
+import { WebSocketProvider } from "../../contexts/WebSocketContext";
 
 type Props = {
   children: ReactNode;
@@ -10,6 +11,10 @@ type Props = {
 
 export const Provider = ({ children }: PropsWithChildren<Props>) => (
   <QueryProvider>
-    <PrimeSSRProvider>{children}</PrimeSSRProvider>
+    <PrimeReactProviderWrapper>
+      <WebSocketProvider autoConnect={true}>
+        {children}
+      </WebSocketProvider>
+    </PrimeReactProviderWrapper>
   </QueryProvider>
 );

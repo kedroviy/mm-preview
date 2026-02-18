@@ -1,7 +1,7 @@
 "use client";
 
 import type { PropsWithChildren, ReactNode } from "react";
-import PrimeSSRProvider from "./PrimeReactProvider";
+import { PrimeReactProviderWrapper } from "@mm-preview/ui";
 import QueryProvider from "./QueryProvider";
 
 type Props = {
@@ -10,6 +10,6 @@ type Props = {
 
 export const Provider = ({ children }: PropsWithChildren<Props>) => (
   <QueryProvider>
-    <PrimeSSRProvider>{children}</PrimeSSRProvider>
+    <PrimeReactProviderWrapper>{children}</PrimeReactProviderWrapper>
   </QueryProvider>
 );

@@ -6,7 +6,7 @@ import type { ToastMessage } from "../../services/notification";
 import { notificationService } from "../../services/notification";
 
 export function Toast() {
-  // biome-ignore lint/suspicious/noExplicitAny: PrimeReact 11 Toast type is not fully typed yet
+  // biome-ignore lint/suspicious/noExplicitAny: PrimeReact 10 Toast type is not fully typed yet
   const toastRef = useRef<any>(null);
 
   useEffect(() => {
@@ -23,6 +23,6 @@ export function Toast() {
     return unsubscribe;
   }, []);
 
-  // biome-ignore lint/suspicious/noExplicitAny: PrimeReact 11 Toast type is not fully typed yet
+  // biome-ignore lint/suspicious/noExplicitAny: PrimeReact 10 Toast type is not fully typed yet
   return <PrimeToast ref={toastRef as any} />;
 }

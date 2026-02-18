@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { getAppUrls } from "@/src/shared/config/constants";
 import { useTranslation } from "@/src/shared/i18n/useTranslation";
+import { useAutoLogin } from "@/src/shared/hooks/useAutoLogin";
 import { NAME_MIN_LENGTH, NAME_PATTERN } from "../constants/validation";
 import { useCreateUser } from "../hooks/useCreateUser";
 import { getErrorMessage } from "../utils/error";
@@ -18,6 +19,8 @@ interface UserFormData {
 export function UserCreationForm() {
   const { t } = useTranslation();
   const [createdUser, setCreatedUser] = useState<User | null>(null);
+  // Проверка токенов происходит на сервере в middleware и page.tsx
+  // useAutoLogin оставлен только для fallback случаев
   const {
     control,
     handleSubmit,
@@ -34,8 +37,13 @@ export function UserCreationForm() {
   const { mutate, isPending } = useCreateUser();
 
   const handleContinue = () => {
+    if (!createdUser?.userId) return;
     const urls = getAppUrls();
-    window.location.href = urls.DASHBOARD;
+    console.log("Current location:", window.location.href);
+    console.log("Hostname:", window.location.hostname);
+    console.log("Port:", window.location.port);
+    console.log("Dashboard URL:", urls.DASHBOARD);
+    window.location.href = `${urls.DASHBOARD}?userId=${createdUser.userId}`;
   };
 
   const onSubmit = (data: UserFormData) => {
@@ -68,8 +76,8 @@ export function UserCreationForm() {
 
   if (createdUser) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-4">
-        <div className="card w-full max-w-md">
+      <div className="flex items-center justify-center min-h-screen p-4" suppressHydrationWarning>
+        <div className="card w-full max-w-md" suppressHydrationWarning>
           <div className="flex flex-col items-center gap-6">
             <div className="text-center">
               <h1 className="text-3xl font-bold mb-4">{t("successTitle")}</h1>
@@ -91,8 +99,8 @@ export function UserCreationForm() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4">
-      <div className="card w-full max-w-md">
+    <div className="flex items-center justify-center min-h-screen p-4" suppressHydrationWarning>
+      <div className="card w-full max-w-md" suppressHydrationWarning>
         <h1 className="text-3xl font-bold mb-6 text-center">{t("title")}</h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">

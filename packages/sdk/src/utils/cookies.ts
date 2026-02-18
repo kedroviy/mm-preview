@@ -9,11 +9,27 @@ export function getCookie(name: string): string | null {
     return null;
   }
 
-  const value = `; ${document.cookie}`;
+  // Проверяем все cookies для отладки
+  const allCookies = document.cookie;
+  
+  // Пробуем стандартный способ
+  const value = `; ${allCookies}`;
   const parts = value.split(`; ${name}=`);
 
   if (parts.length === 2) {
-    return parts.pop()?.split(";").shift() || null;
+    const cookieValue = parts.pop()?.split(";").shift()?.trim();
+    if (cookieValue) {
+      return cookieValue;
+    }
+  }
+
+  // Если не нашли, пробуем альтернативный способ (на случай если есть пробелы)
+  const cookies = allCookies.split(";");
+  for (const cookie of cookies) {
+    const [cookieName, cookieValue] = cookie.split("=").map(c => c.trim());
+    if (cookieName === name && cookieValue) {
+      return cookieValue;
+    }
   }
 
   return null;
@@ -50,4 +66,19 @@ export function setAccessToken(token: string): void {
 
 export function removeAccessToken(): void {
   deleteCookie(COOKIE_NAME);
+}
+
+const REFRESH_COOKIE_NAME = "refresh_token";
+
+export function getRefreshToken(): string | null {
+  return getCookie(REFRESH_COOKIE_NAME);
+}
+
+export function removeRefreshToken(): void {
+  deleteCookie(REFRESH_COOKIE_NAME);
+}
+
+export function removeAllAuthTokens(): void {
+  removeAccessToken();
+  removeRefreshToken();
 }

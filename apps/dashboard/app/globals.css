@@ -12,3 +12,97 @@ html {
 body {
   min-height: 100%;
 }
+
+/* View Transitions Support */
+@view-transition {
+  navigation: auto;
+}
+
+/* Default page transition */
+::view-transition-old(root) {
+  animation: fade-out 0.3s ease-out;
+}
+
+::view-transition-new(root) {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* Slide transitions for page navigation */
+::view-transition-old(slide-out) {
+  animation: slide-out-left 0.3s ease-out;
+}
+
+::view-transition-new(slide-in) {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+/* Card transitions */
+::view-transition-old(card) {
+  animation: scale-out 0.2s ease-out;
+}
+
+::view-transition-new(card) {
+  animation: scale-in 0.2s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out-left {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scale-out {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+}

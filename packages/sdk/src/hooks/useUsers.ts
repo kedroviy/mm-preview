@@ -20,14 +20,14 @@ export function useUsers(params?: { page?: number; limit?: number }) {
   });
 }
 
-export function useUser(id: string) {
+export function useUser(id: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: userKeys.detail(id),
     queryFn: async () => {
       const response = await usersApi.getUserById(id);
       return response.data;
     },
-    enabled: !!id,
+    enabled: !!id && (options?.enabled !== false),
   });
 }
 

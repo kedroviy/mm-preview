@@ -62,11 +62,14 @@ class ApiClient {
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
+      // Удаляем credentials из fetchConfig, чтобы гарантировать использование "include"
+      const { credentials: _, ...restFetchConfig } = fetchConfig;
+      
       const response = await fetch(fullURL, {
-        ...fetchConfig,
+        ...restFetchConfig,
         headers,
         signal: controller.signal,
-        credentials: "include", // Включаем отправку кук
+        credentials: "include", // Включаем отправку кук для CORS
       });
 
       clearTimeout(timeoutId);

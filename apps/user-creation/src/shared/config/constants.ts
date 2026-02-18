@@ -15,6 +15,10 @@ function getAppUrl(key: "LANDING" | "USER_CREATION" | "DASHBOARD"): string {
   // Dynamic URL detection based on current domain
   if (typeof window !== "undefined") {
     const hostname = window.location.hostname;
+    const port = window.location.port;
+    const protocol = window.location.protocol;
+    // Also check href to ensure we have port information
+    const href = window.location.href;
 
     // Vercel pattern: mm-preview-landing.vercel.app -> mm-preview-user-creation.vercel.app
     if (hostname.includes("vercel.app")) {
@@ -27,7 +31,27 @@ function getAppUrl(key: "LANDING" | "USER_CREATION" | "DASHBOARD"): string {
       return `https://${appNames[key]}.${baseDomain}`;
     }
 
-    // Local development with subdomains
+    // Dev mode with IP address or localhost (e.g., http://192.168.0.104:3000)
+    // Check this BEFORE .local to prioritize IP addresses in dev mode
+    const isIPAddress = /^(\d{1,3}\.){3}\d{1,3}$/.test(hostname) || hostname === "localhost" || hostname === "127.0.0.1";
+    // Check if we're in dev mode (has port in URL, which indicates dev server)
+    // Port can be empty string, so we check for truthy value and that it's a number
+    // Also check href for port pattern (e.g., :3000, :3001, :3002)
+    const hasPort = (port && port !== "" && !isNaN(Number(port))) || /:\d{4}/.test(href);
+    const isDevMode = isIPAddress && hasPort;
+    
+    if (isDevMode) {
+      const devPorts: Record<string, string> = {
+        LANDING: "3000",
+        USER_CREATION: "3001",
+        DASHBOARD: "3002",
+      };
+      // Always use the port for the target app, not the current port
+      return `${protocol}//${hostname}:${devPorts[key]}`;
+    }
+
+    // Local development with subdomains (only if not in dev mode with IP)
+    // Only use .local if hostname actually contains .local
     if (hostname.includes(".local")) {
       const appNames: Record<string, string> = {
         LANDING: "landing",
@@ -35,6 +59,17 @@ function getAppUrl(key: "LANDING" | "USER_CREATION" | "DASHBOARD"): string {
         DASHBOARD: "dashboard",
       };
       return `http://${appNames[key]}.local`;
+    }
+    
+    // If we have IP address but no port detected, still try to use dev ports
+    // This handles edge cases where port might not be detected
+    if (isIPAddress) {
+      const devPorts: Record<string, string> = {
+        LANDING: "3000",
+        USER_CREATION: "3001",
+        DASHBOARD: "3002",
+      };
+      return `${protocol}//${hostname}:${devPorts[key]}`;
     }
   }
 

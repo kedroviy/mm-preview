@@ -13,7 +13,8 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "primereact": "^11.0.0-alpha.1",
+    "@primeuix/themes": "^1.2.5",
+    "primereact": "^10.0.0",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
@@ -41,6 +42,9 @@
   },
   "peerDependencies": {
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "primereact": "^10.0.0",
+    "next": "^15.5.5",
+    "@primeuix/themes": "^1.2.5"
   }
 }

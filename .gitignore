@@ -38,3 +38,8 @@ yarn-error.log*
 
 # Storybook
 storybook-static
+
+# Generated SDK files
+packages/sdk/swagger.json
+packages/sdk/src/generated/
+packages/sdk/generated/
