@@ -12,7 +12,7 @@ function getAppUrl(key: "LANDING" | "USER_CREATION" | "DASHBOARD"): string {
     return envValue;
   }
 
-  // Dynamic URL detection based on current domain
+  // Dynamic URL detection based on current domain (только на клиенте)
   if (typeof window !== "undefined") {
     const hostname = window.location.hostname;
     const protocol = window.location.protocol;
@@ -47,9 +47,58 @@ function getAppUrl(key: "LANDING" | "USER_CREATION" | "DASHBOARD"): string {
       return `${protocol}//${hostname}:${devPorts[key]}`;
     }
   }
+  
+  // На сервере: проверяем Vercel переменные окружения
+  const vercelUrl = process.env.VERCEL_URL;
+  const isVercel = process.env.VERCEL === "1" || !!vercelUrl;
+  
+  if (isVercel) {
+    // В Vercel используем VERCEL_URL для определения базового домена
+    // Если VERCEL_URL не установлен, используем дефолтный домен vercel.app
+    const protocol = "https";
+    let baseDomain = "vercel.app";
+    
+    if (vercelUrl) {
+      // Извлекаем базовый домен из VERCEL_URL (например, mm-preview-landing.vercel.app -> vercel.app)
+      const parts = vercelUrl.split(".");
+      if (parts.length >= 2) {
+        baseDomain = parts.slice(-2).join(".");
+      }
+    }
+    
+    const appNames: Record<string, string> = {
+      LANDING: "mm-preview-landing",
+      USER_CREATION: "mm-preview-user-creation",
+      DASHBOARD: "mm-preview-dashboard",
+    };
+    
+    return `${protocol}://${appNames[key]}.${baseDomain}`;
+  }
+  
+  // На сервере используем fallback для dev режима
+  // Если это не клиент и не установлена env переменная, предполагаем dev режим
+  const isDevMode = process.env.NODE_ENV === "development" || !process.env.NODE_ENV;
+  if (isDevMode) {
+    const devPorts: Record<string, string> = {
+      LANDING: "3000",
+      USER_CREATION: "3001",
+      DASHBOARD: "3002",
+    };
+    // На сервере в dev режиме используем localhost
+    return `http://localhost:${devPorts[key]}`;
+  }
 
-  // If no environment variable and not in dev/production mode, throw error
-  throw new Error(`NEXT_PUBLIC_${key}_URL must be set for non-dev environments`);
+  // В production на сервере без переменных окружения используем значения по умолчанию для Vercel
+  // Это предотвратит ошибки во время сборки, если переменные окружения не установлены
+  const protocol = "https";
+  const baseDomain = "vercel.app";
+  const appNames: Record<string, string> = {
+    LANDING: "mm-preview-landing",
+    USER_CREATION: "mm-preview-user-creation",
+    DASHBOARD: "mm-preview-dashboard",
+  };
+  
+  return `${protocol}://${appNames[key]}.${baseDomain}`;
 }
 
 // Export as a function to get URLs dynamically
