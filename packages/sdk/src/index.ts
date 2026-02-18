@@ -55,6 +55,12 @@ export {
   setAccessToken,
   setCookie,
 } from "./utils/cookies";
+export {
+  getSameSiteConfig,
+  isAllowedDomain,
+  isAllowedUrl,
+  shouldUseSameSiteNone,
+} from "./utils/cookie-config";
 export { decodeJWT, getUserIdFromToken } from "./utils/jwt";
 
 // Server-side exports are not included in main index to avoid importing next/headers in client code

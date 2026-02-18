@@ -2,6 +2,8 @@
  * Утилиты для работы с куками на клиенте
  */
 
+import { getSameSiteConfig } from "./cookie-config";
+
 const COOKIE_NAME = "access_token";
 
 export function getCookie(name: string): string | null {
@@ -43,18 +45,14 @@ export function setCookie(name: string, value: string, days = 30): void {
   const expires = new Date();
   expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
 
-  // Определяем, является ли это production окружением
-  // Проверяем hostname на наличие vercel.app или других production доменов
+  // Определяем настройки SameSite на основе разрешенных доменов
   const hostname = window.location.hostname;
-  const isProduction = hostname.includes("vercel.app") || 
-                       (!hostname.includes("localhost") && 
-                        !hostname.includes("127.0.0.1") &&
-                        !/^(\d{1,3}\.){3}\d{1,3}$/.test(hostname));
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
   
-  // Для production используем SameSite=None; Secure для кросс-доменных куки
-  // Для dev используем SameSite=Lax
-  const sameSite = isProduction ? "None" : "Lax";
-  const secure = isProduction ? "Secure;" : "";
+  const cookieConfig = getSameSiteConfig(hostname, apiUrl);
+  
+  const sameSite = cookieConfig.sameSite === "none" ? "None" : "Lax";
+  const secure = cookieConfig.secure ? "Secure;" : "";
 
   // biome-ignore lint/suspicious/noDocumentCookie: Standard way to set cookies in browser
   document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=${sameSite};${secure}`;
