@@ -10,7 +10,8 @@
     "NEXT_PUBLIC_USER_CREATION_URL",
     "NEXT_PUBLIC_DASHBOARD_URL",
     "ALLOWED_COOKIE_DOMAINS",
-    "ALLOWED_COOKIE_URLS"
+    "ALLOWED_COOKIE_URLS",
+    "ALLOW_CROSS_ORIGIN_COOKIES"
   ],
   "tasks": {
     "build": {
@@ -20,6 +21,11 @@
     "type-check": {
       "dependsOn": ["^type-check"],
       "outputs": []
+    },
+    "@mm-preview/ui#type-check": {
+      "dependsOn": ["^type-check"],
+      "outputs": [],
+      "cache": false
     },
     "dev": {
       "cache": false,
