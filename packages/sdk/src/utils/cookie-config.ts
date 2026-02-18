@@ -15,7 +15,8 @@ function getAllowedDomains(): string[] {
 
   // Дефолтные разрешенные домены для production
   const defaultDomains = [
-    "vercel.app",
+    "*.vercel.app", // Все поддомены Vercel (mm-preview-user-creation.vercel.app, mm-preview-dashboard.vercel.app и т.д.)
+    "vercel.app", // Базовый домен Vercel
     "localhost",
     "127.0.0.1",
   ];

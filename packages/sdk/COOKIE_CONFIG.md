@@ -19,7 +19,8 @@ ALLOWED_COOKIE_DOMAINS=domain1.com,domain2.com,*.vercel.app
 - `ALLOWED_COOKIE_DOMAINS=api.example.com,backend.example.com` - разрешает только конкретные домены
 
 **По умолчанию:**
-- `vercel.app`
+- `*.vercel.app` - все поддомены Vercel (mm-preview-user-creation.vercel.app, mm-preview-dashboard.vercel.app и т.д.)
+- `vercel.app` - базовый домен Vercel
 - `localhost`
 - `127.0.0.1`
 
