@@ -18,7 +18,5 @@ export type { TooltipProps } from "./components/tooltip";
 export { Tooltip } from "./components/tooltip";
 export type { BadgeProps } from "./components/badge";
 export { Badge } from "./components/badge";
-export type { AnimateOnScrollProps } from "./components/animateonscroll";
-export { AnimateOnScroll } from "./components/animateonscroll";
 export { PrimeReactProviderWrapper } from "./providers/PrimeReactProvider";
 export { AppPreset } from "./presets/app-preset";

@@ -52,13 +52,48 @@ export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get("access_token");
   const refreshToken = request.cookies.get("refresh_token");
 
-  // Если есть access_token, пропускаем
-  if (accessToken) {
-    return NextResponse.next();
+  // Если есть access_token, проверяем его валидность
+  if (accessToken?.value) {
+    try {
+      const { decodeJWT } = await import("@mm-preview/sdk");
+      const decoded = decodeJWT(accessToken.value);
+      // Если токен валидный и содержит userId, пропускаем
+      if (decoded?.userId) {
+        return NextResponse.next();
+      }
+    } catch (error) {
+      // Токен невалидный, продолжаем проверку refresh_token
+      console.error("Invalid access token:", error);
+    }
   }
 
-  // Если есть refresh_token, пытаемся обновить access_token на сервере
-  if (refreshToken) {
+  // Если нет валидного access_token, проверяем refresh_token
+  if (refreshToken?.value) {
+    // Сначала проверяем валидность refresh_token
+    let isRefreshTokenValid = false;
+    try {
+      const { decodeJWT } = await import("@mm-preview/sdk");
+      const decoded = decodeJWT(refreshToken.value);
+      
+      // Если refresh_token валидный, пытаемся обновить access_token
+      if (decoded?.userId) {
+        isRefreshTokenValid = true;
+      }
+    } catch (error) {
+      // Refresh_token невалидный
+      console.error("Invalid refresh token:", error);
+    }
+
+    // Если refresh_token невалидный, редиректим на страницу входа
+    if (!isRefreshTokenValid) {
+      const userCreationUrl = getUserCreationUrl(request);
+      const redirectResponse = NextResponse.redirect(new URL(userCreationUrl));
+      redirectResponse.cookies.delete("access_token");
+      redirectResponse.cookies.delete("refresh_token");
+      return redirectResponse;
+    }
+
+    // Если refresh_token валидный, пытаемся обновить access_token
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
       const response = await fetch(`${apiUrl}/auth/refresh`, {
@@ -75,23 +110,65 @@ export async function middleware(request: NextRequest) {
         const setCookieHeaders = response.headers.getSetCookie();
         const responseWithCookies = NextResponse.next();
         
-        // Копируем Set-Cookie заголовки из ответа refresh
-        setCookieHeaders.forEach((cookie) => {
-          responseWithCookies.headers.append("Set-Cookie", cookie);
-        });
+        // Устанавливаем куки из Set-Cookie заголовков
+        // Парсим каждый Set-Cookie заголовок и устанавливаем куки через Next.js API
+        for (const cookieHeader of setCookieHeaders) {
+          // Парсим имя куки и значение
+          const nameMatch = cookieHeader.match(/^([^=]+)=([^;]+)/);
+          if (nameMatch) {
+            const cookieName = nameMatch[1];
+            const cookieValue = nameMatch[2];
+            
+            // Парсим дополнительные атрибуты (Path, Domain, Max-Age, HttpOnly, Secure, SameSite)
+            const pathMatch = cookieHeader.match(/Path=([^;]+)/);
+            const domainMatch = cookieHeader.match(/Domain=([^;]+)/);
+            const maxAgeMatch = cookieHeader.match(/Max-Age=([^;]+)/);
+            const httpOnlyMatch = cookieHeader.match(/HttpOnly/);
+            const secureMatch = cookieHeader.match(/Secure/);
+            const sameSiteMatch = cookieHeader.match(/SameSite=([^;]+)/);
+            
+            // Устанавливаем куку через Next.js API
+            responseWithCookies.cookies.set(cookieName, cookieValue, {
+              path: pathMatch ? pathMatch[1] : "/",
+              domain: domainMatch ? domainMatch[1] : undefined,
+              maxAge: maxAgeMatch ? parseInt(maxAgeMatch[1], 10) : undefined,
+              httpOnly: !!httpOnlyMatch,
+              secure: !!secureMatch,
+              sameSite: sameSiteMatch 
+                ? (sameSiteMatch[1].toLowerCase() as "strict" | "lax" | "none")
+                : "lax",
+            });
+          }
+        }
         
         return responseWithCookies;
+      } else if (response.status === 401 || response.status === 403) {
+        // Токен невалидный на сервере - очищаем куки и редиректим на страницу входа
+        const userCreationUrl = getUserCreationUrl(request);
+        const redirectResponse = NextResponse.redirect(new URL(userCreationUrl));
+        redirectResponse.cookies.delete("access_token");
+        redirectResponse.cookies.delete("refresh_token");
+        return redirectResponse;
       }
     } catch (error) {
-      // Если refresh не удался, продолжаем - клиент попробует обновить
+      // Если refresh не удался, редиректим на страницу входа
       console.error("Error refreshing token in middleware:", error);
+      const userCreationUrl = getUserCreationUrl(request);
+      const redirectResponse = NextResponse.redirect(new URL(userCreationUrl));
+      redirectResponse.cookies.delete("access_token");
+      redirectResponse.cookies.delete("refresh_token");
+      return redirectResponse;
     }
     
-    // Пропускаем запрос даже если refresh не удался - клиент попробует обновить
-    return NextResponse.next();
+    // Если refresh не удался по другой причине, редиректим на страницу входа
+    const userCreationUrl = getUserCreationUrl(request);
+    const redirectResponse = NextResponse.redirect(new URL(userCreationUrl));
+    redirectResponse.cookies.delete("access_token");
+    redirectResponse.cookies.delete("refresh_token");
+    return redirectResponse;
   }
 
-  // Если нет ни access, ни refresh токена, редиректим на страницу создания пользователя
+  // Если нет refresh_token, редиректим на страницу создания пользователя
   const userCreationUrl = getUserCreationUrl(request);
   return NextResponse.redirect(new URL(userCreationUrl));
 }

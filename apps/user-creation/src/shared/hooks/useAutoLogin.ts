@@ -155,6 +155,8 @@ export function useAutoLogin() {
           });
           removeAllAuthTokens();
           setIsChecking(false);
+          // Если токен невалидный (401/403), пользователь уже на странице входа (user-creation)
+          // Просто очищаем токены, редирект не нужен
         }
       } catch (error) {
         console.error("❌ Error checking token:", error);

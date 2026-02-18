@@ -1,7 +1,25 @@
 "use client";
 
-import { AnimateOnScroll, Button } from "@mm-preview/ui";
+import { Button } from "@mm-preview/ui";
 import { Avatar } from "primereact/avatar";
+import type { ReactNode } from "react";
+
+// AnimateOnScroll wrapper - primereact/animateonscroll may not exist in PrimeReact 10
+// Using a simple div wrapper for now
+interface AnimateOnScrollProps {
+  children?: ReactNode;
+  className?: string;
+  enterClassName?: string;
+  leaveClassName?: string;
+}
+
+function AnimateOnScroll({ children, className, enterClassName }: AnimateOnScrollProps) {
+  return (
+    <div className={className} data-animate-on-scroll>
+      {children}
+    </div>
+  );
+}
 import { getAppUrls } from "@/src/shared/config/constants";
 
 export default function MainBlock() {

@@ -16,8 +16,8 @@ function DashboardContent() {
 
   if (!userId) {
     return (
-      <div className="min-h-screen p-8 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen p-8 flex items-center justify-center" suppressHydrationWarning>
+        <div className="text-center" suppressHydrationWarning>
           <p className="text-lg text-muted-color">User ID is required</p>
         </div>
       </div>
@@ -26,8 +26,8 @@ function DashboardContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen p-8 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen p-8 flex items-center justify-center" suppressHydrationWarning>
+        <div className="text-center" suppressHydrationWarning>
           <p className="text-lg">Loading...</p>
         </div>
       </div>
@@ -36,8 +36,8 @@ function DashboardContent() {
 
   if (error || !user) {
     return (
-      <div className="min-h-screen p-8 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen p-8 flex items-center justify-center" suppressHydrationWarning>
+        <div className="text-center" suppressHydrationWarning>
           <p className="text-lg text-red-600">Failed to load user data</p>
         </div>
       </div>

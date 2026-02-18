@@ -8,7 +8,7 @@ async function checkAuthAndRedirect() {
   const accessToken = cookieStore.get("access_token");
   const refreshToken = cookieStore.get("refresh_token");
 
-  // Если есть access_token, пытаемся получить userId и редиректить
+  // Если есть access_token, проверяем его валидность и получаем профиль пользователя
   if (accessToken?.value) {
     try {
       // Декодируем JWT на сервере (простая проверка без валидации подписи)
@@ -19,11 +19,43 @@ async function checkAuthAndRedirect() {
         );
         const userId = payload.userId || payload.sub || payload.id;
         if (userId) {
-          const urls = getServerAppUrls();
-          redirect(`${urls.DASHBOARD}?userId=${userId}`);
+          // Делаем запрос профиля пользователя, чтобы убедиться, что пользователь существует
+          try {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+            const userResponse = await fetch(`${apiUrl}/users/${userId}`, {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken.value}`,
+                Cookie: cookieStore.toString(),
+              },
+              credentials: "include",
+              cache: "no-store",
+            });
+
+            if (userResponse.ok) {
+              const user = await userResponse.json();
+              // Если пользователь существует, редиректим на dashboard
+              if (user?.userId) {
+                const urls = getServerAppUrls();
+                redirect(`${urls.DASHBOARD}?userId=${user.userId}`);
+              }
+            }
+          } catch (userError: any) {
+            // Если это ошибка редиректа Next.js, пробрасываем её дальше
+            if (userError?.digest?.startsWith("NEXT_REDIRECT")) {
+              throw userError;
+            }
+            // Если запрос профиля не удался, продолжаем показывать форму
+            console.error("Error fetching user profile:", userError);
+          }
         }
       }
-    } catch (error) {
+    } catch (error: any) {
+      // Если это ошибка редиректа Next.js, пробрасываем её дальше
+      if (error?.digest?.startsWith("NEXT_REDIRECT")) {
+        throw error;
+      }
       // Если декодирование не удалось, продолжаем
       console.error("Error decoding token:", error);
     }
@@ -65,13 +97,48 @@ async function checkAuthAndRedirect() {
             );
             const userId = payload.userId || payload.sub || payload.id;
             if (userId) {
-              const urls = getServerAppUrls();
-              redirect(`${urls.DASHBOARD}?userId=${userId}`);
+              // Делаем запрос профиля пользователя, чтобы убедиться, что пользователь существует
+              try {
+                const userResponse = await fetch(`${apiUrl}/users/${userId}`, {
+                  method: "GET",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${newAccessToken}`,
+                    Cookie: cookieStore.toString(),
+                  },
+                  credentials: "include",
+                  cache: "no-store",
+                });
+
+                if (userResponse.ok) {
+                  const user = await userResponse.json();
+                  // Если пользователь существует, редиректим на dashboard
+                  if (user?.userId) {
+                    const urls = getServerAppUrls();
+                    redirect(`${urls.DASHBOARD}?userId=${user.userId}`);
+                  }
+                }
+              } catch (userError: any) {
+                // Если это ошибка редиректа Next.js, пробрасываем её дальше
+                if (userError?.digest?.startsWith("NEXT_REDIRECT")) {
+                  throw userError;
+                }
+                // Если запрос профиля не удался, продолжаем показывать форму
+                console.error("Error fetching user profile:", userError);
+              }
             }
           }
         }
+      } else if (response.status === 401 || response.status === 403) {
+        // Токен невалидный - очищаем куки и продолжаем показывать форму
+        // (редирект не нужен, так как мы уже на странице создания пользователя)
+        console.error("Invalid refresh token, clearing cookies");
       }
-    } catch (error) {
+    } catch (error: any) {
+      // Если это ошибка редиректа Next.js, пробрасываем её дальше
+      if (error?.digest?.startsWith("NEXT_REDIRECT")) {
+        throw error;
+      }
       // Если refresh не удался, продолжаем показывать форму
       console.error("Error refreshing token on server:", error);
     }

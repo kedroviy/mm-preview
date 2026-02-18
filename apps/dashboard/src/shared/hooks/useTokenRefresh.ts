@@ -41,10 +41,16 @@ export function useTokenRefresh() {
             setAccessToken(response.data.accessToken);
             console.log("✅ Token refreshed via API");
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error("❌ Failed to refresh token:", error);
-          // Если refresh не удался, очищаем токены
-          removeAllAuthTokens();
+          // Если токен невалидный (401/403), очищаем куки и редиректим на страницу входа
+          if (error?.status === 401 || error?.status === 403) {
+            removeAllAuthTokens();
+            const userCreationUrl = process.env.NEXT_PUBLIC_USER_CREATION_URL || "http://user-creation.local";
+            window.location.href = userCreationUrl;
+          } else {
+            removeAllAuthTokens();
+          }
         }
         return;
       }
@@ -56,9 +62,16 @@ export function useTokenRefresh() {
           setAccessToken(response.data.accessToken);
           console.log("✅ Token refreshed via API");
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("❌ Failed to refresh token:", error);
-        removeAllAuthTokens();
+        // Если токен невалидный (401/403), очищаем куки и редиректим на страницу входа
+        if (error?.status === 401 || error?.status === 403) {
+          removeAllAuthTokens();
+          const userCreationUrl = process.env.NEXT_PUBLIC_USER_CREATION_URL || "http://user-creation.local";
+          window.location.href = userCreationUrl;
+        } else {
+          removeAllAuthTokens();
+        }
       }
     } catch (error) {
       console.error("Error in token refresh check:", error);

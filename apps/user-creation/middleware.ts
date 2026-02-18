@@ -65,12 +65,20 @@ export async function middleware(request: NextRequest) {
         // Refresh успешен, получаем новый access_token из Set-Cookie
         const setCookieHeaders = response.headers.getSetCookie();
         let newAccessToken: string | null = null;
+        let refreshTokenValue: string | null = null;
         
+        // Парсим Set-Cookie заголовки и извлекаем значения токенов
         for (const cookie of setCookieHeaders) {
-          const match = cookie.match(/access_token=([^;]+)/);
-          if (match) {
-            newAccessToken = match[1];
-            break;
+          // Парсим access_token
+          const accessMatch = cookie.match(/access_token=([^;]+)/);
+          if (accessMatch) {
+            newAccessToken = accessMatch[1];
+          }
+          
+          // Парсим refresh_token (может быть обновлен)
+          const refreshMatch = cookie.match(/refresh_token=([^;]+)/);
+          if (refreshMatch) {
+            refreshTokenValue = refreshMatch[1];
           }
         }
         
@@ -82,14 +90,46 @@ export async function middleware(request: NextRequest) {
               new URL(`${dashboardUrl}?userId=${decoded.userId}`),
             );
             
-            // Копируем Set-Cookie заголовки из ответа refresh
-            setCookieHeaders.forEach((cookie) => {
-              redirectResponse.headers.append("Set-Cookie", cookie);
-            });
+            // Устанавливаем куки из Set-Cookie заголовков
+            // Парсим каждый Set-Cookie заголовок и устанавливаем куки через Next.js API
+            for (const cookieHeader of setCookieHeaders) {
+              // Парсим имя куки и значение
+              const nameMatch = cookieHeader.match(/^([^=]+)=([^;]+)/);
+              if (nameMatch) {
+                const cookieName = nameMatch[1];
+                const cookieValue = nameMatch[2];
+                
+                // Парсим дополнительные атрибуты (Path, Domain, Max-Age, HttpOnly, Secure, SameSite)
+                const pathMatch = cookieHeader.match(/Path=([^;]+)/);
+                const domainMatch = cookieHeader.match(/Domain=([^;]+)/);
+                const maxAgeMatch = cookieHeader.match(/Max-Age=([^;]+)/);
+                const httpOnlyMatch = cookieHeader.match(/HttpOnly/);
+                const secureMatch = cookieHeader.match(/Secure/);
+                const sameSiteMatch = cookieHeader.match(/SameSite=([^;]+)/);
+                
+                // Устанавливаем куку через Next.js API
+                redirectResponse.cookies.set(cookieName, cookieValue, {
+                  path: pathMatch ? pathMatch[1] : "/",
+                  domain: domainMatch ? domainMatch[1] : undefined,
+                  maxAge: maxAgeMatch ? parseInt(maxAgeMatch[1], 10) : undefined,
+                  httpOnly: !!httpOnlyMatch,
+                  secure: !!secureMatch,
+                  sameSite: sameSiteMatch 
+                    ? (sameSiteMatch[1].toLowerCase() as "strict" | "lax" | "none")
+                    : "lax",
+                });
+              }
+            }
             
             return redirectResponse;
           }
         }
+      } else if (response.status === 401 || response.status === 403) {
+        // Токен невалидный - очищаем куки и показываем форму создания
+        const clearCookiesResponse = NextResponse.next();
+        clearCookiesResponse.cookies.delete("access_token");
+        clearCookiesResponse.cookies.delete("refresh_token");
+        return clearCookiesResponse;
       }
     } catch (error) {
       // Если refresh не удался, продолжаем показывать форму создания

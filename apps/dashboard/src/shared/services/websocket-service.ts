@@ -25,7 +25,10 @@ class WebSocketService {
   private currentRoomId: string | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
+  private authErrorCount = 0;
+  private maxAuthErrors = 3;
   private isConnecting = false;
+  private shouldStopReconnecting = false;
 
   /**
    * Получить URL для WebSocket соединения
@@ -54,11 +57,18 @@ class WebSocketService {
 
       console.log("🔌 Подключение к WebSocket:", socketUrl);
 
+      // Если нужно остановить переподключения, не подключаемся
+      if (this.shouldStopReconnecting) {
+        console.log("⛔ Подключение заблокировано из-за ошибок аутентификации");
+        this.isConnecting = false;
+        return;
+      }
+
       const socketConfig: any = {
         transports: ["websocket"],
-        reconnection: true,
+        reconnection: false, // Отключаем автоматическое переподключение - управляем вручную
         reconnectionDelay: 1000,
-        reconnectionAttempts: this.maxReconnectAttempts,
+        reconnectionAttempts: 0, // Не используем встроенное переподключение
         withCredentials: true,
       };
 
@@ -88,6 +98,11 @@ class WebSocketService {
       console.log("✅ WebSocket подключен");
       this.isConnecting = false;
       this.reconnectAttempts = 0;
+      // Сбрасываем счетчик ошибок аутентификации только если мы не должны останавливать переподключения
+      // Это означает, что предыдущее подключение было успешным
+      if (!this.shouldStopReconnecting) {
+        this.authErrorCount = 0;
+      }
       this.emit("connect");
     });
 
@@ -96,16 +111,54 @@ class WebSocketService {
       this.isConnecting = false;
       this.emit("disconnect", reason);
       
-      if (reason === "io server disconnect") {
-        // Сервер принудительно отключил, не переподключаемся автоматически
-        this.socket?.connect();
+      // Если нужно остановить переподключения (из-за ошибок аутентификации), не переподключаемся
+      if (this.shouldStopReconnecting) {
+        console.log("⛔ Переподключения остановлены из-за ошибок аутентификации");
+        // Очищаем сокет полностью
+        const socketToClean = this.socket;
+        this.socket = null;
+        if (socketToClean) {
+          try {
+            socketToClean.removeAllListeners();
+          } catch (error) {
+            console.error("Ошибка при очистке сокета:", error);
+          }
+        }
+        return;
       }
+      
+      // НЕ переподключаемся автоматически - это должно управляться извне
+      // Если нужно переподключение, оно должно быть явно вызвано через connect()
     });
 
     this.socket.on("connect_error", (error) => {
       console.error("❌ Ошибка подключения WebSocket:", error.message);
       this.isConnecting = false;
       this.reconnectAttempts++;
+      
+      // Проверяем, является ли ошибка ошибкой аутентификации
+      if (error.message?.includes("Authentication required") || error.message?.includes("UNAUTHORIZED")) {
+        console.error("❌ Ошибка аутентификации при подключении. Немедленно останавливаем переподключения.");
+        this.shouldStopReconnecting = true;
+        this.authErrorCount = this.maxAuthErrors; // Устанавливаем максимум
+        
+        // Отключаем соединение
+        const socketToDisconnect = this.socket;
+        this.socket = null; // Сначала обнуляем, чтобы избежать повторных вызовов
+        
+        if (socketToDisconnect) {
+          try {
+            socketToDisconnect.removeAllListeners();
+            socketToDisconnect.disconnect();
+          } catch (error) {
+            console.error("Ошибка при отключении сокета:", error);
+          }
+        }
+        
+        // Очищаем куки и редиректим на страницу входа
+        this.handleAuthFailure();
+        return;
+      }
       
       if (this.reconnectAttempts >= this.maxReconnectAttempts) {
         this.emit("error", {
@@ -175,8 +228,44 @@ class WebSocketService {
     // Error handling
     this.socket.on("error", (error: { message: string; code: string; event?: string }) => {
       console.error("❌ Ошибка WebSocket:", error.message, error.code);
+      
+      // Если ошибка аутентификации, сразу останавливаем все попытки
+      if (error.code === "UNAUTHORIZED") {
+        console.error("❌ Ошибка аутентификации. Немедленно останавливаем переподключения.");
+        this.shouldStopReconnecting = true;
+        this.authErrorCount = this.maxAuthErrors; // Устанавливаем максимум, чтобы больше не пытаться
+        
+        // Отключаем соединение и очищаем
+        const socketToDisconnect = this.socket;
+        this.socket = null; // Сначала обнуляем, чтобы избежать повторных вызовов
+        
+        if (socketToDisconnect) {
+          try {
+            socketToDisconnect.removeAllListeners();
+            socketToDisconnect.disconnect();
+          } catch (error) {
+            console.error("Ошибка при отключении сокета:", error);
+          }
+        }
+        
+        // Очищаем куки и редиректим на страницу входа
+        this.handleAuthFailure();
+        return;
+      }
+      
       this.emit("error", error);
     });
+  }
+
+  /**
+   * Обработка неудачной аутентификации
+   */
+  private async handleAuthFailure(): Promise<void> {
+    const { removeAllAuthTokens } = await import("@mm-preview/sdk");
+    removeAllAuthTokens();
+    const userCreationUrl = process.env.NEXT_PUBLIC_USER_CREATION_URL || "http://user-creation.local";
+    console.error("🔴 Перенаправление на страницу входа из-за ошибок аутентификации");
+    window.location.href = userCreationUrl;
   }
 
   /**
@@ -389,12 +478,20 @@ class WebSocketService {
         this.disconnect();
         this.connect();
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("❌ Ошибка обновления токена:", error);
-      this.emit("error", {
-        message: "Не удалось обновить токен",
-        code: "TOKEN_REFRESH_ERROR",
-      });
+      // Если токен невалидный (401/403), очищаем куки и редиректим на страницу входа
+      if (error?.status === 401 || error?.status === 403) {
+        const { removeAllAuthTokens } = await import("@mm-preview/sdk");
+        removeAllAuthTokens();
+        const userCreationUrl = process.env.NEXT_PUBLIC_USER_CREATION_URL || "http://user-creation.local";
+        window.location.href = userCreationUrl;
+      } else {
+        this.emit("error", {
+          message: "Не удалось обновить токен",
+          code: "TOKEN_REFRESH_ERROR",
+        });
+      }
     }
   }
 }
