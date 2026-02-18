@@ -1,6 +1,6 @@
 import { Suspense } from "react";
-import { getMyRoomsServer } from "@/src/pages/rooms/model/getMyRoomsServer";
-import { RoomsPageClient } from "@/src/pages/rooms/ui/RoomsPageClient";
+import { getMyRoomsServer } from "@/src/views/rooms/model/getMyRoomsServer";
+import { RoomsPageClient } from "@/src/views/rooms/ui/RoomsPageClient";
 
 export default async function UserRoomsPage({
   params,

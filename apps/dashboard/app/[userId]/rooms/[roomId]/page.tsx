@@ -1,4 +1,4 @@
-import { RoomDetailPage } from "@/src/pages/room-detail/ui/RoomDetailPage";
+import { RoomDetailPage } from "@/src/views/room-detail/ui/RoomDetailPage";
 
 export default async function UserRoomDetailPage({
   params,

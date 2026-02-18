@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { Suspense } from "react";
-import { DashboardClient } from "@/src/pages/dashboard/ui/DashboardClient";
+import { DashboardClient } from "@/src/views/dashboard/ui/DashboardClient";
 
 async function getProfileFromServer() {
   const cookieStore = await cookies();

@@ -31,7 +31,7 @@ export default async function DashboardRootPage() {
   }
 
   // Если userId нет, редиректим на страницу создания пользователя
-  const userCreationUrl =
-    process.env.NEXT_PUBLIC_USER_CREATION_URL || "http://localhost:3001";
-  redirect(userCreationUrl);
+  const { getAppUrls } = await import("@/src/shared/config/constants");
+  const urls = getAppUrls();
+  redirect(urls.USER_CREATION);
 }
