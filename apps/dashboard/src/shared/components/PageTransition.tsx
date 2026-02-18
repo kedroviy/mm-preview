@@ -13,6 +13,8 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Set view transition name based on route
+    if (!pathname) return;
+    
     if (pathname.includes("/rooms/")) {
       setTransitionName("room-detail");
     } else if (pathname.includes("/rooms")) {

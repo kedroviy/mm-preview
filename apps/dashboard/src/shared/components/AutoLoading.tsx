@@ -123,9 +123,11 @@ export function SkeletonGrid({
 export function AutoLoading({
   variant = "page",
   className = "",
+  cols,
 }: {
   variant?: "page" | "card" | "grid" | "list" | "form";
   className?: string;
+  cols?: 1 | 2 | 3 | 4;
 }) {
   switch (variant) {
     case "page":
@@ -143,7 +145,7 @@ export function AutoLoading({
       return <SkeletonCard className={className} />;
 
     case "grid":
-      return <SkeletonGrid cols={3} className={className} />;
+      return <SkeletonGrid cols={cols || 3} className={className} />;
 
     case "list":
       return (
