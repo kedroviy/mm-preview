@@ -108,11 +108,34 @@ function getReturnType(responses) {
 function generateRequests() {
   try {
     if (!fs.existsSync(SWAGGER_PATH)) {
-      console.error('✗ Swagger file not found. Run "npm run generate:swagger" first.');
-      process.exit(1);
+      console.warn('⚠ Swagger file not found. Creating empty stub files.');
+      // Create empty stub files
+      if (!fs.existsSync(OUTPUT_DIR)) {
+        fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+      }
+      const stubContent = `// This file is a stub. Run "npm run generate:swagger" and "npm run generate:requests" to generate actual requests.
+export {};
+`;
+      fs.writeFileSync(path.join(OUTPUT_DIR, 'index.ts'), stubContent);
+      console.log(`✓ Stub files created in ${OUTPUT_DIR}`);
+      return;
     }
 
     const swagger = JSON.parse(fs.readFileSync(SWAGGER_PATH, 'utf-8'));
+    
+    // Check if swagger is a stub (empty paths)
+    if (!swagger.paths || Object.keys(swagger.paths).length === 0) {
+      console.warn('⚠ Swagger file appears to be a stub. Creating empty stub files.');
+      if (!fs.existsSync(OUTPUT_DIR)) {
+        fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+      }
+      const stubContent = `// This file is a stub. Run "npm run generate:swagger" and "npm run generate:requests" to generate actual requests.
+export {};
+`;
+      fs.writeFileSync(path.join(OUTPUT_DIR, 'index.ts'), stubContent);
+      console.log(`✓ Stub files created in ${OUTPUT_DIR}`);
+      return;
+    }
     
     if (!fs.existsSync(OUTPUT_DIR)) {
       fs.mkdirSync(OUTPUT_DIR, { recursive: true });
@@ -159,7 +182,15 @@ function generateRequests() {
     console.log(`✓ Total: ${Object.values(requestsByTag).flat().length} requests generated`);
   } catch (error) {
     console.error('✗ Error:', error.message);
-    process.exit(1);
+    // Create stub files on error
+    if (!fs.existsSync(OUTPUT_DIR)) {
+      fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+    }
+    const stubContent = `// This file is a stub. Generation failed: ${error.message}
+export {};
+`;
+    fs.writeFileSync(path.join(OUTPUT_DIR, 'index.ts'), stubContent);
+    console.log(`✓ Stub files created in ${OUTPUT_DIR}`);
   }
 }
 

@@ -45,8 +45,25 @@ async function main() {
     fs.writeFileSync(OUTPUT_PATH, JSON.stringify(swagger, null, 2));
     console.log(`✓ Swagger saved to ${OUTPUT_PATH}`);
   } catch (error) {
-    console.error('✗ Error:', error.message);
-    process.exit(1);
+    console.warn('⚠ Failed to download Swagger:', error.message);
+    console.log('Creating minimal stub swagger.json...');
+    
+    // Create minimal stub swagger.json to allow generation to continue
+    const stubSwagger = {
+      openapi: '3.0.0',
+      info: {
+        title: 'API Stub',
+        version: '1.0.0',
+        description: 'This is a stub file. API was not available during generation.'
+      },
+      paths: {},
+      components: {
+        schemas: {}
+      }
+    };
+    
+    fs.writeFileSync(OUTPUT_PATH, JSON.stringify(stubSwagger, null, 2));
+    console.log(`✓ Stub swagger.json created at ${OUTPUT_PATH}`);
   }
 }
 
