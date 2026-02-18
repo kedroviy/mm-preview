@@ -1,5 +1,6 @@
 "use client";
 
+import { Tooltip } from "@mm-preview/ui";
 import { PageTransition } from "./PageTransition";
 
 export function ClientPageTransition({
@@ -7,6 +8,11 @@ export function ClientPageTransition({
 }: {
   children: React.ReactNode;
 }) {
-  return <PageTransition>{children}</PageTransition>;
+  return (
+    <>
+      <Tooltip />
+      <PageTransition>{children}</PageTransition>
+    </>
+  );
 }
 

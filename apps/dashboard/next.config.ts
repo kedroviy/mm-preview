@@ -52,6 +52,10 @@ const nextConfig: NextConfig = {
       "primereact/api": findPrimeReactModule("api"),
       "primereact/card": findPrimeReactModule("card"),
       "primereact/inputtext": findPrimeReactModule("inputtext"),
+      "primereact/paginator": findPrimeReactModule("paginator"),
+      "primereact/speeddial": findPrimeReactModule("speeddial"),
+      "primereact/tooltip": findPrimeReactModule("tooltip"),
+      "primereact/badge": findPrimeReactModule("badge"),
     };
     
     return config;

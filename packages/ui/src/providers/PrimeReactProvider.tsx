@@ -14,9 +14,8 @@ export function PrimeReactProviderWrapper({
   children,
   preset = AppPreset,
 }: PrimeReactProviderProps) {
-  // In PrimeReact 10, PrimeReactProvider accepts configuration
-  // The exact API may vary, so we use @ts-ignore to suppress type errors
-  // @ts-ignore - PrimeReact 10 API types may not be fully accurate
+  // In PrimeReact 10 with tailwindcss-primeui, we need to pass the preset correctly
+  // The value should contain the preset configuration
   return (
     <PrimeReactProvider value={{ preset } as any}>
       {children}

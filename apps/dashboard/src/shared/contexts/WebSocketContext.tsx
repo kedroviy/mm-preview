@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, type PropsWithChildren } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type PropsWithChildren } from "react";
 import { webSocketService, type WebSocketServiceEvents } from "../services/websocket-service";
 
 interface WebSocketContextValue {
@@ -26,6 +26,7 @@ const WebSocketContext = createContext<WebSocketContextValue | null>(null);
 
 export function WebSocketProvider({ children, autoConnect = true }: PropsWithChildren<{ autoConnect?: boolean }>) {
   const isInitialized = useRef(false);
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     if (autoConnect && !isInitialized.current) {
@@ -34,14 +35,31 @@ export function WebSocketProvider({ children, autoConnect = true }: PropsWithChi
       isInitialized.current = true;
     }
 
+    // Подписываемся на события подключения/отключения для реактивного обновления состояния
+    const handleConnect = () => {
+      setIsConnected(true);
+    };
+
+    const handleDisconnect = () => {
+      setIsConnected(false);
+    };
+
+    const unsubscribeConnect = webSocketService.on("connect", handleConnect);
+    const unsubscribeDisconnect = webSocketService.on("disconnect", handleDisconnect);
+
+    // Устанавливаем начальное состояние
+    setIsConnected(webSocketService.isConnected());
+
     return () => {
+      unsubscribeConnect();
+      unsubscribeDisconnect();
       // Не отключаемся при размонтировании, т.к. это singleton
       // Отключение будет происходить только при явном вызове disconnect()
     };
   }, [autoConnect]);
 
   const value: WebSocketContextValue = {
-    isConnected: webSocketService.isConnected(),
+    isConnected,
     getMyRooms: () => webSocketService.getMyRooms(),
     joinRoom: (publicCode, userId) => webSocketService.joinRoom(publicCode, userId),
     leaveRoom: (roomId, userId) => webSocketService.leaveRoom(roomId, userId),

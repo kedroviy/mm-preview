@@ -1,15 +1,17 @@
 "use client";
 
 import { useUser } from "@mm-preview/sdk";
-import { Button, Card } from "@mm-preview/ui";
+import { Button } from "@mm-preview/ui";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { useViewTransition, ViewTransition } from "@/src/shared/components/ViewTransition";
+import { useWebSocketMyRooms } from "@/src/shared/hooks/useWebSocketMyRooms";
 
 function DashboardContent() {
   const searchParams = useSearchParams();
   const userId = searchParams?.get("userId") || "";
   const { data: user, isLoading, error } = useUser(userId);
+  const { rooms: myRooms, isLoading: isMyRoomsLoading } = useWebSocketMyRooms(userId, !!userId);
   const { navigate, isPending } = useViewTransition();
 
   if (!userId) {
@@ -49,48 +51,46 @@ function DashboardContent() {
           <h1 className="text-4xl font-bold mb-2">
             Welcome, <span className="text-primary">{user.name}</span>!
           </h1>
-          <p className="text-muted-color mb-8">Your personal dashboard</p>
+          <p className="text-muted-color mb-8">Ваш личный кабинет</p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <ViewTransition name="rooms-card">
-              <div className="flex flex-col gap-3">
-                <p className="m-0">
-                  Создайте комнату, присоединитесь к существующей или вернитесь в
-                  недавнюю комнату
-                </p>
-                {user.recentRooms && user.recentRooms.length > 0 && (
-                  <p className="m-0 text-sm text-muted-color">
-                    Недавних комнат: {user.recentRooms.length}
-                  </p>
-                )}
-              </div>
-              <Card
-                title="Комнаты"
-                className="h-full cursor-pointer hover:shadow-lg transition-shadow"
+          <div className="flex flex-wrap gap-4">
+            <ViewTransition name="rooms-button">
+              <Button
+                type="button"
+                label="Комнаты"
+                icon="pi pi-home"
+                {...(!isMyRoomsLoading && myRooms && myRooms.length > 0 && {
+                  badge: String(myRooms.length),
+                  badgeSeverity: "warning",
+                })}
+                tooltip="Создайте комнату, присоединитесь к существующей или вернитесь в недавнюю комнату"
+                tooltipOptions={{ position: "bottom" }}
                 onClick={() => {
                   navigate(`/rooms?userId=${user.userId}`);
                 }}
-              >
-                <Button className="mt-2" disabled={isPending}>
-                  {isPending ? "Загрузка..." : "Управление комнатами"}
-                </Button>
-              </Card>
+                disabled={isPending}
+              />
             </ViewTransition>
 
-            <ViewTransition name="movies-card">
-              <Card title="Movies" className="h-full">
-                <p className="m-0">Browse and discover new movies</p>
-                <Button className="mt-4">Explore</Button>
-              </Card>
+            <ViewTransition name="movies-button">
+              <Button
+                type="button"
+                label="Movies"
+                icon="pi pi-video"
+                tooltip="Browse and discover new movies"
+                tooltipOptions={{ position: "bottom" }}
+              />
             </ViewTransition>
 
-            <ViewTransition name="recommendations-card">
-              <Card title="Recommendations" className="h-full">
-                <p className="m-0">Get personalized movie recommendations</p>
-                <Button className="mt-4" outlined>
-                  View
-                </Button>
-              </Card>
+            <ViewTransition name="recommendations-button">
+              <Button
+                type="button"
+                label="Recommendations"
+                icon="pi pi-star"
+                tooltip="Get personalized movie recommendations"
+                tooltipOptions={{ position: "bottom" }}
+                outlined
+              />
             </ViewTransition>
           </div>
         </div>

@@ -117,5 +117,6 @@ export const roomsApi = {
   getChatHistory: async (roomId: string) => {
     return api.get<{ messages: ChatMessage[] }>(`/rooms/${roomId}/chat/history`);
   },
+
 };
 

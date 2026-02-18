@@ -27,17 +27,11 @@ export function useWebSocketMyRooms(userId: string, enabled = true) {
     const unsubscribeMyRooms = on("myRooms", handleMyRooms);
     const unsubscribeError = on("error", handleError);
 
-    // Запрашиваем комнаты если подключены
-    if (isConnected) {
-      setIsLoading(true);
-      getMyRooms();
-    }
-
     return () => {
       unsubscribeMyRooms();
       unsubscribeError();
     };
-  }, [enabled, userId, isConnected, getMyRooms, on, off]);
+  }, [enabled, userId, on, off]);
 
   // Запрашиваем комнаты при подключении
   useEffect(() => {

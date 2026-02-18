@@ -1,0 +1,152 @@
+/* SpeedDial контейнеры */
+.speeddialContainer {
+  position: relative;
+  overflow: visible;
+  width: 40px;
+  height: 40px;
+}
+
+/* Список меню SpeedDial - без фона, с анимацией */
+.speeddialContainer :global(.p-speeddial-list) {
+  background-color: transparent !important;
+  border-radius: 8px !important;
+  padding: 0 !important;
+  list-style: none !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 0.5rem !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(10px) scale(0.9) !important;
+  transition: opacity 0.3s ease, transform 0.3s ease !important;
+}
+
+/* Показываем элементы только когда меню открыто */
+.speeddialContainer :global(.p-speeddial.p-speeddial-opened .p-speeddial-list),
+.speeddialContainer :global(.p-speeddial[aria-expanded="true"] .p-speeddial-list) {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translateY(0) scale(1) !important;
+}
+
+/* Черный фон для кнопок в меню (стандартные кнопки SpeedDial) */
+.speeddialContainer :global(.p-speeddial-item .p-button) {
+  background-color: #000000 !important;
+  border-color: #000000 !important;
+  color: #ffffff !important;
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Стили для Button компонентов в SpeedDial */
+.speeddialButton {
+  background-color: #000000 !important;
+  border-color: #000000 !important;
+  color: #ffffff !important;
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  min-width: 2.5rem !important;
+  min-height: 2.5rem !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+
+.speeddialButton :global(svg) {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  width: 1rem !important;
+  height: 1rem !important;
+}
+
+.speeddialButton:hover {
+  background-color: #333333 !important;
+  border-color: #333333 !important;
+  transform: scale(1.1) !important;
+}
+
+/* Белые иконки в кнопках */
+.speeddialContainer :global(.p-speeddial-item .p-button svg),
+.speeddialContainer :global(.p-speeddial-item .p-button .p-button-icon) {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* Hover эффект для кнопок */
+.speeddialContainer :global(.p-speeddial-item .p-button:hover) {
+  background-color: #333333 !important;
+  border-color: #333333 !important;
+  transform: scale(1.1) !important;
+}
+
+/* Анимация появления элементов */
+.speeddialContainer :global(.p-speeddial-item) {
+  opacity: 0 !important;
+  transform: translateY(10px) !important;
+  transition: opacity 0.3s ease, transform 0.3s ease !important;
+}
+
+.speeddialContainer :global(.p-speeddial.p-speeddial-opened .p-speeddial-item),
+.speeddialContainer :global(.p-speeddial[aria-expanded="true"] .p-speeddial-item) {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+/* Задержка для второго элемента */
+.speeddialContainer :global(.p-speeddial.p-speeddial-opened .p-speeddial-item:last-child),
+.speeddialContainer :global(.p-speeddial[aria-expanded="true"] .p-speeddial-item:last-child) {
+  transition-delay: 0.1s !important;
+}
+
+/* Позиционирование элементов: первый слева, второй справа */
+.speeddialContainer :global(.p-speeddial-item:first-child) {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  margin-right: auto !important;
+}
+
+.speeddialContainer :global(.p-speeddial-item:last-child) {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  margin-left: auto !important;
+}
+
+/* Убеждаемся, что родительские контейнеры не обрезают меню */
+.tableContainer :global(.p-card) {
+  overflow: visible !important;
+}
+
+.tableContainer :global(.p-card-body) {
+  overflow: visible !important;
+}
+
+.tableContainer :global(.p-datatable-wrapper) {
+  overflow: visible !important;
+}
+
+.tableContainer :global(.p-datatable) {
+  overflow: visible !important;
+}
+
+.tableContainer :global(.p-datatable-table-wrapper) {
+  overflow: visible !important;
+}
+

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Button, Card } from "@mm-preview/ui";
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
 import { useViewTransition, ViewTransition } from "@/src/shared/components/ViewTransition";
 import { useWebSocketMyRooms } from "@/src/shared/hooks/useWebSocketMyRooms";
 import { useTokenRefresh } from "@/src/shared/hooks/useTokenRefresh";
@@ -11,12 +10,17 @@ import { CreateRoomForm } from "@/src/features/create-room";
 import { JoinRoomForm } from "@/src/features/join-room";
 import { RoomList } from "@/src/widgets/room-list";
 import { notificationService } from "@mm-preview/ui";
+import type { Room } from "@/src/entities/room";
 
 type ViewMode = "menu" | "create" | "join";
 
-function RoomsContent() {
+interface RoomsPageClientProps {
+  initialRooms: Room[];
+}
+
+export function RoomsPageClient({ initialRooms }: RoomsPageClientProps) {
   const searchParams = useSearchParams();
-  const userId = searchParams.get("userId") || "";
+  const userId = searchParams?.get("userId") || "";
   const { rooms: myRooms, isLoading: isMyRoomsLoading, refreshRooms } = useWebSocketMyRooms(userId, !!userId);
   const [viewMode, setViewMode] = useState<ViewMode>("menu");
   const { navigate, isPending } = useViewTransition();
@@ -100,8 +104,7 @@ function RoomsContent() {
             </div>
 
             <RoomList
-              rooms={myRooms || undefined}
-              isLoading={isMyRoomsLoading}
+              initialRooms={initialRooms}
               onConnect={handleConnect}
               onDelete={handleDelete}
             />
@@ -168,13 +171,5 @@ function RoomsContent() {
   }
 
   return null;
-}
-
-export default function RoomsPage() {
-  return (
-    <Suspense fallback={null}>
-      <RoomsContent />
-    </Suspense>
-  );
 }
 

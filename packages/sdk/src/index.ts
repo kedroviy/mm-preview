@@ -61,6 +61,8 @@ export type {
   SendChatMessageRequest,
 } from "./services/rooms";
 export { roomsApi } from "./services/rooms";
+// Server-side exports are not included in main index to avoid importing next/headers in client code
+// Use direct fetch in server components instead
 
 // Generated exports (will be available after running generate:all)
 // Uncomment after first generation:

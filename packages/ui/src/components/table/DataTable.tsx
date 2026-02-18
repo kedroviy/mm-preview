@@ -1,6 +1,8 @@
 "use client";
 
 import { Column } from "./Column";
+import { Paginator } from "../paginator";
+import { useState, useMemo } from "react";
 import type {
   ReactNode,
 } from "react";
@@ -23,6 +25,11 @@ export interface DataTableProps<T = any> {
   loading?: boolean;
   emptyMessage?: string;
   children?: ReactNode;
+  paginator?: boolean;
+  rows?: number;
+  rowsPerPageOptions?: number[];
+  first?: number;
+  onPage?: (event: { first: number; rows: number; page: number; pageCount: number }) => void;
   [key: string]: any; // Allow any other props from PrimeReact DataTable
 }
 
@@ -32,28 +39,62 @@ export function DataTable<T = any>({
   columns,
   loading = false,
   emptyMessage = "Нет данных",
+  paginator = false,
+  rows,
+  rowsPerPageOptions,
+  first = 0,
+  onPage,
   children,
   ...props
 }: DataTableProps<T>) {
+  const tableData = (value || data) as any;
+  const [currentFirst, setCurrentFirst] = useState(first);
+  const [currentRows, setCurrentRows] = useState(rows || 10);
+
+  const paginatedData = useMemo(() => {
+    if (!paginator || !tableData) return tableData;
+    return tableData.slice(currentFirst, currentFirst + currentRows);
+  }, [tableData, paginator, currentFirst, currentRows]);
+
+  const handlePageChange = (event: { first: number; rows: number; page: number; pageCount: number }) => {
+    setCurrentFirst(event.first);
+    setCurrentRows(event.rows);
+    onPage?.(event);
+  };
+
   return (
-    <PrimeDataTable
-      value={(value || data) as any}
-      loading={loading}
-      emptyMessage={emptyMessage}
-      {...props}
-    >
-      {columns?.map((column) => (
-        <Column
-          key={column.field}
-          field={column.field}
-          header={column.header}
-          body={column.body}
-          sortable={column.sortable !== false}
-          style={column.style}
-          className={column.className}
-        />
-      ))}
-      {children}
-    </PrimeDataTable>
+    <div className="p-datatable-wrapper">
+      <PrimeDataTable
+        value={paginatedData}
+        loading={loading}
+        emptyMessage={emptyMessage}
+        paginator={false}
+        {...props}
+      >
+        {columns?.map((column) => (
+          <Column
+            key={column.field}
+            field={column.field}
+            header={column.header}
+            body={column.body}
+            sortable={column.sortable !== false}
+            style={column.style}
+            className={column.className}
+          />
+        ))}
+        {children}
+      </PrimeDataTable>
+      {paginator && (
+        <div className="p-datatable-paginator">
+          <Paginator
+            first={currentFirst}
+            rows={currentRows}
+            totalRecords={tableData?.length || 0}
+            rowsPerPageOptions={rowsPerPageOptions || [5, 10, 20]}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
+    </div>
   );
 }
