@@ -7,7 +7,7 @@ import { InputText } from "primereact/inputtext";
 import { Label } from "primereact/label";
 import BasicContainer from "@/src/shared/ui/containers/card-container";
 
-export const Login = () => {
+export const LoginPage = () => {
   return (
     <div className="flex justify-center items-center pt-15">
       <BasicContainer>

@@ -26,9 +26,9 @@ async function getProfileFromServer() {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken.value}`,
-        Cookie: cookieString,
-        Origin: origin,
+        "Authorization": `Bearer ${accessToken.value}`,
+        "Cookie": cookieString,
+        "Origin": origin,
       },
       credentials: "include",
       cache: "no-store",
