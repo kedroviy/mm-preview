@@ -7,10 +7,6 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["primereact"],
   },
-  // Exclude src/pages from page scanning (it's not the pages directory)
-  pageExtensions: ["tsx", "ts", "jsx", "js"],
-  // Ensure Next.js only looks for pages in the app directory
-  distDir: ".next",
   webpack: (config, { isServer }) => {
     // For pnpm, we need to ensure modules are resolved correctly
     // pnpm uses symlinks and a different node_modules structure
