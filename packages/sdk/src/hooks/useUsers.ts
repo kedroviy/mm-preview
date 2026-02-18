@@ -27,7 +27,7 @@ export function useUser(id: string, options?: { enabled?: boolean }) {
       const response = await usersApi.getUserById(id);
       return response.data;
     },
-    enabled: !!id && (options?.enabled !== false),
+    enabled: !!id && options?.enabled !== false,
   });
 }
 

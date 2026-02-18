@@ -1,14 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   type CreateRoomRequest,
-  type CreateRoomResponse,
   type JoinRoomRequest,
-  type LeaveRoomRequest,
-  type ChooseMovieRequest,
-  type RoomMember,
-  type ChatMessage,
   roomsApi,
-  type Room,
 } from "../services/rooms";
 
 export const roomKeys = {
@@ -116,13 +110,21 @@ export function useRemoveUserFromRoom() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ roomId, userId }: { roomId: string; userId: string }) => {
+    mutationFn: async ({
+      roomId,
+      userId,
+    }: {
+      roomId: string;
+      userId: string;
+    }) => {
       const response = await roomsApi.removeUserFromRoom(roomId, userId);
       return response.data;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: roomKeys.detail(data.roomId) });
-      queryClient.invalidateQueries({ queryKey: [...roomKeys.detail(data.roomId), "members"] });
+      queryClient.invalidateQueries({
+        queryKey: [...roomKeys.detail(data.roomId), "members"],
+      });
     },
   });
 }
@@ -137,4 +139,3 @@ export function useChatHistory(roomId: string) {
     enabled: !!roomId,
   });
 }
-

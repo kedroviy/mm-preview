@@ -6,7 +6,7 @@
  * Декодирует JWT токен и возвращает payload
  * Внимание: это только декодирование, без проверки подписи!
  */
-export function decodeJWT(token: string): any | null {
+export function decodeJWT(token: string): Record<string, unknown> | null {
   try {
     const parts = token.split(".");
     if (parts.length !== 3) {
@@ -26,12 +26,16 @@ export function decodeJWT(token: string): any | null {
  * Получает userId из JWT токена
  */
 export function getUserIdFromToken(token: string | null): string | null {
-  if (!token) return null;
+  if (!token) {
+    return null;
+  }
 
   const decoded = decodeJWT(token);
-  if (!decoded) return null;
+  if (!decoded) {
+    return null;
+  }
 
   // JWT может содержать userId в разных полях
-  return decoded.userId || decoded.sub || decoded.id || null;
+  const userId = decoded.userId || decoded.sub || decoded.id;
+  return typeof userId === "string" ? userId : null;
 }
-

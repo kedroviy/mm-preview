@@ -27,4 +27,3 @@ export const authApi = {
     return api.post<void>("/auth/logout");
   },
 };
-

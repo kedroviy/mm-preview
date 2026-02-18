@@ -1,12 +1,48 @@
 // API Client
 export { api, createApiClient } from "./client";
-
+// Rooms
+export {
+  roomKeys,
+  useChatHistory,
+  useChooseMovie,
+  useCreateRoom,
+  useJoinRoom,
+  useLeaveRoom,
+  useRemoveUserFromRoom,
+  useRoom,
+  useRoomMembers,
+} from "./hooks/useRooms";
+// Legacy exports (for backward compatibility)
+export {
+  useCreateUser,
+  userKeys,
+  useUpdateUserName,
+  useUser,
+  useUsers,
+} from "./hooks/useUsers";
 // Query Client
 export { createQueryClient, defaultQueryClient } from "./query-client";
+export type { AuthResponse, RefreshTokenRequest } from "./services/auth";
 
+// Auth
+export { authApi } from "./services/auth";
+export type {
+  ChatMessage,
+  ChooseMovieRequest,
+  CreateRoomRequest,
+  CreateRoomResponse,
+  JoinRoomRequest,
+  LeaveRoomRequest,
+  Room,
+  RoomMember,
+  RoomRole,
+  SendChatMessageRequest,
+} from "./services/rooms";
+export { roomsApi } from "./services/rooms";
+export type { CreateUserRequest, User } from "./services/users";
+export { usersApi } from "./services/users";
 // Types
 export type { ApiError, ApiResponse, RequestConfig } from "./types";
-
 // Utils
 export {
   deleteCookie,
@@ -21,50 +57,10 @@ export {
 } from "./utils/cookies";
 export { decodeJWT, getUserIdFromToken } from "./utils/jwt";
 
-// Auth
-export { authApi } from "./services/auth";
-export type { AuthResponse, RefreshTokenRequest } from "./services/auth";
-
-// Legacy exports (for backward compatibility)
-export {
-  useCreateUser,
-  userKeys,
-  useUpdateUserName,
-  useUser,
-  useUsers,
-} from "./hooks/useUsers";
-export type { CreateUserRequest, User } from "./services/users";
-export { usersApi } from "./services/users";
-
-// Rooms
-export {
-  useChooseMovie,
-  useCreateRoom,
-  useJoinRoom,
-  useLeaveRoom,
-  useRoom,
-  useRoomMembers,
-  useRemoveUserFromRoom,
-  useChatHistory,
-  roomKeys,
-} from "./hooks/useRooms";
-export type {
-  ChooseMovieRequest,
-  CreateRoomRequest,
-  CreateRoomResponse,
-  JoinRoomRequest,
-  LeaveRoomRequest,
-  Room,
-  RoomRole,
-  RoomMember,
-  ChatMessage,
-  SendChatMessageRequest,
-} from "./services/rooms";
-export { roomsApi } from "./services/rooms";
 // Server-side exports are not included in main index to avoid importing next/headers in client code
 // Use direct fetch in server components instead
 
+export * from "./generated/hooks";
+export * from "./generated/requests";
 // Generated exports (will be available after running generate:all)
 export * from "./generated/types";
-export * from "./generated/requests";
-export * from "./generated/hooks";

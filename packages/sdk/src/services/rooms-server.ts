@@ -10,4 +10,3 @@ export const roomsServerApi = {
     return response.data;
   },
 };
-

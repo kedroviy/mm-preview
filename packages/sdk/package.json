@@ -6,12 +6,14 @@
   "types": "./src/index.ts",
   "scripts": {
     "lint": "biome check",
+    "postinstall": "node scripts/create-stubs.js",
     "type-check": "npm run generate:all && tsc --noEmit",
+    "check": "npm run lint && npm run type-check",
     "generate:swagger": "node scripts/download-swagger.js",
     "generate:types": "node scripts/generate-types.js",
     "generate:requests": "node scripts/generate-requests.js",
     "generate:hooks": "node scripts/generate-hooks.js",
-    "generate:all": "npm run generate:swagger; npm run generate:types; npm run generate:requests; npm run generate:hooks"
+    "generate:all": "node scripts/generate-all.js"
   },
   "dependencies": {
     "@hey-api/client-fetch": "^0.7.0",

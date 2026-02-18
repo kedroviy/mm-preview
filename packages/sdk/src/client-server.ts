@@ -1,5 +1,5 @@
-import type { ApiError, ApiResponse, RequestConfig } from "./types";
 import { cookies } from "next/headers";
+import type { ApiError, ApiResponse, RequestConfig } from "./types";
 
 class ServerApiClient {
   private baseURL: string;
@@ -49,7 +49,7 @@ class ServerApiClient {
     const fullURL = this.buildURL(url, params);
     const cookieStore = await cookies();
     const token = cookieStore.get("access_token")?.value;
-    
+
     const headers: Record<string, string> = {
       ...(this.defaultHeaders as Record<string, string>),
       ...(fetchConfig.headers as Record<string, string>),
@@ -166,4 +166,3 @@ class ServerApiClient {
 }
 
 export const serverApi = new ServerApiClient();
-

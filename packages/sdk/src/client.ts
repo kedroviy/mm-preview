@@ -65,7 +65,7 @@ class ApiClient {
     try {
       // Удаляем credentials из fetchConfig, чтобы гарантировать использование "include"
       const { credentials: _, ...restFetchConfig } = fetchConfig;
-      
+
       const response = await fetch(fullURL, {
         ...restFetchConfig,
         headers,

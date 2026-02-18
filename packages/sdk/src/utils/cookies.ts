@@ -11,7 +11,7 @@ export function getCookie(name: string): string | null {
 
   // Проверяем все cookies для отладки
   const allCookies = document.cookie;
-  
+
   // Пробуем стандартный способ
   const value = `; ${allCookies}`;
   const parts = value.split(`; ${name}=`);
@@ -26,7 +26,7 @@ export function getCookie(name: string): string | null {
   // Если не нашли, пробуем альтернативный способ (на случай если есть пробелы)
   const cookies = allCookies.split(";");
   for (const cookie of cookies) {
-    const [cookieName, cookieValue] = cookie.split("=").map(c => c.trim());
+    const [cookieName, cookieValue] = cookie.split("=").map((c) => c.trim());
     if (cookieName === name && cookieValue) {
       return cookieValue;
     }
@@ -83,4 +83,3 @@ export function removeAllAuthTokens(): void {
   removeAccessToken();
   removeRefreshToken();
 }
-
