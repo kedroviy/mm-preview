@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { decodeJWT } from "@mm-preview/sdk";
 
 function getDashboardUrl(request: NextRequest): string {
   const envValue = process.env.NEXT_PUBLIC_DASHBOARD_URL;

@@ -1,7 +1,6 @@
 "use client";
 
-import { Button } from "@mm-preview/ui";
-import { AnimateOnScroll } from "primereact/animateonscroll";
+import { AnimateOnScroll, Button } from "@mm-preview/ui";
 import { Avatar } from "primereact/avatar";
 import { getAppUrls } from "@/src/shared/config/constants";
 
