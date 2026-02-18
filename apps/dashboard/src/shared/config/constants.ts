@@ -20,14 +20,27 @@ function getAppUrl(key: "LANDING" | "USER_CREATION" | "DASHBOARD"): string {
     // Also check href to ensure we have port information
     const href = window.location.href;
 
-    // Vercel pattern: mm-preview-landing.vercel.app -> mm-preview-user-creation.vercel.app
+    // Vercel pattern: 
+    // - mm-preview-landing.vercel.app
+    // - mm-preview-user-creation.vercel.app  
+    // - mm-preview-dashboard.vercel.app
     if (hostname.includes("vercel.app")) {
-      const baseDomain = hostname.replace(/^mm-preview-\w+\./, "");
+      // For Vercel, base domain is always the last two parts: "vercel.app"
+      // Extract base domain by taking last two parts of hostname
+      // e.g., "mm-preview-user-creation.vercel.app" -> "vercel.app"
+      const parts = hostname.split(".");
+      const baseDomain = parts.length >= 2 
+        ? parts.slice(-2).join(".")  // Always take last two parts: "vercel.app"
+        : "vercel.app"; // Fallback
+      
       const appNames: Record<string, string> = {
         LANDING: "mm-preview-landing",
         USER_CREATION: "mm-preview-user-creation",
         DASHBOARD: "mm-preview-dashboard",
       };
+      
+      // Construct URL: https://{app-name}.{base-domain}
+      // e.g., https://mm-preview-dashboard.vercel.app
       return `https://${appNames[key]}.${baseDomain}`;
     }
 
