@@ -1,6 +1,6 @@
 import { UserCreationForm } from "@/src/features/user-creation/components/UserCreationForm";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { getServerAppUrls } from "@/src/shared/config/server-constants";
 
 async function checkAuthAndRedirect() {
@@ -37,7 +37,7 @@ async function checkAuthAndRedirect() {
               const user = await userResponse.json();
               // Если пользователь существует, редиректим на dashboard
               if (user?.userId) {
-                const urls = getServerAppUrls();
+                const urls = getServerAppUrls(request);
                 redirect(`${urls.DASHBOARD}?userId=${user.userId}`);
               }
             }
@@ -114,7 +114,7 @@ async function checkAuthAndRedirect() {
                   const user = await userResponse.json();
                   // Если пользователь существует, редиректим на dashboard
                   if (user?.userId) {
-                    const urls = getServerAppUrls();
+                    const urls = getServerAppUrls(request);
                     redirect(`${urls.DASHBOARD}?userId=${user.userId}`);
                   }
                 }

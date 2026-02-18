@@ -16,6 +16,17 @@ function getUserCreationUrl(request: NextRequest): string {
   // Extract hostname without port
   const hostnameWithoutPort = hostname.split(":")[0];
   
+  // Check for Vercel deployment
+  if (hostnameWithoutPort.includes("vercel.app")) {
+    // For Vercel, base domain is always the last two parts: "vercel.app"
+    const parts = hostnameWithoutPort.split(".");
+    const baseDomain = parts.length >= 2 
+      ? parts.slice(-2).join(".")  // Always take last two parts: "vercel.app"
+      : "vercel.app"; // Fallback
+    
+    return `https://mm-preview-user-creation.${baseDomain}`;
+  }
+  
   // Check if we're in dev mode with IP address
   const isIPAddress = /^(\d{1,3}\.){3}\d{1,3}$/.test(hostnameWithoutPort) || 
                        hostnameWithoutPort === "localhost" || 
