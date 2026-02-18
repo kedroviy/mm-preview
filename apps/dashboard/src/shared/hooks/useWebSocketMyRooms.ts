@@ -1,8 +1,8 @@
 "use client";
 
+import type { Room } from "@mm-preview/sdk";
 import { useEffect, useState } from "react";
 import { useWebSocket } from "../contexts/WebSocketContext";
-import type { Room } from "@mm-preview/sdk";
 
 export function useWebSocketMyRooms(userId: string, enabled = true) {
   const { isConnected, getMyRooms, on, off } = useWebSocket();
@@ -17,7 +17,11 @@ export function useWebSocketMyRooms(userId: string, enabled = true) {
       setIsLoading(false);
     };
 
-    const handleError = (error: { message: string; code: string; event?: string }) => {
+    const handleError = (error: {
+      message: string;
+      code: string;
+      event?: string;
+    }) => {
       if (error.event === "getMyRooms") {
         setIsLoading(false);
       }
@@ -55,4 +59,3 @@ export function useWebSocketMyRooms(userId: string, enabled = true) {
     refreshRooms,
   };
 }
-

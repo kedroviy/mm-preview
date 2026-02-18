@@ -1,8 +1,8 @@
 "use client";
 
-import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
+import { useTransition } from "react";
 
 interface ViewTransitionProps {
   children: ReactNode;
@@ -24,8 +24,7 @@ export function ViewTransition({
 
   // Check if View Transitions are supported
   const supportsViewTransitions =
-    typeof document !== "undefined" &&
-    "startViewTransition" in document;
+    typeof document !== "undefined" && "startViewTransition" in document;
 
   const handleTransition = (callback: () => void) => {
     if (supportsViewTransitions && document.startViewTransition) {
@@ -61,8 +60,7 @@ export function useViewTransition() {
   const [isPending, startTransition] = useTransition();
 
   const supportsViewTransitions =
-    typeof document !== "undefined" &&
-    "startViewTransition" in document;
+    typeof document !== "undefined" && "startViewTransition" in document;
 
   const navigate = (url: string) => {
     if (supportsViewTransitions && document.startViewTransition) {
@@ -80,4 +78,3 @@ export function useViewTransition() {
 
   return { navigate, isPending };
 }
-

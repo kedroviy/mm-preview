@@ -9,14 +9,9 @@ export function RoomNotMember({ onBack, isPending }: RoomNotMemberProps) {
       <p className="text-center text-muted-color mb-4">
         Вы не являетесь участником этой комнаты
       </p>
-      <Button
-        onClick={onBack}
-        className="w-full"
-        disabled={isPending}
-      >
+      <Button onClick={onBack} className="w-full" disabled={isPending}>
         Вернуться к комнатам
       </Button>
     </Card>
   );
 }
-

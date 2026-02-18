@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { useWebSocket } from "../contexts/WebSocketContext";
 import type { ChatMessage, Room } from "@mm-preview/sdk";
+import { useCallback, useEffect, useState } from "react";
+import { useWebSocket } from "../contexts/WebSocketContext";
 
 interface UseWebSocketChatOptions {
   roomId?: string;
@@ -11,7 +11,12 @@ interface UseWebSocketChatOptions {
   enabled?: boolean;
   onMessage?: (message: ChatMessage) => void;
   onHistory?: (messages: ChatMessage[]) => void;
-  onRoomUpdate?: (data: { roomId: string; room: Room; event: string; userId?: string }) => void;
+  onRoomUpdate?: (data: {
+    roomId: string;
+    room: Room;
+    event: string;
+    userId?: string;
+  }) => void;
   onError?: (error: Error) => void;
 }
 
@@ -25,7 +30,13 @@ export function useWebSocketChat({
   onRoomUpdate,
   onError,
 }: UseWebSocketChatOptions) {
-  const { isConnected, joinRoom, sendMessage: wsSendMessage, on, off } = useWebSocket();
+  const {
+    isConnected,
+    joinRoom,
+    sendMessage: wsSendMessage,
+    on,
+    off,
+  } = useWebSocket();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isMuted, setIsMuted] = useState(false);
 
@@ -33,21 +44,31 @@ export function useWebSocketChat({
   useEffect(() => {
     if (!enabled || !userId) return;
 
-    const handleChatHistory = (data: { roomId: string; messages: ChatMessage[] }) => {
+    const handleChatHistory = (data: {
+      roomId: string;
+      messages: ChatMessage[];
+    }) => {
       if (roomId && data.roomId === roomId) {
         setMessages(data.messages);
         onHistory?.(data.messages);
       }
     };
 
-    const handleNewMessage = (data: { roomId: string; message: ChatMessage }) => {
+    const handleNewMessage = (data: {
+      roomId: string;
+      message: ChatMessage;
+    }) => {
       if (roomId && data.roomId === roomId) {
         setMessages((prev) => [...prev, data.message]);
         onMessage?.(data.message);
       }
     };
 
-    const handleJoinedRoom = (data: { roomId: string; publicCode: string; room: Room }) => {
+    const handleJoinedRoom = (data: {
+      roomId: string;
+      publicCode: string;
+      room: Room;
+    }) => {
       if (roomId && data.roomId === roomId) {
         setIsMuted(data.room.isMuted || false);
         if (data.room.muteExpiresAt && data.room.isMuted) {
@@ -71,7 +92,11 @@ export function useWebSocketChat({
       }
     };
 
-    const handleError = (error: { message: string; code: string; event?: string }) => {
+    const handleError = (error: {
+      message: string;
+      code: string;
+      event?: string;
+    }) => {
       if (error.event === "sendMessage" || error.event === "joinRoom") {
         onError?.(new Error(error.message));
       }
@@ -96,7 +121,20 @@ export function useWebSocketChat({
       unsubscribeRoomUpdate();
       unsubscribeError();
     };
-  }, [enabled, userId, roomId, publicCode, isConnected, joinRoom, on, off, onMessage, onHistory, onRoomUpdate, onError]);
+  }, [
+    enabled,
+    userId,
+    roomId,
+    publicCode,
+    isConnected,
+    joinRoom,
+    on,
+    off,
+    onMessage,
+    onHistory,
+    onRoomUpdate,
+    onError,
+  ]);
 
   const sendMessage = useCallback(
     (message: string) => {

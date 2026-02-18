@@ -10,4 +10,3 @@ export async function getMyRoomsServer(): Promise<Room[]> {
   // Реальные данные будут загружены на клиенте через useWebSocketMyRooms
   return [];
 }
-

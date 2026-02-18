@@ -7,7 +7,5 @@ export default async function UserRoomDetailPage({
 }) {
   const { userId, roomId } = await params;
 
-  return <RoomDetailPage userId={userId} roomId={roomId} />
-
+  return <RoomDetailPage userId={userId} roomId={roomId} />;
 }
-

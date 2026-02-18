@@ -1,5 +1,5 @@
-import type { Room } from "@/src/entities/room";
 import type { RoomMember } from "@mm-preview/sdk";
+import type { Room } from "@/src/entities/room";
 
 export interface RoomMembersProps {
   room: Room;
@@ -8,4 +8,3 @@ export interface RoomMembersProps {
   canManage: boolean;
   onRemoveMember?: (userId: string) => void;
 }
-

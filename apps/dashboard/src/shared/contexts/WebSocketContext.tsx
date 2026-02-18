@@ -1,7 +1,17 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, useState, type PropsWithChildren } from "react";
-import { webSocketService, type WebSocketServiceEvents } from "../services/websocket-service";
+import {
+  createContext,
+  type PropsWithChildren,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import {
+  type WebSocketServiceEvents,
+  webSocketService,
+} from "../services/websocket-service";
 
 interface WebSocketContextValue {
   isConnected: boolean;
@@ -14,17 +24,20 @@ interface WebSocketContextValue {
   refreshTokenAndReconnect: () => Promise<void>;
   on: <T extends keyof WebSocketServiceEvents>(
     event: T,
-    listener: WebSocketServiceEvents[T]
+    listener: WebSocketServiceEvents[T],
   ) => () => void;
   off: <T extends keyof WebSocketServiceEvents>(
     event: T,
-    listener: WebSocketServiceEvents[T]
+    listener: WebSocketServiceEvents[T],
   ) => void;
 }
 
-const WebSocketContext = createContext<WebSocketContextValue | null>(null);
+const WEB_SOCKET_CONTEXT = createContext<WebSocketContextValue | null>(null);
 
-export function WebSocketProvider({ children, autoConnect = true }: PropsWithChildren<{ autoConnect?: boolean }>) {
+export function WebSocketProvider({
+  children,
+  autoConnect = true,
+}: PropsWithChildren<{ autoConnect?: boolean }>) {
   const isInitialized = useRef(false);
   const [isConnected, setIsConnected] = useState(false);
 
@@ -45,7 +58,10 @@ export function WebSocketProvider({ children, autoConnect = true }: PropsWithChi
     };
 
     const unsubscribeConnect = webSocketService.on("connect", handleConnect);
-    const unsubscribeDisconnect = webSocketService.on("disconnect", handleDisconnect);
+    const unsubscribeDisconnect = webSocketService.on(
+      "disconnect",
+      handleDisconnect,
+    );
 
     // Устанавливаем начальное состояние
     setIsConnected(webSocketService.isConnected());
@@ -61,9 +77,11 @@ export function WebSocketProvider({ children, autoConnect = true }: PropsWithChi
   const value: WebSocketContextValue = {
     isConnected,
     getMyRooms: () => webSocketService.getMyRooms(),
-    joinRoom: (publicCode, userId) => webSocketService.joinRoom(publicCode, userId),
+    joinRoom: (publicCode, userId) =>
+      webSocketService.joinRoom(publicCode, userId),
     leaveRoom: (roomId, userId) => webSocketService.leaveRoom(roomId, userId),
-    sendMessage: (roomId, message) => webSocketService.sendMessage(roomId, message),
+    sendMessage: (roomId, message) =>
+      webSocketService.sendMessage(roomId, message),
     reconnectToRoom: (roomId, publicCode, userId) =>
       webSocketService.reconnectToRoom(roomId, publicCode, userId),
     getCurrentRoomId: () => webSocketService.getCurrentRoomId(),
@@ -73,17 +91,16 @@ export function WebSocketProvider({ children, autoConnect = true }: PropsWithChi
   };
 
   return (
-    <WebSocketContext.Provider value={value}>
+    <WEB_SOCKET_CONTEXT.Provider value={value}>
       {children}
-    </WebSocketContext.Provider>
+    </WEB_SOCKET_CONTEXT.Provider>
   );
 }
 
 export function useWebSocket() {
-  const context = useContext(WebSocketContext);
+  const context = useContext(WEB_SOCKET_CONTEXT);
   if (!context) {
     throw new Error("useWebSocket must be used within WebSocketProvider");
   }
   return context;
 }
-

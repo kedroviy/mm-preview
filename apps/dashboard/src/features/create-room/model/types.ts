@@ -4,4 +4,3 @@ export interface CreateRoomFormProps {
   onSuccess?: (result: CreateRoomResponse) => void;
   onCancel?: () => void;
 }
-

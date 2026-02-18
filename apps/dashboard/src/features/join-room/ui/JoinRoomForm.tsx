@@ -1,13 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { Button, Card } from "@mm-preview/ui";
-import { InputText } from "primereact/inputtext";
 import { useJoinRoom } from "@mm-preview/sdk";
-import { notificationService } from "@mm-preview/ui";
+import { Button, Card, notificationService } from "@mm-preview/ui";
+import { InputText } from "primereact/inputtext";
+import { useState } from "react";
 import type { JoinRoomFormProps } from "../model/types";
 
-export function JoinRoomForm({ userId, onSuccess, onCancel }: JoinRoomFormProps) {
+export function JoinRoomForm({
+  userId,
+  onSuccess,
+  onCancel,
+}: JoinRoomFormProps) {
   const [roomCode, setRoomCode] = useState("");
   const joinRoom = useJoinRoom();
 
@@ -46,7 +49,9 @@ export function JoinRoomForm({ userId, onSuccess, onCancel }: JoinRoomFormProps)
           <InputText
             id="roomCode"
             value={roomCode}
-            onChange={(e) => setRoomCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+            onChange={(e) =>
+              setRoomCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+            }
             placeholder="123456"
             maxLength={6}
             className="text-2xl text-center tracking-widest"
@@ -74,4 +79,3 @@ export function JoinRoomForm({ userId, onSuccess, onCancel }: JoinRoomFormProps)
     </Card>
   );
 }
-

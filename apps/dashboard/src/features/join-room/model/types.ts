@@ -5,4 +5,3 @@ export interface JoinRoomFormProps {
   onSuccess?: (result: Room) => void;
   onCancel?: () => void;
 }
-

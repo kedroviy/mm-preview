@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
-import { io, Socket } from "socket.io-client";
-import { getAccessToken, setAccessToken } from "@mm-preview/sdk";
 import type { Room } from "@mm-preview/sdk";
+import { getAccessToken, setAccessToken } from "@mm-preview/sdk";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { io, type Socket } from "socket.io-client";
 
 interface MyRoomsResponse {
   rooms: Room[];
@@ -52,7 +52,7 @@ export function useMyRooms(userId: string, enabled = true) {
       socket.on("connect", () => {
         setIsConnected(true);
         console.log("✅ Socket.IO connected for my rooms");
-        
+
         // Запрашиваем комнаты после подключения
         socket.emit("getMyRooms", {});
         setIsLoading(true);
@@ -63,13 +63,19 @@ export function useMyRooms(userId: string, enabled = true) {
         console.log("❌ Socket.IO disconnected for my rooms");
       });
 
-      socket.on("tokenRefreshed", (data: { accessToken: string; message?: string }) => {
-        console.log("🔄 Token refreshed via WebSocket in useMyRooms:", data.message || "New access token received");
-        // Сохраняем новый токен в cookie
-        if (data.accessToken) {
-          setAccessToken(data.accessToken);
-        }
-      });
+      socket.on(
+        "tokenRefreshed",
+        (data: { accessToken: string; message?: string }) => {
+          console.log(
+            "🔄 Token refreshed via WebSocket in useMyRooms:",
+            data.message || "New access token received",
+          );
+          // Сохраняем новый токен в cookie
+          if (data.accessToken) {
+            setAccessToken(data.accessToken);
+          }
+        },
+      );
 
       socket.on("myRooms", (data: MyRoomsResponse) => {
         console.log("📋 My rooms received:", data.rooms.length, "rooms");
@@ -84,7 +90,10 @@ export function useMyRooms(userId: string, enabled = true) {
 
       socketRef.current = socket;
     } catch (error) {
-      console.error("Failed to create Socket.IO connection for my rooms:", error);
+      console.error(
+        "Failed to create Socket.IO connection for my rooms:",
+        error,
+      );
       setIsLoading(false);
     }
   }, [enabled, userId, getCookie]);
@@ -116,4 +125,3 @@ export function useMyRooms(userId: string, enabled = true) {
     refreshRooms,
   };
 }
-

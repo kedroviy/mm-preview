@@ -1,20 +1,22 @@
 "use client";
 
 import {
-  useRoom,
-  useUsersController_getProfile,
   useLeaveRoom,
+  useRoom,
   useRoomMembers,
+  useUsersController_getProfile,
 } from "@mm-preview/sdk";
-import { Button } from "@mm-preview/ui";
+import { Button, notificationService } from "@mm-preview/ui";
 import { useParams, useSearchParams } from "next/navigation";
-import { Suspense, useMemo, useCallback } from "react";
-import { useViewTransition, ViewTransition } from "@/src/shared/components/ViewTransition";
+import { Suspense, useCallback, useMemo } from "react";
 import { ChatWindow, useChat } from "@/src/features/chat";
-import { notificationService } from "@mm-preview/ui";
+import {
+  useViewTransition,
+  ViewTransition,
+} from "@/src/shared/components/ViewTransition";
+import { RoomChoices } from "@/src/widgets/room-choices";
 import { RoomHeader } from "@/src/widgets/room-header";
 import { RoomMembers } from "@/src/widgets/room-members";
-import { RoomChoices } from "@/src/widgets/room-choices";
 import { RoomNotMember } from "@/src/widgets/room-not-member";
 
 type ViewConfig = {
@@ -27,9 +29,19 @@ interface RoomDetailPageProps {
   roomId: string;
 }
 
+type ProfileType = {
+  userId: string;
+  name: string;
+  role?: string;
+  lastActive?: number;
+  recentRooms?: string[];
+  rooms?: unknown[];
+};
+
 function RoomContent({ userId, roomId }: RoomDetailPageProps) {
   const { data: room, isLoading: roomLoading } = useRoom(roomId);
-  const { data: profile } = useUsersController_getProfile();
+  const { data: profileData } = useUsersController_getProfile();
+  const profile = profileData as ProfileType | null | undefined;
   const { data: members } = useRoomMembers(roomId);
   const leaveRoom = useLeaveRoom();
   const { navigate, isPending } = useViewTransition();
@@ -58,7 +70,10 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
     }
   }, [userId, roomId, leaveRoom, navigate]);
 
-  const handleBack = useCallback(() => navigate(`/${userId}/rooms`), [navigate, userId]);
+  const handleBack = useCallback(
+    () => navigate(`/${userId}/rooms`),
+    [navigate, userId],
+  );
   const handleRemoveMember = useCallback((memberUserId: string) => {
     notificationService.showInfo("Функция удаления участника будет добавлена");
   }, []);
@@ -209,4 +224,3 @@ export function RoomDetailPage({ userId, roomId }: RoomDetailPageProps) {
     </Suspense>
   );
 }
-

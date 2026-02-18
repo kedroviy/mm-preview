@@ -175,7 +175,9 @@ export function AutoLoading({
 
     default:
       return (
-        <div className={`min-h-screen p-8 flex items-center justify-center ${className}`}>
+        <div
+          className={`min-h-screen p-8 flex items-center justify-center ${className}`}
+        >
           <div className="text-center">
             <Skeleton className="h-8 w-32 mx-auto mb-4" />
             <SkeletonText lines={2} className="w-64" />
@@ -184,4 +186,3 @@ export function AutoLoading({
       );
   }
 }
-

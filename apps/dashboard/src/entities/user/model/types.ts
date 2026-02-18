@@ -4,4 +4,3 @@ export interface User {
   name: string;
   recentRooms?: string[];
 }
-

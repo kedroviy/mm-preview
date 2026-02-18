@@ -1,16 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { Button, Card } from "@mm-preview/ui";
+import { Button, Card, notificationService } from "@mm-preview/ui";
 import { useSearchParams } from "next/navigation";
-import { useViewTransition, ViewTransition } from "@/src/shared/components/ViewTransition";
-import { useWebSocketMyRooms } from "@/src/shared/hooks/useWebSocketMyRooms";
-import { useTokenRefresh } from "@/src/shared/hooks/useTokenRefresh";
+import { useState } from "react";
+import type { Room } from "@/src/entities/room";
 import { CreateRoomForm } from "@/src/features/create-room";
 import { JoinRoomForm } from "@/src/features/join-room";
+import {
+  useViewTransition,
+  ViewTransition,
+} from "@/src/shared/components/ViewTransition";
+import { useTokenRefresh } from "@/src/shared/hooks/useTokenRefresh";
+import { useWebSocketMyRooms } from "@/src/shared/hooks/useWebSocketMyRooms";
 import { RoomList } from "@/src/widgets/room-list";
-import { notificationService } from "@mm-preview/ui";
-import type { Room } from "@/src/entities/room";
 
 type ViewMode = "menu" | "create" | "join";
 
@@ -19,11 +21,18 @@ interface RoomsPageClientProps {
   initialRooms: Room[];
 }
 
-export function RoomsPageClient({ userId, initialRooms }: RoomsPageClientProps) {
-  const { rooms: myRooms, isLoading: isMyRoomsLoading, refreshRooms } = useWebSocketMyRooms(userId, !!userId);
+export function RoomsPageClient({
+  userId,
+  initialRooms,
+}: RoomsPageClientProps) {
+  const {
+    rooms: myRooms,
+    isLoading: isMyRoomsLoading,
+    refreshRooms,
+  } = useWebSocketMyRooms(userId, !!userId);
   const [viewMode, setViewMode] = useState<ViewMode>("menu");
   const { navigate, isPending } = useViewTransition();
-  
+
   useTokenRefresh();
 
   const handleCreateSuccess = (result: any) => {
@@ -71,8 +80,8 @@ export function RoomsPageClient({ userId, initialRooms }: RoomsPageClientProps) 
               </Button>
               <h1 className="text-4xl font-bold mb-2">Комнаты</h1>
               <p className="text-muted-color">
-                Создайте новую комнату, присоединитесь к существующей или вернитесь
-                в недавнюю
+                Создайте новую комнату, присоединитесь к существующей или
+                вернитесь в недавнюю
               </p>
             </div>
 
@@ -119,11 +128,7 @@ export function RoomsPageClient({ userId, initialRooms }: RoomsPageClientProps) 
         <div className="min-h-screen p-8">
           <div className="max-w-2xl mx-auto">
             <div className="mb-6">
-              <Button
-                onClick={() => setViewMode("menu")}
-                text
-                className="mb-4"
-              >
+              <Button onClick={() => setViewMode("menu")} text className="mb-4">
                 ← Назад
               </Button>
               <h1 className="text-4xl font-bold mb-2">Создать комнату</h1>
@@ -145,14 +150,12 @@ export function RoomsPageClient({ userId, initialRooms }: RoomsPageClientProps) 
         <div className="min-h-screen p-8">
           <div className="max-w-2xl mx-auto">
             <div className="mb-6">
-              <Button
-                onClick={() => setViewMode("menu")}
-                text
-                className="mb-4"
-              >
+              <Button onClick={() => setViewMode("menu")} text className="mb-4">
                 ← Назад
               </Button>
-              <h1 className="text-4xl font-bold mb-2">Присоединиться к комнате</h1>
+              <h1 className="text-4xl font-bold mb-2">
+                Присоединиться к комнате
+              </h1>
               <p className="text-muted-color">
                 Введите 6-значный код комнаты для присоединения
               </p>
@@ -171,4 +174,3 @@ export function RoomsPageClient({ userId, initialRooms }: RoomsPageClientProps) 
 
   return null;
 }
-

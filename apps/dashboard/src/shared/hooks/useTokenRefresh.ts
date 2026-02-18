@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
 import {
+  authApi,
   getAccessToken,
   getRefreshToken,
-  authApi,
-  setAccessToken,
-  removeAllAuthTokens,
   getUserIdFromToken,
+  removeAllAuthTokens,
+  setAccessToken,
 } from "@mm-preview/sdk";
+import { useCallback, useEffect } from "react";
 
 /**
  * Хук для проверки и обновления токена на клиенте
@@ -18,8 +18,8 @@ export function useTokenRefresh() {
   const checkAndRefreshToken = useCallback(async () => {
     try {
       // Проверяем access_token
-      let accessToken = getAccessToken();
-      
+      const accessToken = getAccessToken();
+
       // Если access_token есть, проверяем его валидность (простая проверка структуры)
       if (accessToken) {
         const userId = getUserIdFromToken(accessToken);
@@ -31,7 +31,7 @@ export function useTokenRefresh() {
 
       // Если access_token нет или невалидный, проверяем refresh_token
       const refreshToken = getRefreshToken();
-      
+
       if (!refreshToken) {
         // Нет refresh_token, возможно он HTTP-only
         // Пытаемся обновить токен через API (браузер отправит HTTP-only cookie автоматически)
@@ -95,4 +95,3 @@ export function useTokenRefresh() {
     refreshToken: checkAndRefreshToken,
   };
 }
-

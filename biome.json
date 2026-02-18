@@ -71,6 +71,12 @@
                 },
                 "formats": ["CONSTANT_CASE", "camelCase"]
               }
+            ],
+            "ignore": [
+              "Authorization",
+              "Cookie",
+              "Origin",
+              "Content-Type"
             ]
           }
         },

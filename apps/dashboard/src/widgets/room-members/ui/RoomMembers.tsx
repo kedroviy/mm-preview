@@ -1,8 +1,8 @@
 "use client";
 
+import type { RoomRole } from "@mm-preview/sdk";
 import { Button, Card } from "@mm-preview/ui";
 import type { Room } from "@/src/entities/room";
-import type { RoomRole } from "@mm-preview/sdk";
 import type { RoomMembersProps } from "../model/types";
 
 function getRoleLabel(role?: RoomRole) {
@@ -76,4 +76,3 @@ export function RoomMembers({
     </Card>
   );
 }
-

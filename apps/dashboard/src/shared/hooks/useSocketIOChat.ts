@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import { io, Socket } from "socket.io-client";
 import type { ChatMessage } from "@mm-preview/sdk";
 import { getAccessToken, setAccessToken } from "@mm-preview/sdk";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { io, type Socket } from "socket.io-client";
 
 interface UseSocketIOChatOptions {
   roomId?: string;
@@ -42,13 +42,15 @@ export function useSocketIOChat({
       // Если cookie HTTP-only, document.cookie её не увидит,
       // но браузер автоматически отправит её при подключении Socket.IO
       const token = getAccessToken();
-      
+
       // Логируем для отладки
       if (token) {
         console.log("Found access token in cookies");
       } else {
         console.log("No access token in document.cookie (may be HTTP-only)");
-        console.log("Socket.IO will use cookies automatically if they are HTTP-only");
+        console.log(
+          "Socket.IO will use cookies automatically if they are HTTP-only",
+        );
       }
 
       // Формируем URL для Socket.IO
@@ -80,7 +82,9 @@ export function useSocketIOChat({
       } else {
         // Даже если токена нет в document.cookie, пробуем подключиться
         // HTTP-only cookies отправятся автоматически
-        console.log("Connecting without explicit token (using HTTP-only cookies)");
+        console.log(
+          "Connecting without explicit token (using HTTP-only cookies)",
+        );
       }
 
       const socket = io(socketUrl, socketConfig);
@@ -102,18 +106,21 @@ export function useSocketIOChat({
       });
 
       // Room events
-      socket.on("joinedRoom", (data: { roomId: string; publicCode: string; room: any }) => {
-        currentRoomIdRef.current = data.roomId;
-        setIsMuted(data.room.isMuted || false);
-        console.log("✅ Joined room:", data.roomId);
-        
-        if (data.room.isMuted && data.room.muteExpiresAt) {
-          const minutesLeft = Math.ceil(
-            (data.room.muteExpiresAt - Date.now()) / (60 * 1000),
-          );
-          console.warn(`⚠️ You are muted for ${minutesLeft} more minute(s)`);
-        }
-      });
+      socket.on(
+        "joinedRoom",
+        (data: { roomId: string; publicCode: string; room: any }) => {
+          currentRoomIdRef.current = data.roomId;
+          setIsMuted(data.room.isMuted || false);
+          console.log("✅ Joined room:", data.roomId);
+
+          if (data.room.isMuted && data.room.muteExpiresAt) {
+            const minutesLeft = Math.ceil(
+              (data.room.muteExpiresAt - Date.now()) / (60 * 1000),
+            );
+            console.warn(`⚠️ You are muted for ${minutesLeft} more minute(s)`);
+          }
+        },
+      );
 
       socket.on("leftRoom", (data: { roomId: string }) => {
         if (currentRoomIdRef.current === data.roomId) {
@@ -123,45 +130,67 @@ export function useSocketIOChat({
       });
 
       // Chat events
-      socket.on("chatHistory", (data: { roomId: string; messages: ChatMessage[] }) => {
-        console.log("📜 Chat history received:", data.messages.length, "messages");
-        setMessages(data.messages);
-        onHistory?.(data.messages);
-      });
+      socket.on(
+        "chatHistory",
+        (data: { roomId: string; messages: ChatMessage[] }) => {
+          console.log(
+            "📜 Chat history received:",
+            data.messages.length,
+            "messages",
+          );
+          setMessages(data.messages);
+          onHistory?.(data.messages);
+        },
+      );
 
-      socket.on("newMessage", (data: { roomId: string; message: ChatMessage }) => {
-        console.log("💬 New message:", data.message);
-        setMessages((prev) => [...prev, data.message]);
-        onMessage?.(data.message);
-      });
+      socket.on(
+        "newMessage",
+        (data: { roomId: string; message: ChatMessage }) => {
+          console.log("💬 New message:", data.message);
+          setMessages((prev) => [...prev, data.message]);
+          onMessage?.(data.message);
+        },
+      );
 
       // Room updates
-      socket.on("roomUpdate", (data: {
-        roomId: string;
-        room: any;
-        event: string;
-        userId?: string;
-      }) => {
-        console.log("🔄 Room update:", data.event);
-        setIsMuted(data.room.isMuted || false);
-        onRoomUpdate?.(data);
-      });
+      socket.on(
+        "roomUpdate",
+        (data: {
+          roomId: string;
+          room: any;
+          event: string;
+          userId?: string;
+        }) => {
+          console.log("🔄 Room update:", data.event);
+          setIsMuted(data.room.isMuted || false);
+          onRoomUpdate?.(data);
+        },
+      );
 
       // Token refresh (auto-sent on connection if refresh token is valid)
-      socket.on("tokenRefreshed", (data: { accessToken: string; message?: string }) => {
-        console.log("🔄 Token refreshed via WebSocket:", data.message || "New access token received");
-        // Сохраняем новый токен в cookie
-        if (data.accessToken) {
-          setAccessToken(data.accessToken);
-        }
-        onTokenRefreshed?.(data.accessToken);
-      });
+      socket.on(
+        "tokenRefreshed",
+        (data: { accessToken: string; message?: string }) => {
+          console.log(
+            "🔄 Token refreshed via WebSocket:",
+            data.message || "New access token received",
+          );
+          // Сохраняем новый токен в cookie
+          if (data.accessToken) {
+            setAccessToken(data.accessToken);
+          }
+          onTokenRefreshed?.(data.accessToken);
+        },
+      );
 
       // Error handling
-      socket.on("error", (error: { message: string; code: string; event?: string }) => {
-        console.error("❌ Socket.IO error:", error.message, error.code);
-        onError?.(new Error(error.message || "Socket.IO error"));
-      });
+      socket.on(
+        "error",
+        (error: { message: string; code: string; event?: string }) => {
+          console.error("❌ Socket.IO error:", error.message, error.code);
+          onError?.(new Error(error.message || "Socket.IO error"));
+        },
+      );
 
       socketRef.current = socket;
 
@@ -181,7 +210,17 @@ export function useSocketIOChat({
       console.error("Failed to create Socket.IO connection:", error);
       onError?.(error as Error);
     }
-  }, [enabled, userId, roomId, publicCode, onMessage, onHistory, onRoomUpdate, onTokenRefreshed, onError]);
+  }, [
+    enabled,
+    userId,
+    roomId,
+    publicCode,
+    onMessage,
+    onHistory,
+    onRoomUpdate,
+    onTokenRefreshed,
+    onError,
+  ]);
 
   const sendMessage = useCallback(
     (message: string) => {
@@ -247,23 +286,31 @@ export function useSocketIOChat({
     }
   }, [onError]);
 
-  const reconnectToRoom = useCallback((roomIdToReconnect: string, publicCodeToReconnect: string) => {
-    if (!socketRef.current?.connected) {
-      onError?.(new Error("Socket.IO не подключен"));
-      return;
-    }
+  const reconnectToRoom = useCallback(
+    (roomIdToReconnect: string, publicCodeToReconnect: string) => {
+      if (!socketRef.current?.connected) {
+        onError?.(new Error("Socket.IO не подключен"));
+        return;
+      }
 
-    if (!userId) {
-      onError?.(new Error("User ID не указан"));
-      return;
-    }
+      if (!userId) {
+        onError?.(new Error("User ID не указан"));
+        return;
+      }
 
-    console.log("Reconnecting to room:", roomIdToReconnect, "with code:", publicCodeToReconnect);
-    socketRef.current.emit("joinRoom", {
-      publicCode: publicCodeToReconnect,
-      userId,
-    });
-  }, [userId, onError]);
+      console.log(
+        "Reconnecting to room:",
+        roomIdToReconnect,
+        "with code:",
+        publicCodeToReconnect,
+      );
+      socketRef.current.emit("joinRoom", {
+        publicCode: publicCodeToReconnect,
+        userId,
+      });
+    },
+    [userId, onError],
+  );
 
   return {
     messages,
@@ -276,4 +323,3 @@ export function useSocketIOChat({
     socket: socketRef.current,
   };
 }
-

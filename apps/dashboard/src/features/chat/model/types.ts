@@ -7,4 +7,3 @@ export interface ChatWindowProps {
   isLoading?: boolean;
   isMuted?: boolean;
 }
-

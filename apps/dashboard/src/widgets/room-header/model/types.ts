@@ -1,5 +1,5 @@
-import type { Room } from "@/src/entities/room";
 import type { RoomRole } from "@mm-preview/sdk";
+import type { Room } from "@/src/entities/room";
 
 export interface RoomHeaderProps {
   room: Room;
@@ -9,4 +9,3 @@ export interface RoomHeaderProps {
   isLeaving: boolean;
   isPending: boolean;
 }
-

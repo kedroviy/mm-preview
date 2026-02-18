@@ -1,8 +1,12 @@
 "use client";
 
-import { io, Socket } from "socket.io-client";
-import { getAccessToken, setAccessToken, getRefreshToken } from "@mm-preview/sdk";
-import type { Room, ChatMessage } from "@mm-preview/sdk";
+import type { ChatMessage, Room } from "@mm-preview/sdk";
+import {
+  getAccessToken,
+  getRefreshToken,
+  setAccessToken,
+} from "@mm-preview/sdk";
+import { io, type Socket } from "socket.io-client";
 
 export interface WebSocketServiceEvents {
   connect: () => void;
@@ -10,18 +14,31 @@ export interface WebSocketServiceEvents {
   error: (error: { message: string; code: string; event?: string }) => void;
   tokenRefreshed: (data: { accessToken: string; message?: string }) => void;
   myRooms: (data: { rooms: Room[] }) => void;
-  joinedRoom: (data: { roomId: string; publicCode: string; room: Room }) => void;
+  joinedRoom: (data: {
+    roomId: string;
+    publicCode: string;
+    room: Room;
+  }) => void;
   leftRoom: (data: { roomId: string }) => void;
   chatHistory: (data: { roomId: string; messages: ChatMessage[] }) => void;
   newMessage: (data: { roomId: string; message: ChatMessage }) => void;
-  roomUpdate: (data: { roomId: string; room: Room; event: string; userId?: string }) => void;
+  roomUpdate: (data: {
+    roomId: string;
+    room: Room;
+    event: string;
+    userId?: string;
+  }) => void;
 }
 
-type EventListener<T extends keyof WebSocketServiceEvents> = WebSocketServiceEvents[T];
+type EventListener<T extends keyof WebSocketServiceEvents> =
+  WebSocketServiceEvents[T];
 
 class WebSocketService {
   private socket: Socket | null = null;
-  private listeners: Map<keyof WebSocketServiceEvents, Set<EventListener<any>>> = new Map();
+  private listeners: Map<
+    keyof WebSocketServiceEvents,
+    Set<EventListener<any>>
+  > = new Map();
   private currentRoomId: string | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
@@ -110,10 +127,12 @@ class WebSocketService {
       console.log("❌ WebSocket отключен:", reason);
       this.isConnecting = false;
       this.emit("disconnect", reason);
-      
+
       // Если нужно остановить переподключения (из-за ошибок аутентификации), не переподключаемся
       if (this.shouldStopReconnecting) {
-        console.log("⛔ Переподключения остановлены из-за ошибок аутентификации");
+        console.log(
+          "⛔ Переподключения остановлены из-за ошибок аутентификации",
+        );
         // Очищаем сокет полностью
         const socketToClean = this.socket;
         this.socket = null;
@@ -126,7 +145,7 @@ class WebSocketService {
         }
         return;
       }
-      
+
       // НЕ переподключаемся автоматически - это должно управляться извне
       // Если нужно переподключение, оно должно быть явно вызвано через connect()
     });
@@ -135,17 +154,22 @@ class WebSocketService {
       console.error("❌ Ошибка подключения WebSocket:", error.message);
       this.isConnecting = false;
       this.reconnectAttempts++;
-      
+
       // Проверяем, является ли ошибка ошибкой аутентификации
-      if (error.message?.includes("Authentication required") || error.message?.includes("UNAUTHORIZED")) {
-        console.error("❌ Ошибка аутентификации при подключении. Немедленно останавливаем переподключения.");
+      if (
+        error.message?.includes("Authentication required") ||
+        error.message?.includes("UNAUTHORIZED")
+      ) {
+        console.error(
+          "❌ Ошибка аутентификации при подключении. Немедленно останавливаем переподключения.",
+        );
         this.shouldStopReconnecting = true;
         this.authErrorCount = this.maxAuthErrors; // Устанавливаем максимум
-        
+
         // Отключаем соединение
         const socketToDisconnect = this.socket;
         this.socket = null; // Сначала обнуляем, чтобы избежать повторных вызовов
-        
+
         if (socketToDisconnect) {
           try {
             socketToDisconnect.removeAllListeners();
@@ -154,12 +178,12 @@ class WebSocketService {
             console.error("Ошибка при отключении сокета:", error);
           }
         }
-        
+
         // Очищаем куки и редиректим на страницу входа
         this.handleAuthFailure();
         return;
       }
-      
+
       if (this.reconnectAttempts >= this.maxReconnectAttempts) {
         this.emit("error", {
           message: `Не удалось подключиться после ${this.maxReconnectAttempts} попыток`,
@@ -173,17 +197,23 @@ class WebSocketService {
       }
     });
 
-          // Token refresh
-          this.socket.on("tokenRefreshed", (data: { accessToken: string; message?: string }) => {
-            console.log("🔄 Токен обновлен через WebSocket:", data.message || "Новый access token получен");
-            if (data.accessToken) {
-              setAccessToken(data.accessToken);
-              // Сбрасываем флаги ошибок аутентификации при успешном обновлении токена
-              this.authErrorCount = 0;
-              this.shouldStopReconnecting = false;
-            }
-            this.emit("tokenRefreshed", data);
-          });
+    // Token refresh
+    this.socket.on(
+      "tokenRefreshed",
+      (data: { accessToken: string; message?: string }) => {
+        console.log(
+          "🔄 Токен обновлен через WebSocket:",
+          data.message || "Новый access token получен",
+        );
+        if (data.accessToken) {
+          setAccessToken(data.accessToken);
+          // Сбрасываем флаги ошибок аутентификации при успешном обновлении токена
+          this.authErrorCount = 0;
+          this.shouldStopReconnecting = false;
+        }
+        this.emit("tokenRefreshed", data);
+      },
+    );
 
     // My rooms
     this.socket.on("myRooms", (data: { rooms: Room[] }) => {
@@ -192,11 +222,14 @@ class WebSocketService {
     });
 
     // Room events
-    this.socket.on("joinedRoom", (data: { roomId: string; publicCode: string; room: Room }) => {
-      this.currentRoomId = data.roomId;
-      console.log("✅ Присоединились к комнате:", data.roomId);
-      this.emit("joinedRoom", data);
-    });
+    this.socket.on(
+      "joinedRoom",
+      (data: { roomId: string; publicCode: string; room: Room }) => {
+        this.currentRoomId = data.roomId;
+        console.log("✅ Присоединились к комнате:", data.roomId);
+        this.emit("joinedRoom", data);
+      },
+    );
 
     this.socket.on("leftRoom", (data: { roomId: string }) => {
       if (this.currentRoomId === data.roomId) {
@@ -207,57 +240,75 @@ class WebSocketService {
     });
 
     // Chat events
-    this.socket.on("chatHistory", (data: { roomId: string; messages: ChatMessage[] }) => {
-      console.log("📜 История чата получена:", data.messages.length, "сообщений");
-      this.emit("chatHistory", data);
-    });
+    this.socket.on(
+      "chatHistory",
+      (data: { roomId: string; messages: ChatMessage[] }) => {
+        console.log(
+          "📜 История чата получена:",
+          data.messages.length,
+          "сообщений",
+        );
+        this.emit("chatHistory", data);
+      },
+    );
 
-    this.socket.on("newMessage", (data: { roomId: string; message: ChatMessage }) => {
-      console.log("💬 Новое сообщение:", data.message);
-      this.emit("newMessage", data);
-    });
+    this.socket.on(
+      "newMessage",
+      (data: { roomId: string; message: ChatMessage }) => {
+        console.log("💬 Новое сообщение:", data.message);
+        this.emit("newMessage", data);
+      },
+    );
 
     // Room updates
-    this.socket.on("roomUpdate", (data: {
-      roomId: string;
-      room: Room;
-      event: string;
-      userId?: string;
-    }) => {
-      console.log("🔄 Обновление комнаты:", data.event);
-      this.emit("roomUpdate", data);
-    });
+    this.socket.on(
+      "roomUpdate",
+      (data: {
+        roomId: string;
+        room: Room;
+        event: string;
+        userId?: string;
+      }) => {
+        console.log("🔄 Обновление комнаты:", data.event);
+        this.emit("roomUpdate", data);
+      },
+    );
 
     // Error handling
-    this.socket.on("error", (error: { message: string; code: string; event?: string }) => {
-      console.error("❌ Ошибка WebSocket:", error.message, error.code);
-      
-      // Если ошибка аутентификации, сразу останавливаем все попытки
-      if (error.code === "UNAUTHORIZED") {
-        console.error("❌ Ошибка аутентификации. Немедленно останавливаем переподключения.");
-        this.shouldStopReconnecting = true;
-        this.authErrorCount = this.maxAuthErrors; // Устанавливаем максимум, чтобы больше не пытаться
-        
-        // Отключаем соединение и очищаем
-        const socketToDisconnect = this.socket;
-        this.socket = null; // Сначала обнуляем, чтобы избежать повторных вызовов
-        
-        if (socketToDisconnect) {
-          try {
-            socketToDisconnect.removeAllListeners();
-            socketToDisconnect.disconnect();
-          } catch (error) {
-            console.error("Ошибка при отключении сокета:", error);
+    this.socket.on(
+      "error",
+      (error: { message: string; code: string; event?: string }) => {
+        console.error("❌ Ошибка WebSocket:", error.message, error.code);
+
+        // Если ошибка аутентификации, сразу останавливаем все попытки
+        if (error.code === "UNAUTHORIZED") {
+          console.error(
+            "❌ Ошибка аутентификации. Немедленно останавливаем переподключения.",
+          );
+          this.shouldStopReconnecting = true;
+          this.authErrorCount = this.maxAuthErrors; // Устанавливаем максимум, чтобы больше не пытаться
+
+          // Отключаем соединение и очищаем
+          const socketToDisconnect = this.socket;
+          this.socket = null; // Сначала обнуляем, чтобы избежать повторных вызовов
+
+          if (socketToDisconnect) {
+            try {
+              socketToDisconnect.removeAllListeners();
+              socketToDisconnect.disconnect();
+            } catch (error) {
+              console.error("Ошибка при отключении сокета:", error);
+            }
           }
+
+          // Очищаем куки и редиректим на страницу входа
+          this.handleAuthFailure();
+          return;
         }
-        
-        // Очищаем куки и редиректим на страницу входа
-        this.handleAuthFailure();
-        return;
-      }
-      
-      this.emit("error", error);
-    });
+
+        this.emit("error", error);
+      },
+    );
   }
 
   /**
@@ -266,10 +317,10 @@ class WebSocketService {
   private async handleAuthFailure(): Promise<void> {
     const { removeAllAuthTokens } = await import("@mm-preview/sdk");
     removeAllAuthTokens();
-    
+
     // Определяем URL для user-creation динамически
     let userCreationUrl: string | null = null;
-    
+
     // Проверяем переменную окружения
     if (process.env.NEXT_PUBLIC_USER_CREATION_URL) {
       userCreationUrl = process.env.NEXT_PUBLIC_USER_CREATION_URL;
@@ -277,25 +328,32 @@ class WebSocketService {
       // Динамическое определение URL
       const hostname = window.location.hostname;
       const protocol = window.location.protocol;
-      
+
       // Production - Vercel
       if (hostname.includes("vercel.app")) {
         const parts = hostname.split(".");
-        const baseDomain = parts.length >= 2 ? parts.slice(-2).join(".") : "vercel.app";
+        const baseDomain =
+          parts.length >= 2 ? parts.slice(-2).join(".") : "vercel.app";
         userCreationUrl = `https://mm-preview-user-creation.${baseDomain}`;
       }
       // Dev mode - IP address or localhost
-      else if (/^(\d{1,3}\.){3}\d{1,3}$/.test(hostname) || hostname === "localhost" || hostname === "127.0.0.1") {
+      else if (
+        /^(\d{1,3}\.){3}\d{1,3}$/.test(hostname) ||
+        hostname === "localhost" ||
+        hostname === "127.0.0.1"
+      ) {
         userCreationUrl = `${protocol}//${hostname}:3001`;
       }
     }
-    
+
     if (!userCreationUrl) {
       console.error("❌ Could not determine user creation URL");
       return;
     }
-    
-    console.error("🔴 Перенаправление на страницу входа из-за ошибок аутентификации");
+
+    console.error(
+      "🔴 Перенаправление на страницу входа из-за ошибок аутентификации",
+    );
     window.location.href = userCreationUrl;
   }
 
@@ -318,7 +376,7 @@ class WebSocketService {
    */
   on<T extends keyof WebSocketServiceEvents>(
     event: T,
-    listener: EventListener<T>
+    listener: EventListener<T>,
   ): () => void {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, new Set());
@@ -336,7 +394,7 @@ class WebSocketService {
    */
   off<T extends keyof WebSocketServiceEvents>(
     event: T,
-    listener: EventListener<T>
+    listener: EventListener<T>,
   ): void {
     const eventListeners = this.listeners.get(event);
     if (eventListeners) {
@@ -516,10 +574,10 @@ class WebSocketService {
         const { removeAllAuthTokens } = await import("@mm-preview/sdk");
         removeAllAuthTokens();
         const userCreationUrl = process.env.NEXT_PUBLIC_USER_CREATION_URL;
-    if (!userCreationUrl) {
-      console.error("❌ NEXT_PUBLIC_USER_CREATION_URL is not set");
-      return;
-    }
+        if (!userCreationUrl) {
+          console.error("❌ NEXT_PUBLIC_USER_CREATION_URL is not set");
+          return;
+        }
         window.location.href = userCreationUrl;
       } else {
         this.emit("error", {
@@ -533,4 +591,3 @@ class WebSocketService {
 
 // Singleton instance
 export const webSocketService = new WebSocketService();
-

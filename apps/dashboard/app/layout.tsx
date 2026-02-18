@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "primeicons/primeicons.css";
 import "./globals.css";
-import { Provider } from "@/src/shared/config/providers/Provider";
 import { ClientPageTransition } from "@/src/shared/components/ClientPageTransition";
+import { Provider } from "@/src/shared/config/providers/Provider";
 
 export const metadata: Metadata = {
   title: "Dashboard - Movie match",

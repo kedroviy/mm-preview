@@ -2,7 +2,10 @@
 
 import { useUsersController_getProfile } from "@mm-preview/sdk";
 import { Button } from "@mm-preview/ui";
-import { useViewTransition, ViewTransition } from "@/src/shared/components/ViewTransition";
+import {
+  useViewTransition,
+  ViewTransition,
+} from "@/src/shared/components/ViewTransition";
 import { useWebSocketMyRooms } from "@/src/shared/hooks/useWebSocketMyRooms";
 
 interface DashboardClientProps {
@@ -17,25 +20,45 @@ interface DashboardClientProps {
   } | null;
 }
 
-export function DashboardClient({ userId, initialProfile }: DashboardClientProps) {
+export function DashboardClient({
+  userId,
+  initialProfile,
+}: DashboardClientProps) {
   // Если есть initialProfile, отключаем запрос через хук
   // Иначе используем хук для запроса
   // queryKey устанавливается внутри хука, поэтому используем as any для обхода проверки типов
   const queryResult = useUsersController_getProfile(
-    initialProfile ? ({ enabled: false } as any) : undefined
+    initialProfile ? ({ enabled: false } as any) : undefined,
   );
-  
+
   // Используем initialProfile если есть, иначе данные из запроса
-  const profile = initialProfile || queryResult.data;
+  type ProfileType = {
+    userId: string;
+    name: string;
+    role?: string;
+    lastActive?: number;
+    recentRooms?: string[];
+    rooms?: unknown[];
+  };
+  const profile = (initialProfile || queryResult.data) as
+    | ProfileType
+    | null
+    | undefined;
   const isLoading = initialProfile ? false : queryResult.isLoading;
   const error = initialProfile ? null : queryResult.error;
   const profileUserId = profile?.userId || userId;
-  const { rooms: myRooms, isLoading: isMyRoomsLoading } = useWebSocketMyRooms(profileUserId, !!profileUserId);
+  const { rooms: myRooms, isLoading: isMyRoomsLoading } = useWebSocketMyRooms(
+    profileUserId,
+    !!profileUserId,
+  );
   const { navigate, isPending } = useViewTransition();
 
   if (isLoading && !initialProfile) {
     return (
-      <div className="min-h-screen p-8 flex items-center justify-center" suppressHydrationWarning>
+      <div
+        className="min-h-screen p-8 flex items-center justify-center"
+        suppressHydrationWarning
+      >
         <div className="text-center" suppressHydrationWarning>
           <p className="text-lg">Loading...</p>
         </div>
@@ -45,7 +68,10 @@ export function DashboardClient({ userId, initialProfile }: DashboardClientProps
 
   if (error || !profile) {
     return (
-      <div className="min-h-screen p-8 flex items-center justify-center" suppressHydrationWarning>
+      <div
+        className="min-h-screen p-8 flex items-center justify-center"
+        suppressHydrationWarning
+      >
         <div className="text-center" suppressHydrationWarning>
           <p className="text-lg text-red-600">Failed to load user profile</p>
         </div>
@@ -70,10 +96,12 @@ export function DashboardClient({ userId, initialProfile }: DashboardClientProps
                 type="button"
                 label="Комнаты"
                 icon="pi pi-home"
-                {...(!isMyRoomsLoading && myRooms && myRooms.length > 0 && {
-                  badge: String(myRooms.length),
-                  badgeSeverity: "warning",
-                })}
+                {...(!isMyRoomsLoading &&
+                  myRooms &&
+                  myRooms.length > 0 && {
+                    badge: String(myRooms.length),
+                    badgeSeverity: "warning",
+                  })}
                 tooltip="Создайте комнату, присоединитесь к существующей или вернитесь в недавнюю комнату"
                 tooltipOptions={{ position: "bottom" }}
                 onClick={() => {
@@ -109,4 +137,3 @@ export function DashboardClient({ userId, initialProfile }: DashboardClientProps
     </ViewTransition>
   );
 }
-

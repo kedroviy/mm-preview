@@ -20,24 +20,24 @@ function getAppUrl(key: "LANDING" | "USER_CREATION" | "DASHBOARD"): string {
     // Mode 2: Production - Vercel
     if (hostname.includes("vercel.app")) {
       const parts = hostname.split(".");
-      const baseDomain = parts.length >= 2 
-        ? parts.slice(-2).join(".")
-        : "vercel.app";
-      
+      const baseDomain =
+        parts.length >= 2 ? parts.slice(-2).join(".") : "vercel.app";
+
       const appNames: Record<string, string> = {
         LANDING: "mm-preview-landing",
         USER_CREATION: "mm-preview-user-creation",
         DASHBOARD: "mm-preview-dashboard",
       };
-      
+
       return `https://${appNames[key]}.${baseDomain}`;
     }
 
     // Mode 1: Dev mode - IP address or localhost
-    const isDevMode = /^(\d{1,3}\.){3}\d{1,3}$/.test(hostname) || 
-                      hostname === "localhost" || 
-                      hostname === "127.0.0.1";
-    
+    const isDevMode =
+      /^(\d{1,3}\.){3}\d{1,3}$/.test(hostname) ||
+      hostname === "localhost" ||
+      hostname === "127.0.0.1";
+
     if (isDevMode) {
       const devPorts: Record<string, string> = {
         LANDING: "3000",
@@ -49,7 +49,9 @@ function getAppUrl(key: "LANDING" | "USER_CREATION" | "DASHBOARD"): string {
   }
 
   // If no environment variable and not in dev/production mode, throw error
-  throw new Error(`NEXT_PUBLIC_${key}_URL must be set for non-dev environments`);
+  throw new Error(
+    `NEXT_PUBLIC_${key}_URL must be set for non-dev environments`,
+  );
 }
 
 // Export as a function to get URLs dynamically

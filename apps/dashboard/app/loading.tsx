@@ -7,4 +7,3 @@ import { AutoLoading } from "@/src/shared/components/AutoLoading";
 export default function Loading() {
   return <AutoLoading variant="page" />;
 }
-

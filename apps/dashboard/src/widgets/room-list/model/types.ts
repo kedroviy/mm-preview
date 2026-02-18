@@ -5,4 +5,3 @@ export interface RoomListProps {
   onConnect: (roomId: string) => void;
   onDelete?: (roomId: string) => void;
 }
-

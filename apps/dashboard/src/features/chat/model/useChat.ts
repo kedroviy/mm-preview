@@ -1,7 +1,7 @@
 "use client";
 
-import { useWebSocketChat } from "@/src/shared/hooks/useWebSocketChat";
 import { notificationService } from "@mm-preview/ui";
+import { useWebSocketChat } from "@/src/shared/hooks/useWebSocketChat";
 import type { ChatWindowProps } from "./types";
 
 export function useChat({
@@ -15,19 +15,16 @@ export function useChat({
   userId: string;
   enabled: boolean;
 }) {
-  const {
-    messages,
-    isConnected,
-    isMuted,
-    sendMessage,
-  } = useWebSocketChat({
+  const { messages, isConnected, isMuted, sendMessage } = useWebSocketChat({
     roomId,
     publicCode,
     userId,
     enabled,
     onError: (error) => {
       console.error("Chat error:", error);
-      notificationService.showError(error.message || "Ошибка подключения к чату");
+      notificationService.showError(
+        error.message || "Ошибка подключения к чату",
+      );
     },
   });
 
@@ -38,4 +35,3 @@ export function useChat({
     sendMessage,
   };
 }
-

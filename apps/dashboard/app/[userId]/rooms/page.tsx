@@ -8,7 +8,7 @@ export default async function UserRoomsPage({
   params: Promise<{ userId: string }>;
 }) {
   const { userId } = await params;
-  
+
   // Серверный запрос за комнатами
   const initialRooms = await getMyRoomsServer();
 
@@ -18,4 +18,3 @@ export default async function UserRoomsPage({
     </Suspense>
   );
 }
-

@@ -10,31 +10,36 @@ function getUserCreationUrl(request: NextRequest): string {
 
   // Try to detect URL from request
   const hostname = request.headers.get("host") || "";
-  const protocol = request.headers.get("x-forwarded-proto") || 
-                   (request.url.startsWith("https") ? "https" : "http");
-  
+  const protocol =
+    request.headers.get("x-forwarded-proto") ||
+    (request.url.startsWith("https") ? "https" : "http");
+
   // Extract hostname without port
   const hostnameWithoutPort = hostname.split(":")[0];
-  
+
   // Check for Vercel deployment
   if (hostnameWithoutPort.includes("vercel.app")) {
     // For Vercel, base domain is always the last two parts: "vercel.app"
     const parts = hostnameWithoutPort.split(".");
-    const baseDomain = parts.length >= 2 
-      ? parts.slice(-2).join(".")  // Always take last two parts: "vercel.app"
-      : "vercel.app"; // Fallback
-    
+    const baseDomain =
+      parts.length >= 2
+        ? parts
+            .slice(-2)
+            .join(".") // Always take last two parts: "vercel.app"
+        : "vercel.app"; // Fallback
+
     return `https://mm-preview-user-creation.${baseDomain}`;
   }
-  
+
   // Check if we're in dev mode with IP address
-  const isIPAddress = /^(\d{1,3}\.){3}\d{1,3}$/.test(hostnameWithoutPort) || 
-                       hostnameWithoutPort === "localhost" || 
-                       hostnameWithoutPort === "127.0.0.1";
-  
+  const isIPAddress =
+    /^(\d{1,3}\.){3}\d{1,3}$/.test(hostnameWithoutPort) ||
+    hostnameWithoutPort === "localhost" ||
+    hostnameWithoutPort === "127.0.0.1";
+
   // Check if port is in hostname (dev mode) - ports like 3000, 3001, 3002
   const hasPort = hostname.includes(":") && /:\d{4}/.test(hostname);
-  
+
   if (isIPAddress) {
     // If we have IP address, use dev port 3001 for user-creation
     // Check if port is in hostname, if not, extract from URL
@@ -52,7 +57,9 @@ function getUserCreationUrl(request: NextRequest): string {
 
   // If no environment variable and not in dev mode, throw error
   // Environment variable must be set for production
-  throw new Error(`NEXT_PUBLIC_USER_CREATION_URL must be set for non-dev environments`);
+  throw new Error(
+    "NEXT_PUBLIC_USER_CREATION_URL must be set for non-dev environments",
+  );
 }
 
 export async function middleware(request: NextRequest) {
@@ -105,7 +112,9 @@ export async function middleware(request: NextRequest) {
         headers: {
           "Content-Type": "application/json",
           Cookie: request.headers.get("cookie") || "",
-          Origin: request.headers.get("origin") || request.url.split("/").slice(0, 3).join("/"),
+          Origin:
+            request.headers.get("origin") ||
+            request.url.split("/").slice(0, 3).join("/"),
         },
         credentials: "include",
       });
@@ -114,14 +123,14 @@ export async function middleware(request: NextRequest) {
         // Получаем Set-Cookie заголовки и устанавливаем куки
         const setCookieHeaders = response.headers.getSetCookie();
         const responseWithCookies = NextResponse.next();
-        
+
         // Устанавливаем куки из Set-Cookie заголовков
         for (const cookieHeader of setCookieHeaders) {
           const nameMatch = cookieHeader.match(/^([^=]+)=([^;]+)/);
           if (nameMatch) {
             const cookieName = nameMatch[1];
             const cookieValue = nameMatch[2];
-            
+
             // Парсим атрибуты куки
             const pathMatch = cookieHeader.match(/Path=([^;]+)/);
             const domainMatch = cookieHeader.match(/Domain=([^;]+)/);
@@ -129,25 +138,29 @@ export async function middleware(request: NextRequest) {
             const httpOnlyMatch = cookieHeader.match(/HttpOnly/);
             const secureMatch = cookieHeader.match(/Secure/);
             const sameSiteMatch = cookieHeader.match(/SameSite=([^;]+)/);
-            
+
             responseWithCookies.cookies.set(cookieName, cookieValue, {
               path: pathMatch ? pathMatch[1] : "/",
               domain: domainMatch ? domainMatch[1] : undefined,
-              maxAge: maxAgeMatch ? parseInt(maxAgeMatch[1], 10) : undefined,
+              maxAge: maxAgeMatch
+                ? Number.parseInt(maxAgeMatch[1], 10)
+                : undefined,
               httpOnly: !!httpOnlyMatch,
               secure: !!secureMatch,
-              sameSite: sameSiteMatch 
+              sameSite: sameSiteMatch
                 ? (sameSiteMatch[1].toLowerCase() as "strict" | "lax" | "none")
                 : "lax",
             });
           }
         }
-        
+
         return responseWithCookies;
       } else {
         // Refresh не удался - очищаем куки и редиректим
         const userCreationUrl = getUserCreationUrl(request);
-        const redirectResponse = NextResponse.redirect(new URL(userCreationUrl));
+        const redirectResponse = NextResponse.redirect(
+          new URL(userCreationUrl),
+        );
         redirectResponse.cookies.delete("access_token");
         redirectResponse.cookies.delete("refresh_token");
         return redirectResponse;

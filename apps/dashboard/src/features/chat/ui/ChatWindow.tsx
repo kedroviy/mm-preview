@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { InputText } from "primereact/inputtext";
-import { Button, Card } from "@mm-preview/ui";
 import type { ChatMessage } from "@mm-preview/sdk";
+import { Button, Card } from "@mm-preview/ui";
+import { InputText } from "primereact/inputtext";
+import { useEffect, useRef, useState } from "react";
 import type { ChatWindowProps } from "../model/types";
 
 export function ChatWindow({
@@ -56,7 +56,7 @@ export function ChatWindow({
             </span>
           )}
         </div>
-        
+
         <div className="flex-1 overflow-y-auto mb-4 space-y-2 pr-2">
           {messages.length === 0 ? (
             <p className="text-center text-muted-color py-8">
@@ -102,7 +102,11 @@ export function ChatWindow({
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder={isMuted ? "Вы заглушены и не можете отправлять сообщения" : "Введите сообщение..."}
+            placeholder={
+              isMuted
+                ? "Вы заглушены и не можете отправлять сообщения"
+                : "Введите сообщение..."
+            }
             disabled={isLoading || isMuted}
             maxLength={1000}
             className="flex-1"
@@ -123,4 +127,3 @@ export function ChatWindow({
     </Card>
   );
 }
-

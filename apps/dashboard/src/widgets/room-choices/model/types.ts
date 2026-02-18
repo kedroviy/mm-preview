@@ -4,4 +4,3 @@ export interface RoomChoicesProps {
   room: Room;
   currentUserId: string;
 }
-

@@ -74,9 +74,11 @@ export {};
       // Special stub for useUsers to satisfy common imports
       if (fileName === "useUsers") {
         stubContent = `// This file is a stub. Run "npm run generate:all" to generate actual hooks.
-import type { UseQueryOptions } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 
-export function useUsersController_getProfile(_options?: UseQueryOptions<any>) {
+export function useUsersController_getProfile(
+  _options?: UseQueryOptions<unknown, Error, unknown, readonly unknown[]>
+): UseQueryResult<unknown, Error> {
   throw new Error('This is a stub. Run "npm run generate:all" to generate actual hooks.');
 }
 
