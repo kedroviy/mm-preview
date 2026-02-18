@@ -122,10 +122,32 @@ function generateHooks() {
       if (!fs.existsSync(OUTPUT_DIR)) {
         fs.mkdirSync(OUTPUT_DIR, { recursive: true });
       }
-      const stubContent = `// This file is a stub. Run "npm run generate:swagger" and "npm run generate:hooks" to generate actual hooks.
+      // Create stub files for each expected hook file
+      const stubFiles = ['useHealth', 'useAuth', 'useUsers', 'useRooms'];
+      stubFiles.forEach(fileName => {
+        let stubContent = `// This file is a stub. Run "npm run generate:swagger" and "npm run generate:hooks" to generate actual hooks.
 export {};
 `;
-      fs.writeFileSync(path.join(OUTPUT_DIR, 'index.ts'), stubContent);
+        // Add specific stub exports for useUsers
+        if (fileName === 'useUsers') {
+          stubContent = `// This file is a stub. Run "npm run generate:swagger" and "npm run generate:hooks" to generate actual hooks.
+import type { UseQueryOptions } from '@tanstack/react-query';
+
+export function useUsersController_getProfile(_options?: UseQueryOptions<any>) {
+  throw new Error('This is a stub. Run "npm run generate:all" to generate actual hooks.');
+}
+
+export const usersKeys = {
+  UsersController_getProfile: () => ['users', 'UsersController_getProfile'] as const,
+  UsersController_getUser: (_path: { userId: string }) => ['users', 'UsersController_getUser'] as const,
+} as const;
+`;
+        }
+        fs.writeFileSync(path.join(OUTPUT_DIR, `${fileName}.ts`), stubContent);
+      });
+      // Create index file that exports from all stub files
+      const indexContent = stubFiles.map(fileName => `export * from './${fileName}';`).join('\n');
+      fs.writeFileSync(path.join(OUTPUT_DIR, 'index.ts'), indexContent);
       console.log(`✓ Stub files created in ${OUTPUT_DIR}`);
       return;
     }
@@ -138,10 +160,32 @@ export {};
       if (!fs.existsSync(OUTPUT_DIR)) {
         fs.mkdirSync(OUTPUT_DIR, { recursive: true });
       }
-      const stubContent = `// This file is a stub. Run "npm run generate:swagger" and "npm run generate:hooks" to generate actual hooks.
+      // Create stub files for each expected hook file
+      const stubFiles = ['useHealth', 'useAuth', 'useUsers', 'useRooms'];
+      stubFiles.forEach(fileName => {
+        let stubContent = `// This file is a stub. Run "npm run generate:swagger" and "npm run generate:hooks" to generate actual hooks.
 export {};
 `;
-      fs.writeFileSync(path.join(OUTPUT_DIR, 'index.ts'), stubContent);
+        // Add specific stub exports for useUsers
+        if (fileName === 'useUsers') {
+          stubContent = `// This file is a stub. Run "npm run generate:swagger" and "npm run generate:hooks" to generate actual hooks.
+import type { UseQueryOptions } from '@tanstack/react-query';
+
+export function useUsersController_getProfile(_options?: UseQueryOptions<any>) {
+  throw new Error('This is a stub. Run "npm run generate:all" to generate actual hooks.');
+}
+
+export const usersKeys = {
+  UsersController_getProfile: () => ['users', 'UsersController_getProfile'] as const,
+  UsersController_getUser: (_path: { userId: string }) => ['users', 'UsersController_getUser'] as const,
+} as const;
+`;
+        }
+        fs.writeFileSync(path.join(OUTPUT_DIR, `${fileName}.ts`), stubContent);
+      });
+      // Create index file that exports from all stub files
+      const indexContent = stubFiles.map(fileName => `export * from './${fileName}';`).join('\n');
+      fs.writeFileSync(path.join(OUTPUT_DIR, 'index.ts'), indexContent);
       console.log(`✓ Stub files created in ${OUTPUT_DIR}`);
       return;
     }
@@ -229,10 +273,32 @@ export {};
     if (!fs.existsSync(OUTPUT_DIR)) {
       fs.mkdirSync(OUTPUT_DIR, { recursive: true });
     }
-    const stubContent = `// This file is a stub. Generation failed: ${error.message}
+    // Create stub files for each expected hook file
+    const stubFiles = ['useHealth', 'useAuth', 'useUsers', 'useRooms'];
+    stubFiles.forEach(fileName => {
+      let stubContent = `// This file is a stub. Generation failed: ${error.message}
 export {};
 `;
-    fs.writeFileSync(path.join(OUTPUT_DIR, 'index.ts'), stubContent);
+      // Add specific stub exports for useUsers
+      if (fileName === 'useUsers') {
+        stubContent = `// This file is a stub. Generation failed: ${error.message}
+import type { UseQueryOptions } from '@tanstack/react-query';
+
+export function useUsersController_getProfile(_options?: UseQueryOptions<any>) {
+  throw new Error('This is a stub. Run "npm run generate:all" to generate actual hooks.');
+}
+
+export const usersKeys = {
+  UsersController_getProfile: () => ['users', 'UsersController_getProfile'] as const,
+  UsersController_getUser: (_path: { userId: string }) => ['users', 'UsersController_getUser'] as const,
+} as const;
+`;
+      }
+      fs.writeFileSync(path.join(OUTPUT_DIR, `${fileName}.ts`), stubContent);
+    });
+    // Create index file that exports from all stub files
+    const indexContent = stubFiles.map(fileName => `export * from './${fileName}';`).join('\n');
+    fs.writeFileSync(path.join(OUTPUT_DIR, 'index.ts'), indexContent);
     console.log(`✓ Stub files created in ${OUTPUT_DIR}`);
   }
 }

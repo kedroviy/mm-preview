@@ -113,10 +113,17 @@ function generateRequests() {
       if (!fs.existsSync(OUTPUT_DIR)) {
         fs.mkdirSync(OUTPUT_DIR, { recursive: true });
       }
-      const stubContent = `// This file is a stub. Run "npm run generate:swagger" and "npm run generate:requests" to generate actual requests.
+      // Create stub files for each expected request file
+      const stubFiles = ['health', 'auth', 'users', 'rooms'];
+      stubFiles.forEach(fileName => {
+        const stubContent = `// This file is a stub. Run "npm run generate:swagger" and "npm run generate:requests" to generate actual requests.
 export {};
 `;
-      fs.writeFileSync(path.join(OUTPUT_DIR, 'index.ts'), stubContent);
+        fs.writeFileSync(path.join(OUTPUT_DIR, `${fileName}.ts`), stubContent);
+      });
+      // Create index file that exports from all stub files
+      const indexContent = stubFiles.map(fileName => `export * from './${fileName}';`).join('\n');
+      fs.writeFileSync(path.join(OUTPUT_DIR, 'index.ts'), indexContent);
       console.log(`✓ Stub files created in ${OUTPUT_DIR}`);
       return;
     }
@@ -129,10 +136,17 @@ export {};
       if (!fs.existsSync(OUTPUT_DIR)) {
         fs.mkdirSync(OUTPUT_DIR, { recursive: true });
       }
-      const stubContent = `// This file is a stub. Run "npm run generate:swagger" and "npm run generate:requests" to generate actual requests.
+      // Create stub files for each expected request file
+      const stubFiles = ['health', 'auth', 'users', 'rooms'];
+      stubFiles.forEach(fileName => {
+        const stubContent = `// This file is a stub. Run "npm run generate:swagger" and "npm run generate:requests" to generate actual requests.
 export {};
 `;
-      fs.writeFileSync(path.join(OUTPUT_DIR, 'index.ts'), stubContent);
+        fs.writeFileSync(path.join(OUTPUT_DIR, `${fileName}.ts`), stubContent);
+      });
+      // Create index file that exports from all stub files
+      const indexContent = stubFiles.map(fileName => `export * from './${fileName}';`).join('\n');
+      fs.writeFileSync(path.join(OUTPUT_DIR, 'index.ts'), indexContent);
       console.log(`✓ Stub files created in ${OUTPUT_DIR}`);
       return;
     }
@@ -186,10 +200,17 @@ export {};
     if (!fs.existsSync(OUTPUT_DIR)) {
       fs.mkdirSync(OUTPUT_DIR, { recursive: true });
     }
-    const stubContent = `// This file is a stub. Generation failed: ${error.message}
+    // Create stub files for each expected request file
+    const stubFiles = ['health', 'auth', 'users', 'rooms'];
+    stubFiles.forEach(fileName => {
+      const stubContent = `// This file is a stub. Generation failed: ${error.message}
 export {};
 `;
-    fs.writeFileSync(path.join(OUTPUT_DIR, 'index.ts'), stubContent);
+      fs.writeFileSync(path.join(OUTPUT_DIR, `${fileName}.ts`), stubContent);
+    });
+    // Create index file that exports from all stub files
+    const indexContent = stubFiles.map(fileName => `export * from './${fileName}';`).join('\n');
+    fs.writeFileSync(path.join(OUTPUT_DIR, 'index.ts'), indexContent);
     console.log(`✓ Stub files created in ${OUTPUT_DIR}`);
   }
 }
