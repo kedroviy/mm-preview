@@ -181,6 +181,28 @@ export async function middleware(request: NextRequest) {
                 new URL(`${dashboardUrl}/${user.userId}`),
               );
               
+              // Определяем, является ли запрос кросс-доменным (production на Vercel)
+              const isProduction = process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
+              const requestHost = request.headers.get("host") || "";
+              const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+              
+              // Проверяем, является ли запрос кросс-доменным
+              // В production на Vercel приложения работают на vercel.app, а API может быть на другом домене
+              let isCrossDomain = false;
+              if (isProduction) {
+                try {
+                  const apiHost = new URL(apiUrl).hostname;
+                  const requestHostname = requestHost.split(":")[0]; // Убираем порт
+                  // Если домены разные, это кросс-доменный запрос
+                  isCrossDomain = apiHost !== requestHostname && 
+                                 !requestHostname.includes(apiHost) && 
+                                 !apiHost.includes(requestHostname);
+                } catch {
+                  // Если не удалось распарсить URL, предполагаем кросс-доменный запрос в production
+                  isCrossDomain = true;
+                }
+              }
+
               // Устанавливаем куки из Set-Cookie заголовков
               for (const cookieHeader of setCookieHeaders) {
                 const nameMatch = cookieHeader.match(/^([^=]+)=([^;]+)/);
@@ -195,15 +217,24 @@ export async function middleware(request: NextRequest) {
                   const secureMatch = cookieHeader.match(/Secure/);
                   const sameSiteMatch = cookieHeader.match(/SameSite=([^;]+)/);
                   
+                  // Для кросс-доменных запросов в production используем SameSite=None; Secure
+                  let sameSite: "strict" | "lax" | "none" = sameSiteMatch 
+                    ? (sameSiteMatch[1].toLowerCase() as "strict" | "lax" | "none")
+                    : "lax";
+                  let secure = !!secureMatch;
+
+                  if (isCrossDomain) {
+                    sameSite = "none";
+                    secure = true; // SameSite=None требует Secure
+                  }
+                  
                   redirectResponse.cookies.set(cookieName, cookieValue, {
                     path: pathMatch ? pathMatch[1] : "/",
                     domain: domainMatch ? domainMatch[1] : undefined,
                     maxAge: maxAgeMatch ? parseInt(maxAgeMatch[1], 10) : undefined,
                     httpOnly: !!httpOnlyMatch,
-                    secure: !!secureMatch,
-                    sameSite: sameSiteMatch 
-                      ? (sameSiteMatch[1].toLowerCase() as "strict" | "lax" | "none")
-                      : "lax",
+                    secure,
+                    sameSite,
                   });
                 }
               }

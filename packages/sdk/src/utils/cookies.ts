@@ -43,8 +43,21 @@ export function setCookie(name: string, value: string, days = 30): void {
   const expires = new Date();
   expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
 
+  // Определяем, является ли это production окружением
+  // Проверяем hostname на наличие vercel.app или других production доменов
+  const hostname = window.location.hostname;
+  const isProduction = hostname.includes("vercel.app") || 
+                       (!hostname.includes("localhost") && 
+                        !hostname.includes("127.0.0.1") &&
+                        !/^(\d{1,3}\.){3}\d{1,3}$/.test(hostname));
+  
+  // Для production используем SameSite=None; Secure для кросс-доменных куки
+  // Для dev используем SameSite=Lax
+  const sameSite = isProduction ? "None" : "Lax";
+  const secure = isProduction ? "Secure;" : "";
+
   // biome-ignore lint/suspicious/noDocumentCookie: Standard way to set cookies in browser
-  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=${sameSite};${secure}`;
 }
 
 export function deleteCookie(name: string): void {
