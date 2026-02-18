@@ -49,14 +49,10 @@ function getUserCreationUrl(request: NextRequest): string {
     // Default to port 3001 for dev mode
     return `${protocol}://${hostnameWithoutPort}:3001`;
   }
-  
-  // Check for .local subdomain
-  if (hostnameWithoutPort.includes(".local")) {
-    return "http://user-creation.local";
-  }
 
-  // Fallback to local development URL
-  return "http://user-creation.local";
+  // If no environment variable and not in dev mode, throw error
+  // Environment variable must be set for production
+  throw new Error(`NEXT_PUBLIC_USER_CREATION_URL must be set for non-dev environments`);
 }
 
 export async function middleware(request: NextRequest) {

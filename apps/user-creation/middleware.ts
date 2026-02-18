@@ -25,14 +25,10 @@ function getDashboardUrl(request: NextRequest): string {
   if (isIPAddress) {
     return `${protocol}://${hostnameWithoutPort}:3002`;
   }
-  
-  // Check for .local subdomain
-  if (hostnameWithoutPort.includes(".local")) {
-    return "http://dashboard.local";
-  }
 
-  // Fallback to local development URL
-  return "http://dashboard.local";
+  // If no environment variable and not in dev mode, throw error
+  // Environment variable must be set for production
+  throw new Error(`NEXT_PUBLIC_DASHBOARD_URL must be set for non-dev environments`);
 }
 
 export async function middleware(request: NextRequest) {

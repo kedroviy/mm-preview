@@ -1,8 +1,8 @@
-import type { JoinRoomResponse } from "@mm-preview/sdk";
+import type { Room } from "@mm-preview/sdk";
 
 export interface JoinRoomFormProps {
   userId: string;
-  onSuccess?: (result: JoinRoomResponse) => void;
+  onSuccess?: (result: Room) => void;
   onCancel?: () => void;
 }
 

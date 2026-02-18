@@ -10,6 +10,7 @@ function getServerAppUrl(
   const envKey = `NEXT_PUBLIC_${key}_URL`;
   const envValue = process.env[envKey];
 
+  // Priority 1: Environment variable (production)
   if (envValue) {
     return envValue;
   }
@@ -21,13 +22,12 @@ function getServerAppUrl(
                      (request.url.startsWith("https") ? "https" : "http");
     const hostnameWithoutPort = hostname.split(":")[0];
 
-    // Check for Vercel deployment
+    // Mode 2: Production - Vercel
     if (hostnameWithoutPort.includes("vercel.app")) {
-      // For Vercel, base domain is always the last two parts: "vercel.app"
       const parts = hostnameWithoutPort.split(".");
       const baseDomain = parts.length >= 2 
-        ? parts.slice(-2).join(".")  // Always take last two parts: "vercel.app"
-        : "vercel.app"; // Fallback
+        ? parts.slice(-2).join(".")
+        : "vercel.app";
       
       const appNames: Record<string, string> = {
         LANDING: "mm-preview-landing",
@@ -38,12 +38,12 @@ function getServerAppUrl(
       return `https://${appNames[key]}.${baseDomain}`;
     }
 
-    // Check if we're in dev mode with IP address
-    const isIPAddress = /^(\d{1,3}\.){3}\d{1,3}$/.test(hostnameWithoutPort) || 
-                         hostnameWithoutPort === "localhost" || 
-                         hostnameWithoutPort === "127.0.0.1";
+    // Mode 1: Dev mode - IP address or localhost
+    const isDevMode = /^(\d{1,3}\.){3}\d{1,3}$/.test(hostnameWithoutPort) || 
+                       hostnameWithoutPort === "localhost" || 
+                       hostnameWithoutPort === "127.0.0.1";
     
-    if (isIPAddress) {
+    if (isDevMode) {
       const devPorts: Record<string, string> = {
         LANDING: "3000",
         USER_CREATION: "3001",
@@ -51,26 +51,10 @@ function getServerAppUrl(
       };
       return `${protocol}://${hostnameWithoutPort}:${devPorts[key]}`;
     }
-
-    // Check for .local subdomain
-    if (hostnameWithoutPort.includes(".local")) {
-      const appNames: Record<string, string> = {
-        LANDING: "landing",
-        USER_CREATION: "user-creation",
-        DASHBOARD: "dashboard",
-      };
-      return `http://${appNames[key]}.local`;
-    }
   }
 
-  // Fallback to local development URLs
-  const localUrls: Record<string, string> = {
-    LANDING: "http://landing.local",
-    USER_CREATION: "http://user-creation.local",
-    DASHBOARD: "http://dashboard.local",
-  };
-
-  return localUrls[key];
+  // If no environment variable and not in dev/production mode, throw error
+  throw new Error(`NEXT_PUBLIC_${key}_URL must be set for non-dev environments`);
 }
 
 export function getServerAppUrls(request?: { headers: { get: (name: string) => string | null }; url: string }) {

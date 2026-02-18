@@ -46,7 +46,11 @@ export function useTokenRefresh() {
           // Если токен невалидный (401/403), очищаем куки и редиректим на страницу входа
           if (error?.status === 401 || error?.status === 403) {
             removeAllAuthTokens();
-            const userCreationUrl = process.env.NEXT_PUBLIC_USER_CREATION_URL || "http://user-creation.local";
+            const userCreationUrl = process.env.NEXT_PUBLIC_USER_CREATION_URL;
+            if (!userCreationUrl) {
+              console.error("❌ NEXT_PUBLIC_USER_CREATION_URL is not set");
+              return;
+            }
             window.location.href = userCreationUrl;
           } else {
             removeAllAuthTokens();
@@ -67,7 +71,11 @@ export function useTokenRefresh() {
         // Если токен невалидный (401/403), очищаем куки и редиректим на страницу входа
         if (error?.status === 401 || error?.status === 403) {
           removeAllAuthTokens();
-          const userCreationUrl = process.env.NEXT_PUBLIC_USER_CREATION_URL || "http://user-creation.local";
+          const userCreationUrl = process.env.NEXT_PUBLIC_USER_CREATION_URL;
+          if (!userCreationUrl) {
+            console.error("❌ NEXT_PUBLIC_USER_CREATION_URL is not set");
+            return;
+          }
           window.location.href = userCreationUrl;
         } else {
           removeAllAuthTokens();
