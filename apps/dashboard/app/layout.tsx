@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 
 const font = Montserrat({
   subsets: ["latin"],
+  variable: "--font-montserrat",
 });
 
 export default function RootLayout({
@@ -23,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={font.className}>
-      <body>
+      <body className="font-sans antialiased">
         <Provider>
           <ClientPageTransition>{children}</ClientPageTransition>
         </Provider>

@@ -1,0 +1,212 @@
+"use client";
+
+import {
+  useRoom,
+  useUser,
+  useLeaveRoom,
+  useRoomMembers,
+} from "@mm-preview/sdk";
+import { Button } from "@mm-preview/ui";
+import { useParams, useSearchParams } from "next/navigation";
+import { Suspense, useMemo, useCallback } from "react";
+import { useViewTransition, ViewTransition } from "@/src/shared/components/ViewTransition";
+import { ChatWindow, useChat } from "@/src/features/chat";
+import { notificationService } from "@mm-preview/ui";
+import { RoomHeader } from "@/src/widgets/room-header";
+import { RoomMembers } from "@/src/widgets/room-members";
+import { RoomChoices } from "@/src/widgets/room-choices";
+import { RoomNotMember } from "@/src/widgets/room-not-member";
+
+type ViewConfig = {
+  view: "loading" | "error" | "not-member" | "member";
+  render: () => React.ReactElement | null;
+};
+
+function RoomContent() {
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const roomId = (params?.roomId as string) || "";
+  const userId = searchParams?.get("userId") || "";
+
+  const { data: room, isLoading: roomLoading } = useRoom(roomId);
+  const { data: user } = useUser(userId);
+  const { data: members } = useRoomMembers(roomId);
+  const leaveRoom = useLeaveRoom();
+  const { navigate, isPending } = useViewTransition();
+
+  const {
+    messages: chatMessages,
+    isConnected: isChatConnected,
+    isMuted,
+    sendMessage: sendChatMessage,
+  } = useChat({
+    roomId,
+    publicCode: room?.publicCode,
+    userId,
+    enabled: !!(roomId && room?.isMember && userId),
+  });
+
+  const handleLeaveRoom = useCallback(async () => {
+    if (!userId || !roomId) return;
+
+    try {
+      await leaveRoom.mutateAsync({ roomId, userId });
+      notificationService.showSuccess("Вы покинули комнату");
+      navigate(`/rooms?userId=${userId}`);
+    } catch (error) {
+      notificationService.showError("Не удалось покинуть комнату");
+    }
+  }, [userId, roomId, leaveRoom, navigate]);
+
+  const handleBack = useCallback(() => navigate(`/rooms?userId=${userId}`), [navigate, userId]);
+  const handleRemoveMember = useCallback((memberUserId: string) => {
+    notificationService.showInfo("Функция удаления участника будет добавлена");
+  }, []);
+
+  const viewConfig: ViewConfig = useMemo(() => {
+    if (!userId) {
+      return {
+        view: "error",
+        render: () => (
+          <div className="min-h-screen p-8 flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-lg text-muted-color">User ID is required</p>
+            </div>
+          </div>
+        ),
+      };
+    }
+
+    if (roomLoading) {
+      return {
+        view: "loading",
+        render: () => (
+          <div className="min-h-screen p-8 flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-lg">Loading room...</p>
+            </div>
+          </div>
+        ),
+      };
+    }
+
+    if (!room) {
+      return {
+        view: "error",
+        render: () => (
+          <div className="min-h-screen p-8 flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-lg text-red-600">Room not found</p>
+              <Button
+                onClick={handleBack}
+                className="mt-4"
+                disabled={isPending}
+              >
+                Вернуться к комнатам
+              </Button>
+            </div>
+          </div>
+        ),
+      };
+    }
+
+    if (!room.isMember) {
+      return {
+        view: "not-member",
+        render: () => (
+          <ViewTransition name="page">
+            <div className="min-h-screen p-8">
+              <div className="max-w-4xl mx-auto">
+                <RoomHeader
+                  room={room}
+                  userRole={room.currentUserRole}
+                  onBack={handleBack}
+                  onLeave={handleLeaveRoom}
+                  isLeaving={leaveRoom.isPending}
+                  isPending={isPending}
+                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <RoomMembers
+                    room={room}
+                    members={members}
+                    currentUserId={userId}
+                    canManage={room.canManage}
+                    onRemoveMember={handleRemoveMember}
+                  />
+                  <RoomChoices room={room} currentUserId={userId} />
+                </div>
+                <RoomNotMember onBack={handleBack} isPending={isPending} />
+              </div>
+            </div>
+          </ViewTransition>
+        ),
+      };
+    }
+
+    return {
+      view: "member",
+      render: () => (
+        <ViewTransition name="page">
+          <div className="min-h-screen p-8">
+            <div className="max-w-4xl mx-auto">
+              <RoomHeader
+                room={room}
+                userRole={room.currentUserRole}
+                onBack={handleBack}
+                onLeave={handleLeaveRoom}
+                isLeaving={leaveRoom.isPending}
+                isPending={isPending}
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <RoomMembers
+                  room={room}
+                  members={members}
+                  currentUserId={userId}
+                  canManage={room.canManage}
+                  onRemoveMember={handleRemoveMember}
+                />
+                <RoomChoices room={room} currentUserId={userId} />
+              </div>
+              {user && (
+                <ChatWindow
+                  userId={userId}
+                  messages={chatMessages}
+                  onSendMessage={sendChatMessage}
+                  isLoading={!isChatConnected}
+                  isMuted={isMuted}
+                />
+              )}
+            </div>
+          </div>
+        </ViewTransition>
+      ),
+    };
+  }, [
+    userId,
+    roomLoading,
+    room,
+    members,
+    user,
+    chatMessages,
+    isChatConnected,
+    isMuted,
+    sendChatMessage,
+    leaveRoom.isPending,
+    isPending,
+    handleBack,
+    handleLeaveRoom,
+    handleRemoveMember,
+    navigate,
+  ]);
+
+  return viewConfig.render();
+}
+
+export default function RoomDetailPage() {
+  return (
+    <Suspense fallback={null}>
+      <RoomContent />
+    </Suspense>
+  );
+}
+

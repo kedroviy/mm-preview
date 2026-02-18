@@ -3,6 +3,57 @@
 
 :root {
   height: 100vh;
+  
+  /* Custom Color Palette */
+  --color-platinum: #e7ecef;
+  --color-dusk-blue: #274c77;
+  --color-steel-blue: #6096ba;
+  --color-icy-blue: #a3cef1;
+  --color-grey-olive: #8b8c89;
+  
+  /* Semantic color mappings */
+  --color-primary: var(--color-dusk-blue);
+  --color-secondary: var(--color-steel-blue);
+  --color-accent: var(--color-icy-blue);
+  --color-surface: var(--color-platinum);
+  --color-neutral: var(--color-grey-olive);
+  
+  /* Theme application */
+  color-scheme: light;
+}
+
+/* Apply theme colors to PrimeReact components */
+.p-component {
+  font-family: var(--font-montserrat, sans-serif);
+}
+
+/* Custom utility classes for theme colors */
+.text-primary {
+  color: var(--color-primary);
+}
+
+.bg-primary {
+  background-color: var(--color-primary);
+}
+
+.text-secondary {
+  color: var(--color-secondary);
+}
+
+.bg-secondary {
+  background-color: var(--color-secondary);
+}
+
+.text-accent {
+  color: var(--color-accent);
+}
+
+.bg-accent {
+  background-color: var(--color-accent);
+}
+
+.text-muted-color {
+  color: var(--color-neutral);
 }
 
 html {
