@@ -1,6 +1,24 @@
 import { useMutation, useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query';
-import { RoomsController_createRoom, RoomsController_getMyRooms, RoomsController_getRoom, RoomsController_joinRoom, RoomsController_leaveRoom, RoomsController_chooseMovie, RoomsController_getRoomMembers, RoomsController_removeUserFromRoom, RoomsController_getChatHistory, RoomsController_muteUser, RoomsController_unmuteUser } from '../requests/rooms';
-import type { ApiResponse } from '../types';
+import {
+  RoomsController_createRoom,
+  RoomsController_getMyRooms,
+  RoomsController_getRoom,
+  RoomsController_joinRoom,
+  RoomsController_leaveRoom,
+  RoomsController_chooseMovie,
+  RoomsController_getRoomMembers,
+  RoomsController_removeUserFromRoom,
+  RoomsController_getChatHistory,
+  RoomsController_muteUser,
+  RoomsController_unmuteUser,
+} from '../requests/rooms';
+import type { ApiResponse } from '../../types';
+import type { components } from '../types';
+
+type CreateRoomDto = components['schemas']['CreateRoomDto'];
+type JoinRoomDto = components['schemas']['JoinRoomDto'];
+type RoomResponseDto = components['schemas']['RoomResponseDto'];
+type RoomMembersResponseDto = components['schemas']['RoomMembersResponseDto'];
 
 export const roomsKeys = {
   RoomsController_getMyRooms: () => ['rooms', 'RoomsController_getMyRooms'],
@@ -14,20 +32,17 @@ export const roomsKeys = {
  */
 export function useRoomsController_createRoom() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (data: CreateRoomDto) => {
-      
       const response: ApiResponse<any> = await RoomsController_createRoom(data);
       return response.data;
     },
     onSuccess: () => {
-      // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['rooms'] });
     },
   });
 }
-
 
 /**
  * Get current user rooms
@@ -43,13 +58,12 @@ export function useRoomsController_getMyRooms(options?: UseQueryOptions<RoomResp
   });
 }
 
-
 /**
  * Get room by ID
  */
 export function useRoomsController_getRoom(path: { id: string }, options?: UseQueryOptions<RoomResponseDto>) {
   return useQuery({
-    queryKey: roomsKeys.RoomsController_getRoom(path),
+    queryKey: roomsKeys.RoomsController_getRoom(path.id),
     queryFn: async () => {
       const response: ApiResponse<RoomResponseDto> = await RoomsController_getRoom(path);
       return response.data;
@@ -58,73 +72,65 @@ export function useRoomsController_getRoom(path: { id: string }, options?: UseQu
   });
 }
 
-
 /**
  * Join a room by public code
  */
 export function useRoomsController_joinRoom() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (data: JoinRoomDto) => {
-      
       const response: ApiResponse<RoomResponseDto> = await RoomsController_joinRoom(data);
       return response.data;
     },
     onSuccess: () => {
-      // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['rooms'] });
     },
   });
 }
-
 
 /**
  * Leave a room
  */
 export function useRoomsController_leaveRoom() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: async (data: any) => {
-      const { id, ...rest } = data as any;
-      const response: ApiResponse<RoomResponseDto> = await RoomsController_leaveRoom({ id }, rest);
+    mutationFn: async (data: { id: string; body: any }) => {
+      const { id, body } = data;
+      const response: ApiResponse<RoomResponseDto> = await RoomsController_leaveRoom({ id }, body);
       return response.data;
     },
     onSuccess: () => {
-      // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['rooms'] });
     },
   });
 }
-
 
 /**
  * Choose a movie
  */
 export function useRoomsController_chooseMovie() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: async (data: any) => {
-      const { id, ...rest } = data as any;
-      const response: ApiResponse<RoomResponseDto> = await RoomsController_chooseMovie({ id }, rest);
+    mutationFn: async (data: { id: string; body: any }) => {
+      const { id, body } = data;
+      const response: ApiResponse<RoomResponseDto> = await RoomsController_chooseMovie({ id }, body);
       return response.data;
     },
     onSuccess: () => {
-      // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['rooms'] });
     },
   });
 }
-
 
 /**
  * Get room members
  */
 export function useRoomsController_getRoomMembers(path: { id: string }, options?: UseQueryOptions<RoomMembersResponseDto>) {
   return useQuery({
-    queryKey: roomsKeys.RoomsController_getRoomMembers(path),
+    queryKey: roomsKeys.RoomsController_getRoomMembers(path.id),
     queryFn: async () => {
       const response: ApiResponse<RoomMembersResponseDto> = await RoomsController_getRoomMembers(path);
       return response.data;
@@ -133,33 +139,30 @@ export function useRoomsController_getRoomMembers(path: { id: string }, options?
   });
 }
 
-
 /**
  * Remove user from room
  */
 export function useRoomsController_removeUserFromRoom() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: async () => {
-      const { id, userId, ...rest } = data as any;
+    mutationFn: async (data: { id: string; userId: string }) => {
+      const { id, userId } = data;
       const response: ApiResponse<RoomResponseDto> = await RoomsController_removeUserFromRoom({ id, userId });
       return response.data;
     },
     onSuccess: () => {
-      // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['rooms'] });
     },
   });
 }
-
 
 /**
  * Get chat history (WebSocket recommended)
  */
 export function useRoomsController_getChatHistory(path: { id: string }, options?: UseQueryOptions<any>) {
   return useQuery({
-    queryKey: roomsKeys.RoomsController_getChatHistory(path),
+    queryKey: roomsKeys.RoomsController_getChatHistory(path.id),
     queryFn: async () => {
       const response: ApiResponse<any> = await RoomsController_getChatHistory(path);
       return response.data;
@@ -168,42 +171,40 @@ export function useRoomsController_getChatHistory(path: { id: string }, options?
   });
 }
 
-
 /**
  * Mute a user in room chat
  */
 export function useRoomsController_muteUser() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: async (data: any) => {
-      const { id, userId, ...rest } = data as any;
-      const response: ApiResponse<RoomResponseDto> = await RoomsController_muteUser({ id, userId }, rest);
+    mutationFn: async (data: { id: string; userId: string; body: any }) => {
+      const { id, userId, body } = data;
+      const response: ApiResponse<RoomResponseDto> = await RoomsController_muteUser({ id, userId }, body);
       return response.data;
     },
     onSuccess: () => {
-      // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['rooms'] });
     },
   });
 }
-
 
 /**
  * Unmute a user in room chat
  */
 export function useRoomsController_unmuteUser() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: async () => {
-      const { id, userId, ...rest } = data as any;
+    mutationFn: async (data: { id: string; userId: string }) => {
+      const { id, userId } = data;
       const response: ApiResponse<RoomResponseDto> = await RoomsController_unmuteUser({ id, userId });
       return response.data;
     },
     onSuccess: () => {
-      // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['rooms'] });
     },
   });
 }
+
+

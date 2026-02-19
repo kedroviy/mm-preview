@@ -48,7 +48,7 @@ export function JoinRoomForm({
           <InputOtp
             id="roomCode"
             value={roomCode}
-            onChange={(e) => setRoomCode(e.value || "")}
+            onChange={(e) => setRoomCode(String(e.value || ""))}
             length={6}
             integerOnly
             className="flex justify-center"

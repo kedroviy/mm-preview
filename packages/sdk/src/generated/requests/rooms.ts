@@ -1,5 +1,11 @@
 import { api } from '../../client';
 import type { ApiResponse } from '../../types';
+import type { components } from '../types';
+
+type CreateRoomDto = components['schemas']['CreateRoomDto'];
+type JoinRoomDto = components['schemas']['JoinRoomDto'];
+type RoomResponseDto = components['schemas']['RoomResponseDto'];
+type RoomMembersResponseDto = components['schemas']['RoomMembersResponseDto'];
 
 /**
  * Create a new room
@@ -37,7 +43,7 @@ export async function RoomsController_getMyRooms() {
  * @returns RoomResponseDto
  */
 export async function RoomsController_getRoom(path: { id: string }) {
-  const url = `/rooms/${id}`;
+  const url = `/rooms/${path.id}`;
   const fullUrl = url;
   
   const response = await api.get<RoomResponseDto>(url);
@@ -68,7 +74,7 @@ export async function RoomsController_joinRoom(body: JoinRoomDto) {
  * @returns RoomResponseDto
  */
 export async function RoomsController_leaveRoom(path: { id: string }, body: any) {
-  const url = `/rooms/${id}/leave`;
+  const url = `/rooms/${path.id}/leave`;
   const fullUrl = url;
   
   const response = await api.post<RoomResponseDto>(url, body);
@@ -84,7 +90,7 @@ export async function RoomsController_leaveRoom(path: { id: string }, body: any)
  * @returns RoomResponseDto
  */
 export async function RoomsController_chooseMovie(path: { id: string }, body: any) {
-  const url = `/rooms/${id}/choice`;
+  const url = `/rooms/${path.id}/choice`;
   const fullUrl = url;
   
   const response = await api.post<RoomResponseDto>(url, body);
@@ -99,7 +105,7 @@ export async function RoomsController_chooseMovie(path: { id: string }, body: an
  * @returns RoomMembersResponseDto
  */
 export async function RoomsController_getRoomMembers(path: { id: string }) {
-  const url = `/rooms/${id}/members`;
+  const url = `/rooms/${path.id}/members`;
   const fullUrl = url;
   
   const response = await api.get<RoomMembersResponseDto>(url);
@@ -114,7 +120,7 @@ export async function RoomsController_getRoomMembers(path: { id: string }) {
  * @returns RoomResponseDto
  */
 export async function RoomsController_removeUserFromRoom(path: { id: string, userId: string }) {
-  const url = `/rooms/${id}/members/${userId}`;
+  const url = `/rooms/${path.id}/members/${path.userId}`;
   const fullUrl = url;
   
   const response = await api.delete<RoomResponseDto>(url);
@@ -129,7 +135,7 @@ export async function RoomsController_removeUserFromRoom(path: { id: string, use
  * @returns any
  */
 export async function RoomsController_getChatHistory(path: { id: string }) {
-  const url = `/rooms/${id}/chat/history`;
+  const url = `/rooms/${path.id}/chat/history`;
   const fullUrl = url;
   
   const response = await api.get<any>(url);
@@ -145,7 +151,7 @@ export async function RoomsController_getChatHistory(path: { id: string }) {
  * @returns RoomResponseDto
  */
 export async function RoomsController_muteUser(path: { id: string, userId: string }, body: any) {
-  const url = `/rooms/${id}/members/${userId}/mute`;
+  const url = `/rooms/${path.id}/members/${path.userId}/mute`;
   const fullUrl = url;
   
   const response = await api.post<RoomResponseDto>(url, body);
@@ -160,7 +166,7 @@ export async function RoomsController_muteUser(path: { id: string, userId: strin
  * @returns RoomResponseDto
  */
 export async function RoomsController_unmuteUser(path: { id: string, userId: string }) {
-  const url = `/rooms/${id}/members/${userId}/mute`;
+  const url = `/rooms/${path.id}/members/${path.userId}/mute`;
   const fullUrl = url;
   
   const response = await api.delete<RoomResponseDto>(url);

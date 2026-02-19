@@ -1,5 +1,10 @@
 import { api } from '../../client';
 import type { ApiResponse } from '../../types';
+import type { components } from '../types';
+
+type CreateRedisUserDto = components['schemas']['CreateRedisUserDto'];
+type RedisUserResponseDto = components['schemas']['RedisUserResponseDto'];
+type UserProfileResponseDto = components['schemas']['UserProfileResponseDto'];
 
 /**
  * Create a new user
@@ -37,7 +42,7 @@ export async function UsersController_getProfile() {
  * @returns RedisUserResponseDto
  */
 export async function UsersController_getUser(path: { userId: string }) {
-  const url = `/users/${userId}`;
+  const url = `/users/${path.userId}`;
   const fullUrl = url;
   
   const response = await api.get<RedisUserResponseDto>(url);
@@ -52,7 +57,7 @@ export async function UsersController_getUser(path: { userId: string }) {
  * @returns any
  */
 export async function UsersController_deleteUser(path: { userId: string }) {
-  const url = `/users/${userId}`;
+  const url = `/users/${path.userId}`;
   const fullUrl = url;
   
   const response = await api.delete<any>(url);
@@ -68,7 +73,7 @@ export async function UsersController_deleteUser(path: { userId: string }) {
  * @returns RedisUserResponseDto
  */
 export async function UsersController_updateName(path: { userId: string }, body: any) {
-  const url = `/users/${userId}/name`;
+  const url = `/users/${path.userId}/name`;
   const fullUrl = url;
   
   const response = await api.patch<RedisUserResponseDto>(url, body);

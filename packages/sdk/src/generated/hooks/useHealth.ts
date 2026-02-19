@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query';
 import { AppController_getHello, AppController_healthCheck } from '../requests/health';
-import type { ApiResponse } from '../types';
+import type { ApiResponse } from '../../types';
 
 export const healthKeys = {
   AppController_getHello: () => ['health', 'AppController_getHello'],

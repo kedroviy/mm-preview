@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query';
 import { UsersController_createUser, UsersController_getProfile, UsersController_getUser, UsersController_deleteUser, UsersController_updateName } from '../requests/users';
-import type { ApiResponse } from '../types';
+import type { ApiResponse } from '../../types';
+import type { components } from '../types';
+
+type CreateRedisUserDto = components['schemas']['CreateRedisUserDto'];
+type RedisUserResponseDto = components['schemas']['RedisUserResponseDto'];
+type UserProfileResponseDto = components['schemas']['UserProfileResponseDto'];
 
 export const usersKeys = {
   UsersController_getProfile: () => ['users', 'UsersController_getProfile'],
@@ -47,7 +52,7 @@ export function useUsersController_getProfile(options?: UseQueryOptions<UserProf
  */
 export function useUsersController_getUser(path: { userId: string }, options?: UseQueryOptions<RedisUserResponseDto>) {
   return useQuery({
-    queryKey: usersKeys.UsersController_getUser(path),
+    queryKey: usersKeys.UsersController_getUser(path.userId),
     queryFn: async () => {
       const response: ApiResponse<RedisUserResponseDto> = await UsersController_getUser(path);
       return response.data;
@@ -64,8 +69,8 @@ export function useUsersController_deleteUser() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async () => {
-      const { userId, ...rest } = data as any;
+    mutationFn: async (data: { userId: string }) => {
+      const { userId } = data;
       const response: ApiResponse<any> = await UsersController_deleteUser({ userId });
       return response.data;
     },

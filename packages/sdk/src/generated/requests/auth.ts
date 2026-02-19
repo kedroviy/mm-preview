@@ -1,5 +1,11 @@
 import { api } from '../../client';
 import type { ApiResponse } from '../../types';
+import type { components } from '../types';
+
+type LoginDto = components['schemas']['LoginDto'];
+type LoginResponseDto = components['schemas']['LoginResponseDto'];
+type RefreshTokenDto = components['schemas']['RefreshTokenDto'];
+type AuthResponseDto = components['schemas']['AuthResponseDto'];
 
 /**
  * Login by name

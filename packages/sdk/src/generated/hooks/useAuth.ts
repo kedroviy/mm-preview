@@ -1,6 +1,12 @@
 import { useMutation, useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query';
 import { AuthController_login, AuthController_refreshToken, AuthController_logout } from '../requests/auth';
-import type { ApiResponse } from '../types';
+import type { ApiResponse } from '../../types';
+import type { components } from '../types';
+
+type LoginDto = components['schemas']['LoginDto'];
+type LoginResponseDto = components['schemas']['LoginResponseDto'];
+type RefreshTokenDto = components['schemas']['RefreshTokenDto'];
+type AuthResponseDto = components['schemas']['AuthResponseDto'];
 
 /**
  * Login by name
@@ -31,7 +37,7 @@ export function useAuthController_refreshToken() {
   return useMutation({
     mutationFn: async (data: RefreshTokenDto) => {
       
-      const response: ApiResponse<AuthResponseDto> = await AuthController_refreshToken(data);
+      const response: ApiResponse<components['schemas']['AuthResponseDto']> = await AuthController_refreshToken(data);
       return response.data;
     },
     onSuccess: () => {
