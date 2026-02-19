@@ -9,6 +9,17 @@ const nextConfig: NextConfig = {
         source: "/api/v1/:path*",
         destination: `${backendUrl}/api/v1/:path*`,
       },
+      // WebSocket rewrites (для локальной разработки)
+      // Внимание: Vercel не поддерживает WebSocket через rewrites
+      // В продакшене WebSocket должен использовать прямой URL к бэкенду
+      {
+        source: "/socket.io/:path*",
+        destination: `${backendUrl}/socket.io/:path*`,
+      },
+      {
+        source: "/rooms/:path*",
+        destination: `${backendUrl}/rooms/:path*`,
+      },
     ];
   },
 };

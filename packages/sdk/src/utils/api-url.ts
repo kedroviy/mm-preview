@@ -64,25 +64,59 @@ export function getServerApiUrl(): string {
 
 /**
  * Получить WebSocket URL
- * Всегда использует прямой URL, так как WebSocket не может быть проксирован через rewrites
+ * 
+ * В продакшене (Vercel): использует прямой URL к бэкенду (wss://mm-admin-1.onrender.com/rooms)
+ * Протокол определяется автоматически на основе window.location.protocol (wss:// для HTTPS)
+ * 
+ * ВАЖНО: Vercel не поддерживает WebSocket через rewrites, поэтому в продакшене
+ * всегда используется прямой URL к бэкенду с правильным протоколом.
+ * 
+ * В локальной разработке:
+ * - Если используется прокси (NEXT_PUBLIC_USE_API_PROXY=true), использует относительный URL /rooms
+ *   Socket.IO автоматически определит протокол (ws:// для localhost)
+ * - Иначе использует прямой URL к бэкенду (ws://localhost:4000/rooms)
  */
 export function getWebSocketUrl(): string {
-  // WebSocket всегда использует прямой URL бэкенда
-  // BACKEND_URL имеет приоритет
-  let apiUrl = process.env.BACKEND_URL;
+  // Проверяем, нужно ли использовать прокси (только для локальной разработки)
+  const useProxy = 
+    process.env.NEXT_PUBLIC_USE_API_PROXY === "true" &&
+    process.env.NODE_ENV !== "production";
   
-  if (!apiUrl) {
-    // Если NEXT_PUBLIC_API_URL - это полный URL, используем его
-    const publicApiUrl = process.env.NEXT_PUBLIC_API_URL;
-    if (publicApiUrl && !publicApiUrl.startsWith("/")) {
-      apiUrl = publicApiUrl.replace(/\/api\/v1\/?$/, "");
-    } else {
-      apiUrl = "http://localhost:4000";
+  // В продакшене на Vercel всегда используем прямой URL к бэкенду
+  // так как Vercel не поддерживает WebSocket через rewrites
+  const isProduction = process.env.NODE_ENV === "production";
+  
+  if (isProduction || !useProxy) {
+    // Используем прямой URL к бэкенду
+    // BACKEND_URL имеет приоритет
+    let apiUrl = process.env.BACKEND_URL;
+    
+    if (!apiUrl) {
+      // Если NEXT_PUBLIC_API_URL - это полный URL, используем его
+      const publicApiUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (publicApiUrl && !publicApiUrl.startsWith("/")) {
+        apiUrl = publicApiUrl.replace(/\/api\/v1\/?$/, "");
+      } else {
+        apiUrl = "http://localhost:4000";
+      }
     }
+    
+    // Определяем протокол автоматически на основе текущего протокола страницы
+    // Это важно для правильного определения wss:// вместо ws://
+    if (typeof window !== "undefined") {
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const wsUrl = apiUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
+      return `${protocol}//${wsUrl}/rooms`;
+    }
+    
+    // На сервере определяем протокол на основе URL
+    const wsUrl = apiUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
+    const wsProtocol = apiUrl.startsWith("https") ? "wss:" : "ws:";
+    return `${wsProtocol}//${wsUrl}/rooms`;
   }
   
-  const wsUrl = apiUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
-  const wsProtocol = apiUrl.startsWith("https") ? "wss:" : "ws:";
-  return `${wsProtocol}//${wsUrl}/rooms`;
+  // В локальной разработке с прокси используем относительный URL
+  // Socket.IO автоматически определит протокол (ws:// для localhost)
+  return "/rooms";
 }
 
