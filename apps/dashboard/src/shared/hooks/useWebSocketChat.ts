@@ -42,6 +42,8 @@ export function useWebSocketChat({
   const [isMuted, setIsMuted] = useState(false);
   const joinedRoomRef = useRef<string | null>(null);
   const previousRoomIdRef = useRef<string | undefined>(undefined);
+  const joiningRoomRef = useRef<string | null>(null); // Отслеживаем, к какой комнате мы присоединяемся
+  const joinTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Таймаут для присоединения
 
   // Очищаем состояние при изменении roomId
   useEffect(() => {
@@ -50,8 +52,14 @@ export function useWebSocketChat({
         // Очищаем сообщения при переходе в другую комнату
         setMessages([]);
       }
+      // Очищаем таймаут присоединения, если он есть
+      if (joinTimeoutRef.current) {
+        clearTimeout(joinTimeoutRef.current);
+        joinTimeoutRef.current = null;
+      }
       previousRoomIdRef.current = roomId;
       joinedRoomRef.current = null;
+      joiningRoomRef.current = null; // Сбрасываем флаг присоединения
     }
   }, [roomId]);
 
@@ -86,6 +94,12 @@ export function useWebSocketChat({
     }) => {
       if (roomId && data.roomId === roomId) {
         joinedRoomRef.current = data.roomId;
+        joiningRoomRef.current = null; // Сбрасываем флаг присоединения
+        // Очищаем таймаут присоединения
+        if (joinTimeoutRef.current) {
+          clearTimeout(joinTimeoutRef.current);
+          joinTimeoutRef.current = null;
+        }
         setIsMuted(data.room.isMuted || false);
         if (data.room.muteExpiresAt && data.room.isMuted) {
           const minutesLeft = Math.ceil(
@@ -113,6 +127,10 @@ export function useWebSocketChat({
       code: string;
       event?: string;
     }) => {
+      if (error.event === "joinRoom") {
+        // При ошибке присоединения сбрасываем флаг
+        joiningRoomRef.current = null;
+      }
       if (error.event === "sendMessage" || error.event === "joinRoom") {
         onError?.(new Error(error.message));
       }
@@ -128,17 +146,36 @@ export function useWebSocketChat({
     // Присоединяемся к комнате только если:
     // 1. enabled, isConnected, publicCode и userId доступны
     // 2. Мы еще не присоединены к этой комнате (проверяем через joinedRoomRef)
-    // 3. roomId существует
+    // 3. Мы еще не присоединяемся к этой комнате (проверяем через joiningRoomRef)
+    // 4. roomId существует
     const shouldJoin =
       enabled &&
       isConnected &&
       publicCode &&
       userId &&
       roomId &&
-      joinedRoomRef.current !== roomId;
+      joinedRoomRef.current !== roomId &&
+      joiningRoomRef.current !== roomId;
 
     if (shouldJoin) {
+      // Очищаем предыдущий таймаут, если он есть
+      if (joinTimeoutRef.current) {
+        clearTimeout(joinTimeoutRef.current);
+      }
+      
+      joiningRoomRef.current = roomId; // Устанавливаем флаг присоединения
       joinRoom(publicCode, userId);
+      
+      // Таймаут для присоединения (10 секунд)
+      // Если присоединение не завершилось за это время, сбрасываем флаг
+      joinTimeoutRef.current = setTimeout(() => {
+        if (joiningRoomRef.current === roomId && joinedRoomRef.current !== roomId) {
+          console.warn("⚠️ Таймаут присоединения к комнате:", roomId);
+          joiningRoomRef.current = null;
+          joinTimeoutRef.current = null;
+          onError?.(new Error("Не удалось присоединиться к комнате. Пожалуйста, попробуйте еще раз."));
+        }
+      }, 10000);
     }
 
     return () => {
@@ -147,6 +184,11 @@ export function useWebSocketChat({
       unsubscribeJoinedRoom();
       unsubscribeRoomUpdate();
       unsubscribeError();
+      // Очищаем таймаут при размонтировании
+      if (joinTimeoutRef.current) {
+        clearTimeout(joinTimeoutRef.current);
+        joinTimeoutRef.current = null;
+      }
     };
   }, [
     enabled,
@@ -171,13 +213,34 @@ export function useWebSocketChat({
         return;
       }
 
+      // Проверяем, что roomId - это UUID, а не publicCode
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(roomId);
+      const isPublicCode = /^\d{6}$/.test(roomId);
+      
+      if (isPublicCode) {
+        console.error("❌ ОШИБКА: В sendMessage передан publicCode вместо roomId:", roomId);
+        onError?.(new Error("Ошибка: передан код комнаты вместо ID. Пожалуйста, обновите страницу."));
+        return;
+      }
+      
+      if (!isUUID) {
+        console.warn("⚠️ roomId не похож на UUID:", roomId);
+      }
+
       if (!isConnected) {
         onError?.(new Error("WebSocket не подключен. Пожалуйста, подождите подключения."));
         return;
       }
 
-      if (joinedRoomRef.current !== roomId) {
+      // Проверяем, присоединились ли мы к комнате или присоединяемся
+      if (joinedRoomRef.current !== roomId && joiningRoomRef.current !== roomId) {
         onError?.(new Error("Вы еще не присоединились к этой комнате. Пожалуйста, подождите."));
+        return;
+      }
+
+      // Если мы еще присоединяемся, ждем завершения
+      if (joiningRoomRef.current === roomId && joinedRoomRef.current !== roomId) {
+        onError?.(new Error("Присоединение к комнате в процессе. Пожалуйста, подождите."));
         return;
       }
 
@@ -186,6 +249,7 @@ export function useWebSocketChat({
         return;
       }
 
+      console.log("💬 Отправка сообщения, roomId:", roomId, isUUID ? "(UUID)" : "(не UUID)");
       wsSendMessage(roomId, message);
     },
     [roomId, isMuted, isConnected, wsSendMessage, onError],

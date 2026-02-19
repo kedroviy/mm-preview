@@ -549,7 +549,26 @@ class WebSocketService {
       return;
     }
 
-    console.log("💬 Отправка сообщения в комнату:", roomId);
+    // Проверяем, что roomId - это UUID, а не publicCode
+    // UUID формат: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx (36 символов с дефисами)
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(roomId);
+    const isPublicCode = /^\d{6}$/.test(roomId);
+    
+    if (isPublicCode) {
+      console.error("❌ ОШИБКА: Передан publicCode вместо roomId:", roomId);
+      this.emit("error", {
+        message: "Ошибка: передан код комнаты вместо ID. Пожалуйста, обновите страницу.",
+        code: "INVALID_ROOM_ID",
+        event: "sendMessage",
+      });
+      return;
+    }
+    
+    if (!isUUID) {
+      console.warn("⚠️ roomId не похож на UUID:", roomId);
+    }
+    
+    console.log("💬 Отправка сообщения в комнату:", roomId, isUUID ? "(UUID)" : "(не UUID)");
     this.socket.emit("sendMessage", { roomId, message: message.trim() });
   }
 
