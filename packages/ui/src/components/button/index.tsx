@@ -1,11 +1,9 @@
-"use client";
-
 import {
   type ButtonHTMLAttributes,
   forwardRef,
   type ReactNode,
 } from "react";
-import { Badge } from "../badge/Badge";
+import { Badge } from "../badge";
 
 // Define ButtonProps manually to avoid TypeScript resolution issues
 export interface ButtonProps

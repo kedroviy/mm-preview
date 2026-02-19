@@ -40,12 +40,12 @@ export async function AuthController_refreshToken(body: RefreshTokenDto) {
 /**
  * Logout user
  * Revokes the current refresh token and clears authentication cookies.
- * @returns any
+ * @returns void
  */
 export async function AuthController_logout() {
   const url = `/auth/logout`;
   const fullUrl = url;
   
-  const response = await api.post<any>(url);
+  const response = await api.post<void>(url);
   return response;
 }

@@ -7,6 +7,7 @@ import {
   ViewTransition,
 } from "@/src/shared/components/ViewTransition";
 import { useWebSocketMyRooms } from "@/src/shared/hooks/useWebSocketMyRooms";
+import type { Room } from "@/src/entities/room";
 
 interface DashboardClientProps {
   userId: string;
@@ -16,7 +17,7 @@ interface DashboardClientProps {
     role?: string;
     lastActive?: number;
     recentRooms?: string[];
-    rooms?: unknown[];
+    rooms?: Room[];
   } | null;
 }
 
@@ -38,7 +39,7 @@ export function DashboardClient({
     role?: string;
     lastActive?: number;
     recentRooms?: string[];
-    rooms?: unknown[];
+    rooms?: Room[];
   };
   const profile = (initialProfile || queryResult.data) as
     | ProfileType

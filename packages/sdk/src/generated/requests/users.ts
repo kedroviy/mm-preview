@@ -54,13 +54,13 @@ export async function UsersController_getUser(path: { userId: string }) {
  * Delete user
  * Deletes a user by their userId (UUID). Requires authentication. Users can only delete themselves unless they are admin.
  * @param params - Request parameters
- * @returns any
+ * @returns void
  */
 export async function UsersController_deleteUser(path: { userId: string }) {
   const url = `/users/${path.userId}`;
   const fullUrl = url;
   
-  const response = await api.delete<any>(url);
+  const response = await api.delete<void>(url);
   return response;
 }
 
@@ -72,7 +72,7 @@ export async function UsersController_deleteUser(path: { userId: string }) {
  * @param body - Request body
  * @returns RedisUserResponseDto
  */
-export async function UsersController_updateName(path: { userId: string }, body: any) {
+export async function UsersController_updateName(path: { userId: string }, body: { name: string }) {
   const url = `/users/${path.userId}/name`;
   const fullUrl = url;
   

@@ -154,13 +154,14 @@ export function RoomList({
                     return (
                       <Button
                         rounded
+                        text
+                        raised
                         icon={<ConnectIcon className="w-4 h-4" />}
                         onClick={(e: MouseEvent<HTMLButtonElement>) => {
                           e.preventDefault();
                           item.command();
                         }}
                         aria-label="Подключиться"
-                        className={styles.speeddialButton}
                       />
                     );
                   },
@@ -176,13 +177,14 @@ export function RoomList({
                       return (
                         <Button
                           rounded
+                          text
+                          raised
                           icon={<DeleteIcon className="w-4 h-4" />}
                           onClick={(e: MouseEvent<HTMLButtonElement>) => {
                             e.preventDefault();
                             item.command();
                           }}
                           aria-label="Удалить"
-                          className={styles.speeddialButton}
                         />
                       );
                     },
@@ -198,9 +200,10 @@ export function RoomList({
                     <SpeedDial
                       model={items}
                       direction="down"
-                      type="semi-circle"
+                      radius={80}
+                       type="circle"
                       mask
-                      //  buttonClassName="p-button-rounded p-button-text"
+                      buttonClassName="p-button-warning"
                       buttonStyle={{ width: "2rem", height: "2rem" }}
                     />
                   </div>

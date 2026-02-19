@@ -4,6 +4,24 @@
   "private": true,
   "main": "./src/index.ts",
   "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./badge": "./src/components/badge/index.tsx",
+    "./button": "./src/components/button/index.tsx",
+    "./card": "./src/components/card/index.tsx",
+    "./inputtext": "./src/components/inputtext/index.tsx",
+    "./inputotp": "./src/components/inputotp/index.tsx",
+    "./paginator": "./src/components/paginator/index.tsx",
+    "./progressbar": "./src/components/progressbar/index.tsx",
+    "./speeddial": "./src/components/speeddial/index.tsx",
+    "./table": "./src/components/table/index.tsx",
+    "./toast": "./src/components/toast/index.tsx",
+    "./tooltip": "./src/components/tooltip/index.tsx",
+    "./icon": "./src/components/icon/index.ts",
+    "./notification": "./src/services/notification.ts",
+    "./prime-react-provider": "./src/providers/PrimeReactProvider.tsx",
+    "./app-preset": "./src/presets/app-preset.ts"
+  },
   "scripts": {
     "lint": "biome check",
     "type-check": "npm exec -- tsc --noEmit",
@@ -44,6 +62,7 @@
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "primereact": "^10.0.0",
+    "primeicons": "^7.0.0",
     "next": "^15.5.5",
     "@primeuix/themes": "^1.2.5"
   }

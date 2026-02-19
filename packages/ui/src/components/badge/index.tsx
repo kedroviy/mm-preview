@@ -1,5 +1,3 @@
-"use client";
-
 import type { ComponentProps } from "react";
 
 // Static import - webpack will resolve this from the app's node_modules

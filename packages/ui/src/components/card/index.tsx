@@ -1,5 +1,3 @@
-"use client";
-
 import type { ReactNode, CSSProperties } from "react";
 
 // Define CardProps manually to avoid TypeScript resolution issues

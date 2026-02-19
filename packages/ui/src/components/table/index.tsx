@@ -7,6 +7,10 @@ import type {
   ReactNode,
 } from "react";
 
+// Re-export Column for convenience
+export { Column } from "./Column";
+export type { ColumnProps } from "./Column";
+
 // Static import - webpack will resolve this from the app's node_modules
 // @ts-ignore - Module resolution happens at build time via webpack
 import { DataTable as PrimeDataTable } from "primereact/datatable";
@@ -85,7 +89,7 @@ export function DataTable<T = any>({
         {children}
       </PrimeDataTable>
       {paginator && (
-        <div className="p-datatable-paginator">
+        <>
           <Paginator
             first={currentFirst}
             rows={currentRows}
@@ -93,8 +97,9 @@ export function DataTable<T = any>({
             rowsPerPageOptions={rowsPerPageOptions || [5, 10, 20]}
             onPageChange={handlePageChange}
           />
-        </div>
+        </>
       )}
     </div>
   );
 }
+

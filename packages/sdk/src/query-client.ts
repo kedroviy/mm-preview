@@ -3,15 +3,17 @@ import {
   QueryClient,
   type QueryClientConfig,
 } from "@tanstack/react-query";
+import type { ApiError } from "./types";
 
 const defaultQueryConfig: DefaultOptions = {
   queries: {
     refetchOnWindowFocus: false,
     refetchOnMount: true,
     refetchOnReconnect: true,
-    retry: (failureCount, error: any) => {
+    retry: (failureCount, error: unknown) => {
       // Don't retry on 4xx errors
-      if (error?.status >= 400 && error?.status < 500) {
+      const apiError = error as ApiError;
+      if (apiError?.status && apiError.status >= 400 && apiError.status < 500) {
         return false;
       }
       // Retry up to 1 time for other errors

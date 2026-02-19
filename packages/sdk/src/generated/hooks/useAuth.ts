@@ -37,7 +37,7 @@ export function useAuthController_refreshToken() {
   return useMutation({
     mutationFn: async (data: RefreshTokenDto) => {
       
-      const response: ApiResponse<components['schemas']['AuthResponseDto']> = await AuthController_refreshToken(data);
+      const response: ApiResponse<AuthResponseDto> = await AuthController_refreshToken(data);
       return response.data;
     },
     onSuccess: () => {
@@ -56,8 +56,7 @@ export function useAuthController_logout() {
   
   return useMutation({
     mutationFn: async () => {
-      
-      const response: ApiResponse<any> = await AuthController_logout();
+      const response: ApiResponse<void> = await AuthController_logout();
       return response.data;
     },
     onSuccess: () => {

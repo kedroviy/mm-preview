@@ -6,8 +6,7 @@ import {
   useRoomMembers,
   useUsersController_getProfile,
 } from "@mm-preview/sdk";
-import { Button, notificationService } from "@mm-preview/ui";
-import { ProgressSpinner } from "primereact/progressspinner";
+import { Button, notificationService, ProgressSpinner } from "@mm-preview/ui";
 import { useParams, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useMemo } from "react";
 import { ChatWindow, useChat } from "@/src/features/chat";

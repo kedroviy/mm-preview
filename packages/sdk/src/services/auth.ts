@@ -8,7 +8,7 @@ export interface AuthResponse {
   accessToken?: string;
   refreshToken?: string;
   // Может быть и другой формат ответа
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export const authApi = {

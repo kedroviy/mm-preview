@@ -9,7 +9,7 @@ type UserProfileResponseDto = components['schemas']['UserProfileResponseDto'];
 
 export const usersKeys = {
   UsersController_getProfile: () => ['users', 'UsersController_getProfile'],
-  UsersController_getUser: (userId: string) => ['users', 'UsersController_getUser', ...Object.values({ userId })],
+  UsersController_getUser: (path: { userId: string }) => ['users', 'UsersController_getUser', path.userId],
 } as const;
 
 /**
@@ -52,7 +52,7 @@ export function useUsersController_getProfile(options?: UseQueryOptions<UserProf
  */
 export function useUsersController_getUser(path: { userId: string }, options?: UseQueryOptions<RedisUserResponseDto>) {
   return useQuery({
-    queryKey: usersKeys.UsersController_getUser(path.userId),
+    queryKey: usersKeys.UsersController_getUser(path),
     queryFn: async () => {
       const response: ApiResponse<RedisUserResponseDto> = await UsersController_getUser(path);
       return response.data;
@@ -71,7 +71,7 @@ export function useUsersController_deleteUser() {
   return useMutation({
     mutationFn: async (data: { userId: string }) => {
       const { userId } = data;
-      const response: ApiResponse<any> = await UsersController_deleteUser({ userId });
+      const response: ApiResponse<void> = await UsersController_deleteUser({ userId });
       return response.data;
     },
     onSuccess: () => {
@@ -89,9 +89,9 @@ export function useUsersController_updateName() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (data: any) => {
-      const { userId, ...rest } = data as any;
-      const response: ApiResponse<RedisUserResponseDto> = await UsersController_updateName({ userId }, rest);
+    mutationFn: async (data: { userId: string; name: string }) => {
+      const { userId, name } = data;
+      const response: ApiResponse<RedisUserResponseDto> = await UsersController_updateName({ userId }, { name });
       return response.data;
     },
     onSuccess: () => {

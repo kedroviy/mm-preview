@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChatMessage, Room } from "@mm-preview/sdk";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useWebSocket } from "../contexts/WebSocketContext";
 
 interface UseWebSocketChatOptions {
@@ -34,11 +34,26 @@ export function useWebSocketChat({
     isConnected,
     joinRoom,
     sendMessage: wsSendMessage,
+    getCurrentRoomId,
     on,
     off,
   } = useWebSocket();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isMuted, setIsMuted] = useState(false);
+  const joinedRoomRef = useRef<string | null>(null);
+  const previousRoomIdRef = useRef<string | undefined>(undefined);
+
+  // Очищаем состояние при изменении roomId
+  useEffect(() => {
+    if (previousRoomIdRef.current !== roomId) {
+      if (previousRoomIdRef.current !== undefined) {
+        // Очищаем сообщения при переходе в другую комнату
+        setMessages([]);
+      }
+      previousRoomIdRef.current = roomId;
+      joinedRoomRef.current = null;
+    }
+  }, [roomId]);
 
   // Подписываемся на события чата
   useEffect(() => {
@@ -70,6 +85,7 @@ export function useWebSocketChat({
       room: Room;
     }) => {
       if (roomId && data.roomId === roomId) {
+        joinedRoomRef.current = data.roomId;
         setIsMuted(data.room.isMuted || false);
         if (data.room.muteExpiresAt && data.room.isMuted) {
           const minutesLeft = Math.ceil(
@@ -109,8 +125,19 @@ export function useWebSocketChat({
     const unsubscribeRoomUpdate = on("roomUpdate", handleRoomUpdate);
     const unsubscribeError = on("error", handleError);
 
-    // Присоединяемся к комнате если подключены и есть publicCode
-    if (enabled && isConnected && publicCode && userId) {
+    // Присоединяемся к комнате только если:
+    // 1. enabled, isConnected, publicCode и userId доступны
+    // 2. Мы еще не присоединены к этой комнате (проверяем через joinedRoomRef)
+    // 3. roomId существует
+    const shouldJoin =
+      enabled &&
+      isConnected &&
+      publicCode &&
+      userId &&
+      roomId &&
+      joinedRoomRef.current !== roomId;
+
+    if (shouldJoin) {
       joinRoom(publicCode, userId);
     }
 
@@ -128,6 +155,7 @@ export function useWebSocketChat({
     publicCode,
     isConnected,
     joinRoom,
+    getCurrentRoomId,
     on,
     off,
     onMessage,

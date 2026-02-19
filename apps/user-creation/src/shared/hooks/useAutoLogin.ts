@@ -133,8 +133,10 @@ export function useAutoLogin() {
           
           // Возможно userId есть в ответе
           if (response.data && typeof response.data === "object") {
-            const responseUserId = response.data.userId || response.data.user?.userId;
-            if (responseUserId) {
+            const data = response.data as Record<string, unknown>;
+            const responseUserId = (data.userId as string | undefined) || 
+              (data.user && typeof data.user === "object" && (data.user as Record<string, unknown>).userId as string | undefined);
+            if (responseUserId && typeof responseUserId === "string") {
               console.log("Found userId in response:", responseUserId);
               setUserId(responseUserId);
               setShouldRedirect(true);

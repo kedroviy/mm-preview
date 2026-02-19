@@ -7,17 +7,32 @@ type JoinRoomDto = components['schemas']['JoinRoomDto'];
 type RoomResponseDto = components['schemas']['RoomResponseDto'];
 type RoomMembersResponseDto = components['schemas']['RoomMembersResponseDto'];
 
+type LeaveRoomBody = { userId: string };
+type ChooseMovieBody = { userId: string; movieId: string };
+type MuteUserBody = { durationMinutes: 1 | 5 | 10 };
+type ChatHistoryResponse = {
+  roomId?: string;
+  messages?: Array<{
+    id?: string;
+    roomId?: string;
+    userId?: string;
+    userName?: string;
+    message?: string;
+    createdAt?: number;
+  }>;
+};
+
 /**
  * Create a new room
  * Creates a new room with a unique 6-digit public code and broadcasts the event via WebSocket. Requires authentication.
  * @param body - Request body
- * @returns any
+ * @returns RoomResponseDto
  */
-export async function RoomsController_createRoom(body: CreateRoomDto) {
+export async function RoomsController_createRoom(body?: CreateRoomDto) {
   const url = `/rooms`;
   const fullUrl = url;
   
-  const response = await api.post<any>(url, body);
+  const response = await api.post<RoomResponseDto>(url, body);
   return response;
 }
 
@@ -73,7 +88,7 @@ export async function RoomsController_joinRoom(body: JoinRoomDto) {
  * @param body - Request body
  * @returns RoomResponseDto
  */
-export async function RoomsController_leaveRoom(path: { id: string }, body: any) {
+export async function RoomsController_leaveRoom(path: { id: string }, body: LeaveRoomBody) {
   const url = `/rooms/${path.id}/leave`;
   const fullUrl = url;
   
@@ -89,7 +104,7 @@ export async function RoomsController_leaveRoom(path: { id: string }, body: any)
  * @param body - Request body
  * @returns RoomResponseDto
  */
-export async function RoomsController_chooseMovie(path: { id: string }, body: any) {
+export async function RoomsController_chooseMovie(path: { id: string }, body: ChooseMovieBody) {
   const url = `/rooms/${path.id}/choice`;
   const fullUrl = url;
   
@@ -132,13 +147,13 @@ export async function RoomsController_removeUserFromRoom(path: { id: string, use
  * Get chat history (WebSocket recommended)
  * Retrieves chat history for a room. Note: Chat history is automatically sent via WebSocket when joining a room. This HTTP endpoint is provided for reference. Requires authentication and room membership.
  * @param params - Request parameters
- * @returns any
+ * @returns ChatHistoryResponse
  */
 export async function RoomsController_getChatHistory(path: { id: string }) {
   const url = `/rooms/${path.id}/chat/history`;
   const fullUrl = url;
   
-  const response = await api.get<any>(url);
+  const response = await api.get<ChatHistoryResponse>(url);
   return response;
 }
 
@@ -150,7 +165,7 @@ export async function RoomsController_getChatHistory(path: { id: string }) {
  * @param body - Request body
  * @returns RoomResponseDto
  */
-export async function RoomsController_muteUser(path: { id: string, userId: string }, body: any) {
+export async function RoomsController_muteUser(path: { id: string, userId: string }, body: MuteUserBody) {
   const url = `/rooms/${path.id}/members/${path.userId}/mute`;
   const fullUrl = url;
   

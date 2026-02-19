@@ -14,10 +14,18 @@ export function PrimeReactProviderWrapper({
   children,
   preset = AppPreset,
 }: PrimeReactProviderProps) {
-  // In PrimeReact 10 with tailwindcss-primeui, we need to pass the preset correctly
-  // The value should contain the preset configuration
+  // In PrimeReact 10 with tailwindcss-primeui, we need to pass the preset in the theme configuration
+  // The value should contain the theme configuration with preset
+  // Similar to Ant Design's ConfigProvider pattern
   return (
-    <PrimeReactProvider value={{ preset, ripple: true } as any}>
+    <PrimeReactProvider
+      value={{
+        theme: {
+          preset,
+        },
+        ripple: true,
+      } as any}
+    >
       {children}
     </PrimeReactProvider>
   );

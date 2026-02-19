@@ -10,11 +10,11 @@ export const healthKeys = {
 /**
  * Health check endpoint
  */
-export function useAppController_getHello(options?: UseQueryOptions<any>) {
+export function useAppController_getHello(options?: UseQueryOptions<void>) {
   return useQuery({
     queryKey: healthKeys.AppController_getHello(),
     queryFn: async () => {
-      const response: ApiResponse<any> = await AppController_getHello();
+      const response: ApiResponse<void> = await AppController_getHello();
       return response.data;
     },
     ...options,
@@ -25,11 +25,11 @@ export function useAppController_getHello(options?: UseQueryOptions<any>) {
 /**
  * Health check for monitoring
  */
-export function useAppController_healthCheck(options?: UseQueryOptions<any>) {
+export function useAppController_healthCheck(options?: UseQueryOptions<void>) {
   return useQuery({
     queryKey: healthKeys.AppController_healthCheck(),
     queryFn: async () => {
-      const response: ApiResponse<any> = await AppController_healthCheck();
+      const response: ApiResponse<void> = await AppController_healthCheck();
       return response.data;
     },
     ...options,
