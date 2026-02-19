@@ -17,7 +17,17 @@ function getAppUrl(key: "LANDING" | "USER_CREATION" | "DASHBOARD"): string {
     const hostname = window.location.hostname;
     const protocol = window.location.protocol;
 
-    // Mode 2: Production - Vercel
+    // Mode 2: Production - moviematch.space
+    if (hostname.includes("moviematch.space")) {
+      const appNames: Record<string, string> = {
+        LANDING: "moviematch.space",
+        USER_CREATION: "start.moviematch.space",
+        DASHBOARD: "dashboard.moviematch.space",
+      };
+      return `https://${appNames[key]}`;
+    }
+    
+    // Mode 2.1: Production - Vercel (fallback для обратной совместимости)
     if (hostname.includes("vercel.app")) {
       const parts = hostname.split(".");
       const baseDomain =
@@ -67,12 +77,16 @@ function getAppUrl(key: "LANDING" | "USER_CREATION" | "DASHBOARD"): string {
     }
 
     const appNames: Record<string, string> = {
-      LANDING: "mm-preview-landing",
-      USER_CREATION: "mm-preview-user-creation",
-      DASHBOARD: "mm-preview-dashboard",
+      LANDING: "moviematch.space",
+      USER_CREATION: "start.moviematch.space",
+      DASHBOARD: "dashboard.moviematch.space",
     };
 
-    return `${protocol}://${appNames[key]}.${baseDomain}`;
+    // Если домен уже полный (moviematch.space), возвращаем его как есть
+    if (!appNames[key].includes(".")) {
+      return `${protocol}://${appNames[key]}.${baseDomain}`;
+    }
+    return `${protocol}://${appNames[key]}`;
   }
 
   // На сервере используем fallback для dev режима
@@ -94,12 +108,16 @@ function getAppUrl(key: "LANDING" | "USER_CREATION" | "DASHBOARD"): string {
   const protocol = "https";
   const baseDomain = "vercel.app";
   const appNames: Record<string, string> = {
-    LANDING: "mm-preview-landing",
-    USER_CREATION: "mm-preview-user-creation",
-    DASHBOARD: "mm-preview-dashboard",
+    LANDING: "moviematch.space",
+    USER_CREATION: "start.moviematch.space",
+    DASHBOARD: "dashboard.moviematch.space",
   };
 
-  return `${protocol}://${appNames[key]}.${baseDomain}`;
+  // Если домен уже полный (moviematch.space), возвращаем его как есть
+  if (!appNames[key].includes(".")) {
+    return `${protocol}://${appNames[key]}.${baseDomain}`;
+  }
+  return `${protocol}://${appNames[key]}`;
 }
 
 // Export as a function to get URLs dynamically

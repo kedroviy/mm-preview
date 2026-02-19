@@ -15,7 +15,9 @@ function getAllowedDomains(): string[] {
 
   // Дефолтные разрешенные домены для production
   const defaultDomains = [
-    "*.vercel.app", // Все поддомены Vercel (mm-preview-user-creation.vercel.app, mm-preview-dashboard.vercel.app и т.д.)
+    "moviematch.space", // Основной домен
+    "*.moviematch.space", // Все поддомены (start.moviematch.space, dashboard.moviematch.space и т.д.)
+    "*.vercel.app", // Все поддомены Vercel (для обратной совместимости)
     "vercel.app", // Базовый домен Vercel
     "localhost",
     "127.0.0.1",
@@ -157,10 +159,18 @@ export function getSameSiteConfig(
 
 /**
  * Получает домен для кук, чтобы они работали между поддоменами
+ * Для moviematch.space поддоменов возвращает ".moviematch.space"
  * Для Vercel поддоменов возвращает ".vercel.app"
  */
 export function getCookieDomain(hostname: string): string | undefined {
   const hostnameWithoutPort = hostname.split(":")[0];
+  
+  // Проверяем, находимся ли мы на moviematch.space
+  if (hostnameWithoutPort.endsWith(".moviematch.space") || hostnameWithoutPort === "moviematch.space") {
+    // Для moviematch.space поддоменов используем общий домен ".moviematch.space"
+    // Точка в начале означает, что куки будут доступны для всех поддоменов
+    return ".moviematch.space";
+  }
   
   // Проверяем, находимся ли мы на Vercel
   if (hostnameWithoutPort.endsWith(".vercel.app")) {

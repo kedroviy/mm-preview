@@ -22,7 +22,17 @@ function getServerAppUrl(
                      (request.url.startsWith("https") ? "https" : "http");
     const hostnameWithoutPort = hostname.split(":")[0];
 
-    // Mode 2: Production - Vercel
+    // Mode 2: Production - moviematch.space
+    if (hostnameWithoutPort.includes("moviematch.space")) {
+      const appNames: Record<string, string> = {
+        LANDING: "moviematch.space",
+        USER_CREATION: "start.moviematch.space",
+        DASHBOARD: "dashboard.moviematch.space",
+      };
+      return `https://${appNames[key]}`;
+    }
+    
+    // Mode 2.1: Production - Vercel (fallback для обратной совместимости)
     if (hostnameWithoutPort.includes("vercel.app")) {
       const parts = hostnameWithoutPort.split(".");
       const baseDomain = parts.length >= 2 

@@ -329,8 +329,10 @@ class WebSocketService {
       const hostname = window.location.hostname;
       const protocol = window.location.protocol;
 
-      // Production - Vercel
-      if (hostname.includes("vercel.app")) {
+      // Production - определяем домен на основе текущего домена
+      if (hostname.includes("moviematch.space")) {
+        userCreationUrl = "https://start.moviematch.space";
+      } else if (hostname.includes("vercel.app")) {
         const parts = hostname.split(".");
         const baseDomain =
           parts.length >= 2 ? parts.slice(-2).join(".") : "vercel.app";
