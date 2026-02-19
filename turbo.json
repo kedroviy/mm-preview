@@ -15,8 +15,12 @@
   ],
   "tasks": {
     "build": {
-      "dependsOn": ["^build", "type-check"],
+      "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "@mm-preview/ui#build": {
+      "dependsOn": ["^build"],
+      "outputs": []
     },
     "type-check": {
       "dependsOn": ["^type-check"],
