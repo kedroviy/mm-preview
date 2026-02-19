@@ -56,6 +56,7 @@ export {
   setCookie,
 } from "./utils/cookies";
 export {
+  getCookieDomain,
   getSameSiteConfig,
   isAllowedDomain,
   isAllowedUrl,

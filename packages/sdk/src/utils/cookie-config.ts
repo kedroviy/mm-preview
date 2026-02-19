@@ -155,3 +155,30 @@ export function getSameSiteConfig(
   };
 }
 
+/**
+ * Получает домен для кук, чтобы они работали между поддоменами
+ * Для Vercel поддоменов возвращает ".vercel.app"
+ */
+export function getCookieDomain(hostname: string): string | undefined {
+  const hostnameWithoutPort = hostname.split(":")[0];
+  
+  // Проверяем, находимся ли мы на Vercel
+  if (hostnameWithoutPort.endsWith(".vercel.app")) {
+    // Для Vercel поддоменов используем общий домен ".vercel.app"
+    return ".vercel.app";
+  }
+  
+  // Для localhost и IP адресов не устанавливаем домен
+  if (
+    hostnameWithoutPort === "localhost" ||
+    hostnameWithoutPort === "127.0.0.1" ||
+    /^(\d{1,3}\.){3}\d{1,3}$/.test(hostnameWithoutPort)
+  ) {
+    return undefined;
+  }
+  
+  // Для других доменов можно попробовать извлечь базовый домен
+  // Но это сложно, поэтому возвращаем undefined
+  return undefined;
+}
+

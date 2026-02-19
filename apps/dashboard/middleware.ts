@@ -99,8 +99,21 @@ export async function middleware(request: NextRequest) {
     if (!isRefreshTokenValid) {
       const userCreationUrl = getUserCreationUrl(request);
       const redirectResponse = NextResponse.redirect(new URL(userCreationUrl));
-      redirectResponse.cookies.delete("access_token");
-      redirectResponse.cookies.delete("refresh_token");
+      const requestHost = request.headers.get("host") || "";
+      const { getCookieDomain } = await import("@mm-preview/sdk");
+      const cookieDomain = getCookieDomain(requestHost);
+      
+      // Удаляем куки с правильным доменом
+      redirectResponse.cookies.set("access_token", "", {
+        expires: new Date(0),
+        domain: cookieDomain,
+        path: "/",
+      });
+      redirectResponse.cookies.set("refresh_token", "", {
+        expires: new Date(0),
+        domain: cookieDomain,
+        path: "/",
+      });
       return redirectResponse;
     }
 
@@ -128,8 +141,9 @@ export async function middleware(request: NextRequest) {
         const requestHost = request.headers.get("host") || "";
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
         
-        const { getSameSiteConfig } = await import("@mm-preview/sdk");
+        const { getSameSiteConfig, getCookieDomain } = await import("@mm-preview/sdk");
         const cookieConfig = getSameSiteConfig(requestHost, apiUrl);
+        const cookieDomain = getCookieDomain(requestHost);
 
         // Устанавливаем куки из Set-Cookie заголовков
         for (const cookieHeader of setCookieHeaders) {
@@ -140,11 +154,9 @@ export async function middleware(request: NextRequest) {
 
             // Парсим атрибуты куки
             const pathMatch = cookieHeader.match(/Path=([^;]+)/);
-            const domainMatch = cookieHeader.match(/Domain=([^;]+)/);
             const maxAgeMatch = cookieHeader.match(/Max-Age=([^;]+)/);
             const httpOnlyMatch = cookieHeader.match(/HttpOnly/);
             const secureMatch = cookieHeader.match(/Secure/);
-            const sameSiteMatch = cookieHeader.match(/SameSite=([^;]+)/);
 
             // Используем настройки из конфигурации разрешенных доменов
             // Если домен разрешен для кросс-доменных запросов, используем SameSite=None; Secure
@@ -153,7 +165,7 @@ export async function middleware(request: NextRequest) {
 
             responseWithCookies.cookies.set(cookieName, cookieValue, {
               path: pathMatch ? pathMatch[1] : "/",
-              domain: domainMatch ? domainMatch[1] : undefined,
+              domain: cookieDomain, // Используем домен для работы между поддоменами
               maxAge: maxAgeMatch
                 ? Number.parseInt(maxAgeMatch[1], 10)
                 : undefined,
@@ -171,16 +183,42 @@ export async function middleware(request: NextRequest) {
         const redirectResponse = NextResponse.redirect(
           new URL(userCreationUrl),
         );
-        redirectResponse.cookies.delete("access_token");
-        redirectResponse.cookies.delete("refresh_token");
+        const requestHost = request.headers.get("host") || "";
+        const { getCookieDomain } = await import("@mm-preview/sdk");
+        const cookieDomain = getCookieDomain(requestHost);
+        
+        // Удаляем куки с правильным доменом
+        redirectResponse.cookies.set("access_token", "", {
+          expires: new Date(0),
+          domain: cookieDomain,
+          path: "/",
+        });
+        redirectResponse.cookies.set("refresh_token", "", {
+          expires: new Date(0),
+          domain: cookieDomain,
+          path: "/",
+        });
         return redirectResponse;
       }
     } catch (error) {
       console.error("Error refreshing token in middleware:", error);
       const userCreationUrl = getUserCreationUrl(request);
       const redirectResponse = NextResponse.redirect(new URL(userCreationUrl));
-      redirectResponse.cookies.delete("access_token");
-      redirectResponse.cookies.delete("refresh_token");
+      const requestHost = request.headers.get("host") || "";
+      const { getCookieDomain } = await import("@mm-preview/sdk");
+      const cookieDomain = getCookieDomain(requestHost);
+      
+      // Удаляем куки с правильным доменом
+      redirectResponse.cookies.set("access_token", "", {
+        expires: new Date(0),
+        domain: cookieDomain,
+        path: "/",
+      });
+      redirectResponse.cookies.set("refresh_token", "", {
+        expires: new Date(0),
+        domain: cookieDomain,
+        path: "/",
+      });
       return redirectResponse;
     }
   }

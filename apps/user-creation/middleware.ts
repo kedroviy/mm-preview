@@ -185,8 +185,9 @@ export async function middleware(request: NextRequest) {
               const requestHost = request.headers.get("host") || "";
               const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
               
-              const { getSameSiteConfig } = await import("@mm-preview/sdk");
+              const { getSameSiteConfig, getCookieDomain } = await import("@mm-preview/sdk");
               const cookieConfig = getSameSiteConfig(requestHost, apiUrl);
+              const cookieDomain = getCookieDomain(requestHost);
 
               // Устанавливаем куки из Set-Cookie заголовков
               for (const cookieHeader of setCookieHeaders) {
@@ -196,11 +197,9 @@ export async function middleware(request: NextRequest) {
                   const cookieValue = nameMatch[2];
                   
                   const pathMatch = cookieHeader.match(/Path=([^;]+)/);
-                  const domainMatch = cookieHeader.match(/Domain=([^;]+)/);
                   const maxAgeMatch = cookieHeader.match(/Max-Age=([^;]+)/);
                   const httpOnlyMatch = cookieHeader.match(/HttpOnly/);
                   const secureMatch = cookieHeader.match(/Secure/);
-                  const sameSiteMatch = cookieHeader.match(/SameSite=([^;]+)/);
                   
                   // Используем настройки из конфигурации разрешенных доменов
                   // Если домен разрешен для кросс-доменных запросов, используем SameSite=None; Secure
@@ -209,7 +208,7 @@ export async function middleware(request: NextRequest) {
                   
                   redirectResponse.cookies.set(cookieName, cookieValue, {
                     path: pathMatch ? pathMatch[1] : "/",
-                    domain: domainMatch ? domainMatch[1] : undefined,
+                    domain: cookieDomain, // Используем домен для работы между поддоменами
                     maxAge: maxAgeMatch ? parseInt(maxAgeMatch[1], 10) : undefined,
                     httpOnly: !!httpOnlyMatch,
                     secure,
@@ -225,8 +224,21 @@ export async function middleware(request: NextRequest) {
       } else if (response.status === 401 || response.status === 403) {
         // Токен невалидный - очищаем куки и показываем форму создания
         const clearCookiesResponse = NextResponse.next();
-        clearCookiesResponse.cookies.delete("access_token");
-        clearCookiesResponse.cookies.delete("refresh_token");
+        const requestHost = request.headers.get("host") || "";
+        const { getCookieDomain } = await import("@mm-preview/sdk");
+        const cookieDomain = getCookieDomain(requestHost);
+        
+        // Удаляем куки с правильным доменом
+        clearCookiesResponse.cookies.set("access_token", "", {
+          expires: new Date(0),
+          domain: cookieDomain,
+          path: "/",
+        });
+        clearCookiesResponse.cookies.set("refresh_token", "", {
+          expires: new Date(0),
+          domain: cookieDomain,
+          path: "/",
+        });
         return clearCookiesResponse;
       }
     } catch (error) {
