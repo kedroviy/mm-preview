@@ -2,6 +2,7 @@
 
 import { Button } from "@mm-preview/ui";
 import { Avatar } from "primereact/avatar";
+import { Ripple } from "primereact/ripple";
 import type { ReactNode } from "react";
 
 // AnimateOnScroll wrapper - primereact/animateonscroll may not exist in PrimeReact 10
@@ -33,7 +34,7 @@ export default function MainBlock() {
       <div className="h-[30rem]"></div>
       <div className="flex flex-wrap justify-center gap-8">
         <AnimateOnScroll
-          className="flex flex-col border border-surface shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4"
+          className="flex flex-col border border-surface shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
           enterClassName="animate-enter fade-in-10 slide-in-from-l-8 animate-duration-1000"
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
@@ -45,9 +46,10 @@ export default function MainBlock() {
             Мы подбираем фильмы по твоему вкусу — жанры, актёры и настроение,
             всё учитывается.
           </span>
+          <Ripple />
         </AnimateOnScroll>
         <AnimateOnScroll
-          className="flex flex-col border border-surface shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4"
+          className="flex flex-col border border-surface shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
           enterClassName="animate-enter fade-in-10 animate-duration-1000"
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
@@ -59,9 +61,10 @@ export default function MainBlock() {
             Создавай подборки, голосуй вместе с друзьями и находи идеальный
             фильм для вечера.
           </span>
+          <Ripple />
         </AnimateOnScroll>
         <AnimateOnScroll
-          className="flex flex-col border border-surface shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4"
+          className="flex flex-col border border-surface shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
           enterClassName="animate-enter fade-in-10 slide-in-from-r-8 animate-duration-1000"
         >
           <div className="rounded-full bg-primary text-primary-contrast w-12 h-12 flex items-center justify-center">
@@ -72,12 +75,13 @@ export default function MainBlock() {
             Умный алгоритм учитывает твои оценки и привычки, предлагая всё
             точнее с каждым просмотром.
           </span>
+          <Ripple />
         </AnimateOnScroll>
       </div>
       <div className="h-[30rem]"></div>
       <div className="flex flex-wrap justify-center gap-8">
         <AnimateOnScroll
-          className="flex flex-col border border-primary-200 shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4"
+          className="flex flex-col border border-primary-200 shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
           enterClassName="animate-enter fade-in-10 slide-in-from-t-20 animate-duration-1000"
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
@@ -86,9 +90,10 @@ export default function MainBlock() {
           <span className="text-muted-color text-center">
             Не знаю как я жила без этого раньше!
           </span>
+          <Ripple />
         </AnimateOnScroll>
         <AnimateOnScroll
-          className="flex flex-col border border-primary-200 shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4"
+          className="flex flex-col border border-primary-200 shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
           enterClassName="animate-enter fade-in-10 slide-in-from-b-20 animate-duration-1000"
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
@@ -97,21 +102,23 @@ export default function MainBlock() {
           <span className="text-muted-color text-center">
             Никогда бы не узнал про генеральские котлы без этого приложения
           </span>
+          <Ripple />
         </AnimateOnScroll>
         <AnimateOnScroll
-          className="flex flex-col border border-primary-200 shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4"
+          className="flex flex-col border border-primary-200 shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
           enterClassName="animate-enter fade-in-10 slide-in-from-t-20 animate-duration-1000"
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
           <Avatar shape="circle" size="xlarge"></Avatar>
           <span className="text-2xl font-medium">Xavier Mason</span>
           <span className="text-muted-color text-center">Паааааа</span>
+          <Ripple />
         </AnimateOnScroll>
       </div>
       <div className="h-[30rem]"></div>
       <div className="flex flex-wrap justify-center gap-8">
         <AnimateOnScroll
-          className="flex flex-col bg-primary text-primary-contrast border-primary shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4"
+          className="flex flex-col bg-primary text-primary-contrast border-primary shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
           enterClassName="animate-enter fade-in-10 spin-in-45 slide-in-from-t-12 animate-duration-1000"
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
@@ -122,9 +129,10 @@ export default function MainBlock() {
           <span className="text-center">
             Lorem ipsum dolor sit amet consectetur adipisicing elit.
           </span>
+          <Ripple />
         </AnimateOnScroll>
         <AnimateOnScroll
-          className="flex flex-col bg-primary text-primary-contrast border-primary shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4"
+          className="flex flex-col bg-primary text-primary-contrast border-primary shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
           enterClassName="animate-enter fade-in-10 zoom-in-50 slide-in-from-t-20 animate-duration-1000"
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
@@ -135,9 +143,10 @@ export default function MainBlock() {
           <span className="text-center">
             Lorem ipsum dolor sit amet consectetur adipisicing elit.
           </span>
+          <Ripple />
         </AnimateOnScroll>
         <AnimateOnScroll
-          className="flex flex-col bg-primary text-primary-contrast border-primary shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4"
+          className="flex flex-col bg-primary text-primary-contrast border-primary shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
           enterClassName="animate-enter fade-in-10 spin-in-[-45deg] slide-in-from-t-16 animate-duration-1000"
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
@@ -148,12 +157,13 @@ export default function MainBlock() {
           <span className="text-center">
             Lorem ipsum dolor sit amet consectetur adipisicing elit.
           </span>
+          <Ripple />
         </AnimateOnScroll>
       </div>
       <div className="h-[30rem]"></div>
       <div className="flex flex-wrap justify-center gap-8">
         <AnimateOnScroll
-          className="flex flex-col bg-purple-500 text-white border-purple-500 shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4"
+          className="flex flex-col bg-purple-500 text-white border-purple-500 shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
           enterClassName="animate-enter fade-in-10 zoom-in-50 animate-duration-1000"
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
@@ -164,9 +174,10 @@ export default function MainBlock() {
           <span className="text-center">
             Lorem ipsum dolor sit amet consectetur adipisicing elit.
           </span>
+          <Ripple />
         </AnimateOnScroll>
         <AnimateOnScroll
-          className="flex flex-col bg-teal-500 text-white border-teal-500 shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4"
+          className="flex flex-col bg-teal-500 text-white border-teal-500 shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
           enterClassName="animate-enter fade-in-10 zoom-in-75 animate-duration-1000"
           leaveClassName="animate-leave fade-out-0 animate-duration-1000"
         >
@@ -177,10 +188,11 @@ export default function MainBlock() {
           <span className="text-center">
             Lorem ipsum dolor sit amet consectetur adipisicing elit.
           </span>
+          <Ripple />
         </AnimateOnScroll>
 
         <AnimateOnScroll
-          className="flex flex-col bg-indigo-500 text-white border-indigo-500 shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4"
+          className="flex flex-col bg-indigo-500 text-white border-indigo-500 shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
           enterClassName="animate-enter fade-in-10 zoom-in-50 animate-duration-1000"
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
@@ -191,6 +203,7 @@ export default function MainBlock() {
           <span className="text-center">
             Lorem ipsum dolor sit amet consectetur adipisicing elit.
           </span>
+          <Ripple />
         </AnimateOnScroll>
       </div>
       <div className="h-[30rem]"></div>
@@ -217,11 +230,20 @@ export default function MainBlock() {
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
           <div className="flex items-center justify-center gap-4">
-            <Button onClick={handleCreateUser} className="text-lg px-6 py-3">
+            <Button
+              onClick={handleCreateUser}
+              className="text-lg px-6 py-3 p-ripple"
+            >
               Create Account
+              <Ripple />
             </Button>
-            <Button outlined color="secondary" className="text-lg px-6 py-3">
+            <Button
+              outlined
+              color="secondary"
+              className="text-lg px-6 py-3 p-ripple"
+            >
               See our plans
+              <Ripple />
             </Button>
           </div>
         </AnimateOnScroll>

@@ -63,6 +63,53 @@ function getUserCreationUrl(request: NextRequest): string {
 }
 
 export async function middleware(request: NextRequest) {
+  // Проверяем наличие токенов в URL параметрах (для кросс-доменной/кросс-портовой передачи)
+  const urlAccessToken = request.nextUrl.searchParams.get("access_token");
+  const urlRefreshToken = request.nextUrl.searchParams.get("refresh_token");
+  
+  if (urlAccessToken || urlRefreshToken) {
+    console.log("[dashboard middleware] Tokens found in URL, setting cookies and redirecting");
+    
+    // Извлекаем токены из URL и устанавливаем их как куки
+    const requestHost = request.headers.get("host") || "";
+    const { getCookieDomain, getSameSiteConfig } = await import("@mm-preview/sdk");
+    const cookieDomain = getCookieDomain(requestHost);
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    const cookieConfig = getSameSiteConfig(requestHost, apiUrl);
+    
+    // Создаем новый URL без токенов в параметрах
+    const cleanUrl = new URL(request.url);
+    cleanUrl.searchParams.delete("access_token");
+    cleanUrl.searchParams.delete("refresh_token");
+    
+    const redirectResponse = NextResponse.redirect(cleanUrl);
+    
+    // Устанавливаем куки из URL параметров
+    if (urlAccessToken) {
+      redirectResponse.cookies.set("access_token", urlAccessToken, {
+        path: "/",
+        domain: cookieDomain,
+        httpOnly: true,
+        secure: cookieConfig.secure,
+        sameSite: cookieConfig.sameSite,
+        maxAge: 60 * 60 * 24 * 7, // 7 дней
+      });
+    }
+    
+    if (urlRefreshToken) {
+      redirectResponse.cookies.set("refresh_token", urlRefreshToken, {
+        path: "/",
+        domain: cookieDomain,
+        httpOnly: true,
+        secure: cookieConfig.secure,
+        sameSite: cookieConfig.sameSite,
+        maxAge: 60 * 60 * 24 * 30, // 30 дней
+      });
+    }
+    
+    return redirectResponse;
+  }
+  
   const accessToken = request.cookies.get("access_token");
   const refreshToken = request.cookies.get("refresh_token");
 
@@ -145,7 +192,15 @@ export async function middleware(request: NextRequest) {
         const cookieConfig = getSameSiteConfig(requestHost, apiUrl);
         const cookieDomain = getCookieDomain(requestHost);
 
-        // Устанавливаем куки из Set-Cookie заголовков
+        console.log("[dashboard middleware] Setting cookies from refresh:", {
+          requestHost,
+          cookieDomain,
+          cookieCount: setCookieHeaders.length,
+          secure: cookieConfig.secure,
+          sameSite: cookieConfig.sameSite,
+        });
+
+        // Устанавливаем куки из Set-Cookie заголовков с domain: "localhost" для работы между портами
         for (const cookieHeader of setCookieHeaders) {
           const nameMatch = cookieHeader.match(/^([^=]+)=([^;]+)/);
           if (nameMatch) {
@@ -165,7 +220,7 @@ export async function middleware(request: NextRequest) {
 
             responseWithCookies.cookies.set(cookieName, cookieValue, {
               path: pathMatch ? pathMatch[1] : "/",
-              domain: cookieDomain, // Используем домен для работы между поддоменами
+              domain: cookieDomain, // "localhost" для работы между портами
               maxAge: maxAgeMatch
                 ? Number.parseInt(maxAgeMatch[1], 10)
                 : undefined,

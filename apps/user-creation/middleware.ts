@@ -102,7 +102,34 @@ export async function middleware(request: NextRequest) {
         if (user?.userId) {
           console.log("[user-creation middleware] Profile fetched, redirecting to dashboard with userId:", user.userId);
           const dashboardUrl = getDashboardUrl(request);
-          return NextResponse.redirect(new URL(`${dashboardUrl}/${user.userId}`));
+          
+          // Передаем токены через URL параметры для кросс-доменной/кросс-портовой передачи
+          // Это работает когда куки не могут быть переданы напрямую между разными портами/доменами
+          const redirectUrl = new URL(`${dashboardUrl}/${user.userId}`);
+          
+          if (accessToken?.value) {
+            redirectUrl.searchParams.set("access_token", accessToken.value);
+          }
+          if (refreshToken?.value) {
+            redirectUrl.searchParams.set("refresh_token", refreshToken.value);
+          }
+          
+          const redirectResponse = NextResponse.redirect(redirectUrl);
+          
+          // НЕ удаляем куки на user-creation - они должны остаться для этого домена/порта
+          // Токены передаются через URL параметры для dashboard, но куки остаются на user-creation
+          // Это позволяет пользователю вернуться на user-creation и иметь валидные куки
+          
+          console.log("[user-creation middleware] Redirecting with tokens in URL (cookies preserved on user-creation):", {
+            requestHost: request.headers.get("host") || "",
+            hasAccessToken: !!accessToken?.value,
+            hasRefreshToken: !!refreshToken?.value,
+          });
+          
+          // НЕ устанавливаем куки в redirectResponse, так как они уже есть и должны остаться
+          // Токены передаются через URL для dashboard
+          
+          return redirectResponse;
         }
       } else {
         const errorText = await userResponse.text().catch(() => "");
@@ -177,45 +204,47 @@ export async function middleware(request: NextRequest) {
             const user = await userResponse.json();
             if (user?.userId) {
               const dashboardUrl = getDashboardUrl(request);
-              const redirectResponse = NextResponse.redirect(
-                new URL(`${dashboardUrl}/${user.userId}`),
-              );
               
-              // Определяем настройки SameSite на основе разрешенных доменов
-              const requestHost = request.headers.get("host") || "";
-              const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+              // Передаем токены через URL параметры для кросс-доменной/кросс-портовой передачи
+              const redirectUrl = new URL(`${dashboardUrl}/${user.userId}`);
               
-              const { getSameSiteConfig, getCookieDomain } = await import("@mm-preview/sdk");
-              const cookieConfig = getSameSiteConfig(requestHost, apiUrl);
-              const cookieDomain = getCookieDomain(requestHost);
-
-              // Устанавливаем куки из Set-Cookie заголовков
+              // Извлекаем токены из Set-Cookie заголовков
+              let extractedAccessToken: string | null = null;
+              let extractedRefreshToken: string | null = null;
+              
               for (const cookieHeader of setCookieHeaders) {
-                const nameMatch = cookieHeader.match(/^([^=]+)=([^;]+)/);
-                if (nameMatch) {
-                  const cookieName = nameMatch[1];
-                  const cookieValue = nameMatch[2];
-                  
-                  const pathMatch = cookieHeader.match(/Path=([^;]+)/);
-                  const maxAgeMatch = cookieHeader.match(/Max-Age=([^;]+)/);
-                  const httpOnlyMatch = cookieHeader.match(/HttpOnly/);
-                  const secureMatch = cookieHeader.match(/Secure/);
-                  
-                  // Используем настройки из конфигурации разрешенных доменов
-                  // Если домен разрешен для кросс-доменных запросов, используем SameSite=None; Secure
-                  const sameSite: "strict" | "lax" | "none" = cookieConfig.sameSite;
-                  const secure = cookieConfig.secure || !!secureMatch;
-                  
-                  redirectResponse.cookies.set(cookieName, cookieValue, {
-                    path: pathMatch ? pathMatch[1] : "/",
-                    domain: cookieDomain, // Используем домен для работы между поддоменами
-                    maxAge: maxAgeMatch ? parseInt(maxAgeMatch[1], 10) : undefined,
-                    httpOnly: !!httpOnlyMatch,
-                    secure,
-                    sameSite,
-                  });
+                const accessMatch = cookieHeader.match(/access_token=([^;]+)/);
+                if (accessMatch) {
+                  extractedAccessToken = accessMatch[1];
+                }
+                const refreshMatch = cookieHeader.match(/refresh_token=([^;]+)/);
+                if (refreshMatch) {
+                  extractedRefreshToken = refreshMatch[1];
                 }
               }
+              
+              // Если токены не найдены в Set-Cookie, используем существующие из запроса
+              if (!extractedAccessToken && accessToken?.value) {
+                extractedAccessToken = accessToken.value;
+              }
+              if (!extractedRefreshToken && refreshToken?.value) {
+                extractedRefreshToken = refreshToken.value;
+              }
+              
+              if (extractedAccessToken) {
+                redirectUrl.searchParams.set("access_token", extractedAccessToken);
+              }
+              if (extractedRefreshToken) {
+                redirectUrl.searchParams.set("refresh_token", extractedRefreshToken);
+              }
+              
+              const redirectResponse = NextResponse.redirect(redirectUrl);
+              
+              // НЕ устанавливаем куки в redirectResponse для user-creation
+              // Куки должны остаться на user-creation, токены передаются через URL для dashboard
+              // Если нужно обновить куки на user-creation, это можно сделать отдельно
+              
+              console.log("[user-creation middleware] Redirecting after refresh with tokens in URL (cookies preserved)");
               
               return redirectResponse;
             }

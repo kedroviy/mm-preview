@@ -165,10 +165,13 @@ export function getCookieDomain(hostname: string): string | undefined {
   // Проверяем, находимся ли мы на Vercel
   if (hostnameWithoutPort.endsWith(".vercel.app")) {
     // Для Vercel поддоменов используем общий домен ".vercel.app"
+    // Точка в начале означает, что куки будут доступны для всех поддоменов
     return ".vercel.app";
   }
   
   // Для localhost и IP адресов не устанавливаем домен
+  // Браузеры автоматически делают куки доступными для всех портов на localhost
+  // Указание domain: "localhost" может вызвать проблемы в некоторых браузерах
   if (
     hostnameWithoutPort === "localhost" ||
     hostnameWithoutPort === "127.0.0.1" ||

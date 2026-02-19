@@ -7,6 +7,7 @@ import {
   useUsersController_getProfile,
 } from "@mm-preview/sdk";
 import { Button, notificationService } from "@mm-preview/ui";
+import { ProgressSpinner } from "primereact/progressspinner";
 import { useParams, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useMemo } from "react";
 import { ChatWindow, useChat } from "@/src/features/chat";
@@ -98,7 +99,7 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
         render: () => (
           <div className="min-h-screen p-8 flex items-center justify-center">
             <div className="text-center">
-              <p className="text-lg">Loading room...</p>
+              <ProgressSpinner aria-label="Loading room" />
             </div>
           </div>
         ),

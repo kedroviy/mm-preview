@@ -56,6 +56,14 @@ export {
   setCookie,
 } from "./utils/cookies";
 export {
+  getTokensFromStorage,
+  removeTokensFromStorage,
+  saveTokensToStorage,
+  syncTokensFromCookiesToStorage,
+  syncTokensFromStorageToCookies,
+} from "./utils/token-sync";
+export { TokenSync } from "./components/TokenSync";
+export {
   getCookieDomain,
   getSameSiteConfig,
   isAllowedDomain,

@@ -17,7 +17,7 @@ export function PrimeReactProviderWrapper({
   // In PrimeReact 10 with tailwindcss-primeui, we need to pass the preset correctly
   // The value should contain the preset configuration
   return (
-    <PrimeReactProvider value={{ preset } as any}>
+    <PrimeReactProvider value={{ preset, ripple: true } as any}>
       {children}
     </PrimeReactProvider>
   );

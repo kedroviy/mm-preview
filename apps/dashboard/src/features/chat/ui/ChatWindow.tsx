@@ -1,8 +1,7 @@
 "use client";
 
 import type { ChatMessage } from "@mm-preview/sdk";
-import { Button, Card } from "@mm-preview/ui";
-import { InputText } from "primereact/inputtext";
+import { Button, Card, InputText } from "@mm-preview/ui";
 import { useEffect, useRef, useState } from "react";
 import type { ChatWindowProps } from "../model/types";
 

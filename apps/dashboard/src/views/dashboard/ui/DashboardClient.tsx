@@ -1,7 +1,7 @@
 "use client";
 
 import { useUsersController_getProfile } from "@mm-preview/sdk";
-import { Button } from "@mm-preview/ui";
+import { Button, ProgressSpinner } from "@mm-preview/ui";
 import {
   useViewTransition,
   ViewTransition,
@@ -60,7 +60,7 @@ export function DashboardClient({
         suppressHydrationWarning
       >
         <div className="text-center" suppressHydrationWarning>
-          <p className="text-lg">Loading...</p>
+          <ProgressSpinner aria-label="Loading" />
         </div>
       </div>
     );
@@ -99,9 +99,9 @@ export function DashboardClient({
                 {...(!isMyRoomsLoading &&
                   myRooms &&
                   myRooms.length > 0 && {
-                    badge: String(myRooms.length),
-                    badgeSeverity: "warning",
-                  })}
+                  badge: String(myRooms.length),
+                  badgeSeverity: "warning",
+                })}
                 tooltip="Создайте комнату, присоединитесь к существующей или вернитесь в недавнюю комнату"
                 tooltipOptions={{ position: "bottom" }}
                 onClick={() => {

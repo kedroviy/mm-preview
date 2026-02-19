@@ -1,8 +1,7 @@
 "use client";
 
 import { useCreateRoom } from "@mm-preview/sdk";
-import { Button, Card, notificationService } from "@mm-preview/ui";
-import { InputText } from "primereact/inputtext";
+import { Button, Card, InputText, notificationService } from "@mm-preview/ui";
 import { useState } from "react";
 import type { CreateRoomFormProps } from "../model/types";
 

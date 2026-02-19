@@ -1,13 +1,10 @@
 "use client";
 
 import type { User } from "@mm-preview/sdk";
-import { Button, notificationService } from "@mm-preview/ui";
-import { InputText } from "primereact/inputtext";
+import { Button, InputText, notificationService } from "@mm-preview/ui";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { getAppUrls } from "@/src/shared/config/constants";
 import { useTranslation } from "@/src/shared/i18n/useTranslation";
-import { useAutoLogin } from "@/src/shared/hooks/useAutoLogin";
 import { NAME_MIN_LENGTH, NAME_PATTERN } from "../constants/validation";
 import { useCreateUser } from "../hooks/useCreateUser";
 import { getErrorMessage } from "../utils/error";
@@ -19,8 +16,7 @@ interface UserFormData {
 export function UserCreationForm() {
   const { t } = useTranslation();
   const [createdUser, setCreatedUser] = useState<User | null>(null);
-  // Проверка токенов происходит на сервере в middleware и page.tsx
-  // useAutoLogin оставлен только для fallback случаев
+  
   const {
     control,
     handleSubmit,
@@ -38,12 +34,7 @@ export function UserCreationForm() {
 
   const handleContinue = () => {
     if (!createdUser?.userId) return;
-    const urls = getAppUrls();
-    console.log("Current location:", window.location.href);
-    console.log("Hostname:", window.location.hostname);
-    console.log("Port:", window.location.port);
-    console.log("Dashboard URL:", urls.DASHBOARD);
-    window.location.href = `${urls.DASHBOARD}/${createdUser.userId}`;
+    window.location.href = "/";
   };
 
   const onSubmit = (data: UserFormData) => {

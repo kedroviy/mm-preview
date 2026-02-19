@@ -1,8 +1,7 @@
 "use client";
 
 import { useJoinRoom } from "@mm-preview/sdk";
-import { Button, Card, notificationService } from "@mm-preview/ui";
-import { InputText } from "primereact/inputtext";
+import { Button, Card, InputOtp, notificationService } from "@mm-preview/ui";
 import { useState } from "react";
 import type { JoinRoomFormProps } from "../model/types";
 
@@ -46,15 +45,13 @@ export function JoinRoomForm({
           <label htmlFor="roomCode" className="font-medium">
             Код комнаты
           </label>
-          <InputText
+          <InputOtp
             id="roomCode"
             value={roomCode}
-            onChange={(e) =>
-              setRoomCode(e.target.value.replace(/\D/g, "").slice(0, 6))
-            }
-            placeholder="123456"
-            maxLength={6}
-            className="text-2xl text-center tracking-widest"
+            onChange={(e) => setRoomCode(e.value || "")}
+            length={6}
+            integerOnly
+            className="flex justify-center"
           />
           <small className="text-muted-color">
             Введите 6-значный код комнаты

@@ -2,14 +2,12 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 import { Provider } from "@/src/shared/config/providers/Provider";
+import { generateMetadataFromHeaders } from "@/src/shared/config/metadata";
 
-export const metadata: Metadata = {
-  title: "Create Account - Movie match",
-  description: "Create your account",
-  icons: {
-    icon: "./favicon.ico",
-  },
-};
+// Генерация метаданных на основе языка из заголовков
+export async function generateMetadata(): Promise<Metadata> {
+  return generateMetadataFromHeaders();
+}
 
 const font = Montserrat({
   subsets: ["latin"],
