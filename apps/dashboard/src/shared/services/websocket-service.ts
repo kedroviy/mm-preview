@@ -443,11 +443,32 @@ class WebSocketService {
    */
   joinRoom(publicCode: string, userId: string): void {
     if (!this.socket?.connected) {
-      this.emit("error", {
-        message: "WebSocket не подключен",
-        code: "NOT_CONNECTED",
-        event: "joinRoom",
-      });
+      console.warn("⚠️ WebSocket не подключен, пытаемся подключиться...");
+      // Пытаемся подключиться, если еще не подключены
+      if (!this.isConnecting) {
+        this.connect();
+      }
+      // Откладываем joinRoom до подключения (максимум 5 секунд)
+      let attempts = 0;
+      const maxAttempts = 50; // 50 попыток по 100мс = 5 секунд
+      const checkConnection = () => {
+        attempts++;
+        if (this.socket?.connected) {
+          this.socket.emit("joinRoom", { publicCode, userId });
+          console.log("✅ Присоединились к комнате после подключения");
+        } else if (attempts >= maxAttempts || (!this.isConnecting && !this.socket)) {
+          // Если не удалось подключиться, отправляем ошибку
+          this.emit("error", {
+            message: "WebSocket не подключен. Не удалось подключиться.",
+            code: "NOT_CONNECTED",
+            event: "joinRoom",
+          });
+        } else {
+          // Продолжаем ждать подключения
+          setTimeout(checkConnection, 100);
+        }
+      };
+      setTimeout(checkConnection, 100);
       return;
     }
 
@@ -495,8 +516,13 @@ class WebSocketService {
    */
   sendMessage(roomId: string, message: string): void {
     if (!this.socket?.connected) {
+      console.warn("⚠️ WebSocket не подключен при попытке отправить сообщение");
+      // Пытаемся подключиться, если еще не подключены
+      if (!this.isConnecting) {
+        this.connect();
+      }
       this.emit("error", {
-        message: "WebSocket не подключен",
+        message: "WebSocket не подключен. Пожалуйста, подождите подключения.",
         code: "NOT_CONNECTED",
         event: "sendMessage",
       });

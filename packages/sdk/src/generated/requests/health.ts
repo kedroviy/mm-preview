@@ -3,25 +3,25 @@ import type { ApiResponse } from '../../types';
 
 /**
  * Health check endpoint
- * @returns void
+ * @returns any
  */
 export async function AppController_getHello() {
-  const url = `/`;
+  const url = `/api/v1`;
   const fullUrl = url;
   
-  const response = await api.get<void>(url);
+  const response = await api.get<any>(url);
   return response;
 }
 
 
 /**
  * Health check for monitoring
- * @returns void
+ * @returns any
  */
 export async function AppController_healthCheck() {
-  const url = `/health`;
+  const url = `/api/v1/health`;
   const fullUrl = url;
   
-  const response = await api.get<void>(url);
+  const response = await api.get<any>(url);
   return response;
 }

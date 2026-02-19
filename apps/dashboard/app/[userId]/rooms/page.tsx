@@ -27,7 +27,7 @@ async function getProfileFromServer() {
     // Делаем запрос к профилю с токеном в Authorization и Cookie
     const origin =
       process.env.NEXT_PUBLIC_DASHBOARD_URL || "http://localhost:3002";
-    const response = await fetch(`${apiUrl}/users/profile`, {
+    const response = await fetch(`${apiUrl}/api/v1/users/profile`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

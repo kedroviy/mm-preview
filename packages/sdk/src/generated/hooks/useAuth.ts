@@ -56,6 +56,7 @@ export function useAuthController_logout() {
   
   return useMutation({
     mutationFn: async () => {
+      
       const response: ApiResponse<void> = await AuthController_logout();
       return response.data;
     },

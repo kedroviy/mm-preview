@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/": {
+    "/api/v1": {
         parameters: {
             query?: never;
             header?: never;
@@ -21,7 +21,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/health": {
+    "/api/v1/health": {
         parameters: {
             query?: never;
             header?: never;
@@ -38,7 +38,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/login": {
+    "/api/v1/auth/login": {
         parameters: {
             query?: never;
             header?: never;
@@ -58,7 +58,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/refresh": {
+    "/api/v1/auth/refresh": {
         parameters: {
             query?: never;
             header?: never;
@@ -78,7 +78,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/logout": {
+    "/api/v1/auth/logout": {
         parameters: {
             query?: never;
             header?: never;
@@ -98,7 +98,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/users": {
+    "/api/v1/users": {
         parameters: {
             query?: never;
             header?: never;
@@ -118,7 +118,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/users/profile": {
+    "/api/v1/users/profile": {
         parameters: {
             query?: never;
             header?: never;
@@ -138,7 +138,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/users/{userId}": {
+    "/api/v1/users/{userId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -162,7 +162,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/users/{userId}/name": {
+    "/api/v1/users/{userId}/name": {
         parameters: {
             query?: never;
             header?: never;
@@ -182,7 +182,7 @@ export interface paths {
         patch: operations["UsersController_updateName"];
         trace?: never;
     };
-    "/rooms": {
+    "/api/v1/rooms": {
         parameters: {
             query?: never;
             header?: never;
@@ -202,7 +202,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/rooms/my-rooms": {
+    "/api/v1/rooms/my-rooms": {
         parameters: {
             query?: never;
             header?: never;
@@ -222,7 +222,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/rooms/{id}": {
+    "/api/v1/rooms/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -242,7 +242,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/rooms/join": {
+    "/api/v1/rooms/join": {
         parameters: {
             query?: never;
             header?: never;
@@ -262,7 +262,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/rooms/{id}/leave": {
+    "/api/v1/rooms/{id}/leave": {
         parameters: {
             query?: never;
             header?: never;
@@ -282,7 +282,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/rooms/{id}/choice": {
+    "/api/v1/rooms/{id}/choice": {
         parameters: {
             query?: never;
             header?: never;
@@ -302,7 +302,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/rooms/{id}/members": {
+    "/api/v1/rooms/{id}/members": {
         parameters: {
             query?: never;
             header?: never;
@@ -322,7 +322,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/rooms/{id}/members/{userId}": {
+    "/api/v1/rooms/{id}/members/{userId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -342,7 +342,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/rooms/{id}/chat/history": {
+    "/api/v1/rooms/{id}/chat/history": {
         parameters: {
             query?: never;
             header?: never;
@@ -362,7 +362,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/rooms/{id}/members/{userId}/mute": {
+    "/api/v1/rooms/{id}/members/{userId}/mute": {
         parameters: {
             query?: never;
             header?: never;

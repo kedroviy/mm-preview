@@ -17,13 +17,13 @@ export const authApi = {
    * Refresh token может быть в cookie или в теле запроса
    */
   refreshToken: async (data?: RefreshTokenRequest) => {
-    return api.post<AuthResponse>("/auth/refresh", data);
+    return api.post<AuthResponse>("/api/v1/auth/refresh", data);
   },
 
   /**
    * Выйти из системы (удаляет refresh token и очищает cookies)
    */
   logout: async () => {
-    return api.post<void>("/auth/logout");
+    return api.post<void>("/api/v1/auth/logout");
   },
 };

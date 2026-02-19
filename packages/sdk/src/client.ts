@@ -23,7 +23,13 @@ class ApiClient {
   }
 
   private buildURL(url: string, params?: RequestConfig["params"]): string {
-    const fullURL = url.startsWith("http") ? url : `${this.baseURL}${url}`;
+    // Если baseURL заканчивается на /api/v1, а url начинается с /api/v1, убираем дублирование
+    let base = this.baseURL;
+    if (base.endsWith('/api/v1') && url.startsWith('/api/v1')) {
+      base = base.replace(/\/api\/v1\/?$/, '');
+    }
+    
+    const fullURL = url.startsWith("http") ? url : `${base}${url}`;
 
     if (!params || Object.keys(params).length === 0) {
       return fullURL;

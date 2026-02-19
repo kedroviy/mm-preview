@@ -12,8 +12,11 @@
 
 /**
  * Получить API URL для клиентских запросов
- * В продакшене возвращает /api (проксируется через Vercel)
+ * В продакшене возвращает /api/v1 (проксируется через Vercel rewrites)
  * В разработке возвращает NEXT_PUBLIC_API_URL или localhost
+ * 
+ * Важно: В сгенерированных requests уже есть /api/v1/ в URL,
+ * поэтому baseURL должен быть пустым при прокси или содержать полный путь без /api/v1
  */
 export function getClientApiUrl(): string {
   // Можно принудительно включить прокси через переменную окружения
@@ -22,10 +25,15 @@ export function getClientApiUrl(): string {
     (process.env.NODE_ENV === "production" && !process.env.NEXT_PUBLIC_API_URL);
   
   if (useProxy) {
-    return "/api";
+    // При прокси возвращаем пустую строку, так как в requests уже есть /api/v1/
+    // Vercel rewrites настроены на /api/v1/:path* → https://mm-admin.onrender.com/:path*
+    return "";
   }
   
-  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+  // В разработке возвращаем полный URL без /api/v1, так как в requests уже есть /api/v1/
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+  // Убираем /api/v1 из конца, если есть, так как в requests уже есть /api/v1/
+  return apiUrl.replace(/\/api\/v1\/?$/, "");
 }
 
 /**

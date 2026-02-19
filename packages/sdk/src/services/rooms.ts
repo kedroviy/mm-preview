@@ -66,49 +66,49 @@ export const roomsApi = {
    * Создать новую комнату
    */
   createRoom: async (data?: CreateRoomRequest) => {
-    return api.post<CreateRoomResponse>("/rooms", data);
+    return api.post<CreateRoomResponse>("/api/v1/rooms", data);
   },
 
   /**
    * Получить комнату по ID
    */
   getRoom: async (roomId: string) => {
-    return api.get<Room>(`/rooms/${roomId}`);
+    return api.get<Room>(`/api/v1/rooms/${roomId}`);
   },
 
   /**
    * Присоединиться к комнате по публичному коду
    */
   joinRoom: async (data: JoinRoomRequest) => {
-    return api.post<Room>("/rooms/join", data);
+    return api.post<Room>("/api/v1/rooms/join", data);
   },
 
   /**
    * Покинуть комнату
    */
   leaveRoom: async (roomId: string, data: LeaveRoomRequest) => {
-    return api.post<Room>(`/rooms/${roomId}/leave`, data);
+    return api.post<Room>(`/api/v1/rooms/${roomId}/leave`, data);
   },
 
   /**
    * Выбрать фильм в комнате
    */
   chooseMovie: async (roomId: string, data: ChooseMovieRequest) => {
-    return api.post<Room>(`/rooms/${roomId}/choice`, data);
+    return api.post<Room>(`/api/v1/rooms/${roomId}/choice`, data);
   },
 
   /**
    * Получить список участников комнаты с ролями
    */
   getRoomMembers: async (roomId: string) => {
-    return api.get<{ members: RoomMember[] }>(`/rooms/${roomId}/members`);
+    return api.get<{ members: RoomMember[] }>(`/api/v1/rooms/${roomId}/members`);
   },
 
   /**
    * Удалить пользователя из комнаты (только создатель)
    */
   removeUserFromRoom: async (roomId: string, userId: string) => {
-    return api.delete<Room>(`/rooms/${roomId}/members/${userId}`);
+    return api.delete<Room>(`/api/v1/rooms/${roomId}/members/${userId}`);
   },
 
   /**
@@ -116,7 +116,7 @@ export const roomsApi = {
    */
   getChatHistory: async (roomId: string) => {
     return api.get<{ messages: ChatMessage[] }>(
-      `/rooms/${roomId}/chat/history`,
+      `/api/v1/rooms/${roomId}/chat/history`,
     );
   },
 };

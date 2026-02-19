@@ -13,7 +13,7 @@ type UserProfileResponseDto = components['schemas']['UserProfileResponseDto'];
  * @returns RedisUserResponseDto
  */
 export async function UsersController_createUser(body: CreateRedisUserDto) {
-  const url = `/users`;
+  const url = `/api/v1/users`;
   const fullUrl = url;
   
   const response = await api.post<RedisUserResponseDto>(url, body);
@@ -27,7 +27,7 @@ export async function UsersController_createUser(body: CreateRedisUserDto) {
  * @returns UserProfileResponseDto
  */
 export async function UsersController_getProfile() {
-  const url = `/users/profile`;
+  const url = `/api/v1/users/profile`;
   const fullUrl = url;
   
   const response = await api.get<UserProfileResponseDto>(url);
@@ -42,7 +42,7 @@ export async function UsersController_getProfile() {
  * @returns RedisUserResponseDto
  */
 export async function UsersController_getUser(path: { userId: string }) {
-  const url = `/users/${path.userId}`;
+  const url = `/api/v1/users/${path.userId}`;
   const fullUrl = url;
   
   const response = await api.get<RedisUserResponseDto>(url);
@@ -57,7 +57,7 @@ export async function UsersController_getUser(path: { userId: string }) {
  * @returns void
  */
 export async function UsersController_deleteUser(path: { userId: string }) {
-  const url = `/users/${path.userId}`;
+  const url = `/api/v1/users/${path.userId}`;
   const fullUrl = url;
   
   const response = await api.delete<void>(url);
@@ -73,7 +73,7 @@ export async function UsersController_deleteUser(path: { userId: string }) {
  * @returns RedisUserResponseDto
  */
 export async function UsersController_updateName(path: { userId: string }, body: { name: string }) {
-  const url = `/users/${path.userId}/name`;
+  const url = `/api/v1/users/${path.userId}/name`;
   const fullUrl = url;
   
   const response = await api.patch<RedisUserResponseDto>(url, body);

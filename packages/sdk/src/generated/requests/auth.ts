@@ -14,7 +14,7 @@ type AuthResponseDto = components['schemas']['AuthResponseDto'];
  * @returns LoginResponseDto
  */
 export async function AuthController_login(body: LoginDto) {
-  const url = `/auth/login`;
+  const url = `/api/v1/auth/login`;
   const fullUrl = url;
   
   const response = await api.post<LoginResponseDto>(url, body);
@@ -29,7 +29,7 @@ export async function AuthController_login(body: LoginDto) {
  * @returns AuthResponseDto
  */
 export async function AuthController_refreshToken(body: RefreshTokenDto) {
-  const url = `/auth/refresh`;
+  const url = `/api/v1/auth/refresh`;
   const fullUrl = url;
   
   const response = await api.post<AuthResponseDto>(url, body);
@@ -43,7 +43,7 @@ export async function AuthController_refreshToken(body: RefreshTokenDto) {
  * @returns void
  */
 export async function AuthController_logout() {
-  const url = `/auth/logout`;
+  const url = `/api/v1/auth/logout`;
   const fullUrl = url;
   
   const response = await api.post<void>(url);

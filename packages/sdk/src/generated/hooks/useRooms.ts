@@ -37,7 +37,8 @@ export function useRoomsController_createRoom() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (data?: CreateRoomDto) => {
+    mutationFn: async (data: CreateRoomDto) => {
+      
       const response: ApiResponse<RoomResponseDto> = await RoomsController_createRoom(data);
       return response.data;
     },

@@ -171,6 +171,16 @@ export function useWebSocketChat({
         return;
       }
 
+      if (!isConnected) {
+        onError?.(new Error("WebSocket не подключен. Пожалуйста, подождите подключения."));
+        return;
+      }
+
+      if (joinedRoomRef.current !== roomId) {
+        onError?.(new Error("Вы еще не присоединились к этой комнате. Пожалуйста, подождите."));
+        return;
+      }
+
       if (isMuted) {
         onError?.(new Error("Вы не можете отправлять сообщения (заглушены)"));
         return;
@@ -178,7 +188,7 @@ export function useWebSocketChat({
 
       wsSendMessage(roomId, message);
     },
-    [roomId, isMuted, wsSendMessage, onError],
+    [roomId, isMuted, isConnected, wsSendMessage, onError],
   );
 
   return {

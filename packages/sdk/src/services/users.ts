@@ -22,14 +22,14 @@ export const usersApi = {
    * Получить список пользователей
    */
   getUsers: async (params?: { page?: number; limit?: number }) => {
-    return api.get<User[]>("/users", { params });
+    return api.get<User[]>("/api/v1/users", { params });
   },
 
   /**
    * Получить пользователя по ID
    */
   getUserById: async (userId: string) => {
-    return api.get<User>(`/users/${userId}`);
+    return api.get<User>(`/api/v1/users/${userId}`);
   },
 
   /**
@@ -37,13 +37,13 @@ export const usersApi = {
    * Токен автоматически устанавливается в куки через Set-Cookie заголовок
    */
   createUser: async (data: CreateUserRequest) => {
-    return api.post<User>("/users", data);
+    return api.post<User>("/api/v1/users", data);
   },
 
   /**
    * Обновить имя пользователя
    */
   updateUserName: async (userId: string, name: string) => {
-    return api.patch<User>(`/users/${userId}/name`, { name });
+    return api.patch<User>(`/api/v1/users/${userId}/name`, { name });
   },
 };
