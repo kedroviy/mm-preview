@@ -43,7 +43,9 @@ export async function middleware(request: NextRequest) {
   // Проверяем access_token в куках
   const accessToken = request.cookies.get("access_token");
   const refreshToken = request.cookies.get("refresh_token");
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+  // Middleware работает на сервере, используем прямой URL (не прокси)
+  const { getServerApiUrl } = await import("@mm-preview/sdk");
+  const apiUrl = getServerApiUrl();
 
   if (!accessToken?.value) {
     if (!refreshToken?.value) {

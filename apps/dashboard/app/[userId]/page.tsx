@@ -6,7 +6,9 @@ async function getProfileFromServer() {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("access_token");
   const refreshToken = cookieStore.get("refresh_token");
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+  // Server component - используем прямой URL (не прокси)
+  const { getServerApiUrl } = await import("@mm-preview/sdk");
+  const apiUrl = getServerApiUrl();
 
   if (!accessToken?.value) {
     return null;

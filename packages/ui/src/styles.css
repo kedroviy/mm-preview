@@ -1,2 +1,53 @@
 @import "tailwindcss";
 @import "tailwindcss-primeui";
+
+/* Button Styles - Applied automatically from packages/ui */
+/* Primary button uses colors from preset (colorScheme.primary) */
+/* Colors from AppPreset: primary.color = #274c77 (Dusk Blue) */
+.p-button {
+  transition: all 0.2s ease;
+  /* Primary button background from preset: #274c77 (Dusk Blue) */
+  background-color: #274c77;
+  color: #ffffff;
+  border: 1px solid #274c77;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.p-button:hover:not(:disabled) {
+  background-color: #1f3c5f; /* primary.hoverColor from preset */
+  border-color: #1f3c5f;
+}
+
+.p-button:active:not(:disabled) {
+  background-color: #172c47; /* primary.activeColor from preset */
+  border-color: #172c47;
+}
+
+.p-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.p-button.p-button-outlined {
+  background-color: transparent;
+  border-color: #274c77;
+  color: #274c77;
+}
+
+.p-button.p-button-outlined:hover:not(:disabled) {
+  background-color: #274c77;
+  color: #ffffff;
+}
+
+.p-button.p-button-text {
+  background-color: transparent;
+  border-color: transparent;
+  color: #274c77;
+}
+
+.p-button.p-button-text:hover:not(:disabled) {
+  background-color: rgba(39, 76, 119, 0.1);
+}

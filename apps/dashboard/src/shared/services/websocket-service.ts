@@ -49,12 +49,12 @@ class WebSocketService {
 
   /**
    * Получить URL для WebSocket соединения
+   * WebSocket всегда использует прямой URL, так как не может быть проксирован через rewrites
    */
   private getSocketUrl(): string {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-    const wsUrl = apiUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
-    const wsProtocol = apiUrl.startsWith("https") ? "wss:" : "ws:";
-    return `${wsProtocol}//${wsUrl}/rooms`;
+    // Импортируем утилиту для получения WebSocket URL
+    const { getWebSocketUrl } = require("@mm-preview/sdk");
+    return getWebSocketUrl();
   }
 
   /**

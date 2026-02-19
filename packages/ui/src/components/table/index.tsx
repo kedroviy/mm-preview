@@ -1,8 +1,9 @@
 "use client";
 
+import { useState, useMemo } from "react";
+import { DataTable as PrimeDataTable } from "primereact/datatable";
 import { Column } from "./Column";
 import { Paginator } from "../paginator";
-import { useState, useMemo } from "react";
 import type {
   ReactNode,
 } from "react";
@@ -13,7 +14,6 @@ export type { ColumnProps } from "./Column";
 
 // Static import - webpack will resolve this from the app's node_modules
 // @ts-ignore - Module resolution happens at build time via webpack
-import { DataTable as PrimeDataTable } from "primereact/datatable";
 
 export interface DataTableProps<T = any> {
   value?: T[];

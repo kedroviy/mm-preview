@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import type { ApiError, ApiResponse, RequestConfig } from "./types";
+import { getServerApiUrl } from "./utils/api-url";
 
 class ServerApiClient {
   private baseURL: string;
@@ -11,10 +12,9 @@ class ServerApiClient {
     timeout?: number;
     headers?: HeadersInit;
   }) {
-    this.baseURL =
-      config?.baseURL ||
-      process.env.NEXT_PUBLIC_API_URL ||
-      "http://localhost:4000";
+    // Server-side клиент всегда использует прямой URL (не прокси)
+    // так как серверные запросы идут напрямую, минуя Vercel rewrites
+    this.baseURL = config?.baseURL || getServerApiUrl();
     this.timeout = config?.timeout || 30000;
     this.defaultHeaders = {
       "Content-Type": "application/json",

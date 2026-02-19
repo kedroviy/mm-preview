@@ -71,6 +71,7 @@ export {
   shouldUseSameSiteNone,
 } from "./utils/cookie-config";
 export { decodeJWT, getUserIdFromToken } from "./utils/jwt";
+export { getClientApiUrl, getServerApiUrl, getWebSocketUrl } from "./utils/api-url";
 
 // Server-side exports are not included in main index to avoid importing next/headers in client code
 // Use direct fetch in server components instead

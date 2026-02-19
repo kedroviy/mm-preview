@@ -1,5 +1,6 @@
 import type { ApiError, ApiResponse, RequestConfig } from "./types";
 import { getAccessToken } from "./utils/cookies";
+import { getClientApiUrl } from "./utils/api-url";
 
 class ApiClient {
   private baseURL: string;
@@ -11,10 +12,9 @@ class ApiClient {
     timeout?: number;
     headers?: HeadersInit;
   }) {
-    this.baseURL =
-      config?.baseURL ||
-      process.env.NEXT_PUBLIC_API_URL ||
-      "http://localhost:4000"; // Fallback для локальной разработки
+    // Используем утилиту для определения правильного URL
+    // В продакшене с прокси вернет /api, иначе прямой URL
+    this.baseURL = config?.baseURL || getClientApiUrl();
     this.timeout = config?.timeout || 30000;
     this.defaultHeaders = {
       "Content-Type": "application/json",

@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChatMessage } from "@mm-preview/sdk";
-import { getAccessToken, setAccessToken } from "@mm-preview/sdk";
+import { getAccessToken, getWebSocketUrl, setAccessToken } from "@mm-preview/sdk";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { io, type Socket } from "socket.io-client";
 
@@ -54,10 +54,8 @@ export function useSocketIOChat({
       }
 
       // Формируем URL для Socket.IO
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-      const wsUrl = apiUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
-      const wsProtocol = apiUrl.startsWith("https") ? "wss:" : "ws:";
-      const socketUrl = `${wsProtocol}//${wsUrl}/rooms`;
+      // WebSocket всегда использует прямой URL (не может быть проксирован)
+      const socketUrl = getWebSocketUrl();
 
       console.log("Connecting to Socket.IO:", socketUrl);
 

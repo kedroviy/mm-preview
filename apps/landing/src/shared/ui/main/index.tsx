@@ -34,8 +34,8 @@ export default function MainBlock() {
       <div className="h-[30rem]"></div>
       <div className="flex flex-wrap justify-center gap-8">
         <AnimateOnScroll
-          className="flex flex-col border border-surface shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
-          enterClassName="animate-enter fade-in-10 slide-in-from-l-8 animate-duration-1000"
+          className="flex flex-col bg-primary text-primary-contrast border-primary shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
+          enterClassName="animate-enter fade-in-10 spin-in-45 slide-in-from-t-12 animate-duration-1000"
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
           <div className="rounded-full bg-primary text-primary-contrast w-12 h-12 flex items-center justify-center">
@@ -49,8 +49,8 @@ export default function MainBlock() {
           <Ripple />
         </AnimateOnScroll>
         <AnimateOnScroll
-          className="flex flex-col border border-surface shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
-          enterClassName="animate-enter fade-in-10 animate-duration-1000"
+          className="flex flex-col bg-primary text-primary-contrast border-primary shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
+          enterClassName="animate-enter fade-in-10 spin-in-45 slide-in-from-t-12 animate-duration-1000"
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
           <div className="rounded-full bg-primary text-primary-contrast w-12 h-12 flex items-center justify-center">
@@ -64,8 +64,9 @@ export default function MainBlock() {
           <Ripple />
         </AnimateOnScroll>
         <AnimateOnScroll
-          className="flex flex-col border border-surface shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
-          enterClassName="animate-enter fade-in-10 slide-in-from-r-8 animate-duration-1000"
+          className="flex flex-col bg-primary text-primary-contrast border-primary shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
+          enterClassName="animate-enter fade-in-10 spin-in-45 slide-in-from-t-12 animate-duration-1000"
+          leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
           <div className="rounded-full bg-primary text-primary-contrast w-12 h-12 flex items-center justify-center">
             <i className="pi pi-building !text-2xl"></i>
@@ -81,7 +82,7 @@ export default function MainBlock() {
       <div className="h-[30rem]"></div>
       <div className="flex flex-wrap justify-center gap-8">
         <AnimateOnScroll
-          className="flex flex-col border border-primary-200 shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
+          className="flex flex-col shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
           enterClassName="animate-enter fade-in-10 slide-in-from-t-20 animate-duration-1000"
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
@@ -93,7 +94,7 @@ export default function MainBlock() {
           <Ripple />
         </AnimateOnScroll>
         <AnimateOnScroll
-          className="flex flex-col border border-primary-200 shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
+          className="flex flex-col shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
           enterClassName="animate-enter fade-in-10 slide-in-from-b-20 animate-duration-1000"
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
@@ -105,7 +106,7 @@ export default function MainBlock() {
           <Ripple />
         </AnimateOnScroll>
         <AnimateOnScroll
-          className="flex flex-col border border-primary-200 shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
+          className="flex flex-col shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
           enterClassName="animate-enter fade-in-10 slide-in-from-t-20 animate-duration-1000"
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >

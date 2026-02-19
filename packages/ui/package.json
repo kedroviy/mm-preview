@@ -20,7 +20,8 @@
     "./icon": "./src/components/icon/index.ts",
     "./notification": "./src/services/notification.ts",
     "./prime-react-provider": "./src/providers/PrimeReactProvider.tsx",
-    "./app-preset": "./src/presets/app-preset.ts"
+    "./app-preset": "./src/presets/app-preset.ts",
+    "./styles": "./src/styles.css"
   },
   "scripts": {
     "lint": "biome check",
