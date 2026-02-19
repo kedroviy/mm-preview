@@ -8,6 +8,7 @@ import { useTranslation } from "@/src/shared/i18n/useTranslation";
 import { NAME_MIN_LENGTH, NAME_PATTERN } from "../constants/validation";
 import { useCreateUser } from "../hooks/useCreateUser";
 import { getErrorMessage } from "../utils/error";
+import { getAppUrls } from "@/src/shared/config/constants";
 
 interface UserFormData {
   name: string;
@@ -34,7 +35,9 @@ export function UserCreationForm() {
 
   const handleContinue = () => {
     if (!createdUser?.userId) return;
-    window.location.href = "/";
+    
+    const dashboardUrl = getAppUrls().DASHBOARD;
+    window.location.href = `${dashboardUrl}/${createdUser.userId}`;
   };
 
   const onSubmit = (data: UserFormData) => {

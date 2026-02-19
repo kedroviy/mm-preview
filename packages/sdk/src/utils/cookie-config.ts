@@ -169,16 +169,16 @@ export function getCookieDomain(hostname: string): string | undefined {
     return ".vercel.app";
   }
   
-  // Для localhost и IP адресов не устанавливаем домен
-  // Браузеры автоматически делают куки доступными для всех портов на localhost
-  // Указание domain: "localhost" может вызвать проблемы в некоторых браузерах
-  if (
-    hostnameWithoutPort === "localhost" ||
-    hostnameWithoutPort === "127.0.0.1" ||
-    /^(\d{1,3}\.){3}\d{1,3}$/.test(hostnameWithoutPort)
-  ) {
-    return undefined;
-  }
+  // // Для localhost и IP адресов не устанавливаем домен
+  // // Браузеры автоматически делают куки доступными для всех портов на localhost
+  // // Указание domain: "localhost" может вызвать проблемы в некоторых браузерах
+  // if (
+  //   hostnameWithoutPort === "localhost" ||
+  //   hostnameWithoutPort === "127.0.0.1" ||
+  //   /^(\d{1,3}\.){3}\d{1,3}$/.test(hostnameWithoutPort)
+  // ) {
+  //   return undefined;
+  // }
   
   // Для других доменов можно попробовать извлечь базовый домен
   // Но это сложно, поэтому возвращаем undefined

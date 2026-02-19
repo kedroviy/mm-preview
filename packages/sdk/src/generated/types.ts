@@ -3,10 +3,662 @@
  * Do not make direct changes to the file.
  */
 
-export type paths = Record<string, never>;
+export interface paths {
+    "/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Health check endpoint */
+        get: operations["AppController_getHello"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Health check for monitoring */
+        get: operations["AppController_healthCheck"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Login by name
+         * @description Logs in a user by name. Creates a new user with unique ID if needed. No uniqueness check - multiple users can have the same name. Sets JWT tokens in cookies.
+         */
+        post: operations["AuthController_login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh access token
+         * @description Generates a new access token using a valid refresh token. Refresh token is read from HTTP-only cookie (refresh_token). If cookie is not available, token can be provided in request body (for testing only).
+         */
+        post: operations["AuthController_refreshToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Logout user
+         * @description Revokes the current refresh token and clears authentication cookies.
+         */
+        post: operations["AuthController_logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create a new user
+         * @description Creates a new user in PostgreSQL and sets JWT token in cookie. If userId is not provided, a new UUID will be generated.
+         */
+        post: operations["UsersController_createUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get current user profile
+         * @description Retrieves the profile of the authenticated user (userId from JWT token) with their rooms. Requires authentication.
+         */
+        get: operations["UsersController_getProfile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get user by ID (admin only)
+         * @description Retrieves a user by their userId (UUID). Requires authentication. Only admins can view other users' data.
+         */
+        get: operations["UsersController_getUser"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete user
+         * @description Deletes a user by their userId (UUID). Requires authentication. Users can only delete themselves unless they are admin.
+         */
+        delete: operations["UsersController_deleteUser"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{userId}/name": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update user name
+         * @description Updates the name of an existing user. Requires authentication. Users can only update their own name unless they are admin.
+         */
+        patch: operations["UsersController_updateName"];
+        trace?: never;
+    };
+    "/rooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create a new room
+         * @description Creates a new room with a unique 6-digit public code and broadcasts the event via WebSocket. Requires authentication.
+         */
+        post: operations["RoomsController_createRoom"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rooms/my-rooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get current user rooms
+         * @description Retrieves all rooms where the current user is a member. Requires authentication.
+         */
+        get: operations["RoomsController_getMyRooms"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rooms/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get room by ID
+         * @description Retrieves room data by room ID. Requires authentication.
+         */
+        get: operations["RoomsController_getRoom"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rooms/join": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Join a room by public code
+         * @description Adds a user to a room using 6-digit public code and broadcasts the update via WebSocket. Requires authentication.
+         */
+        post: operations["RoomsController_joinRoom"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rooms/{id}/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Leave a room
+         * @description Removes a user from a room and broadcasts the update via WebSocket. Requires authentication.
+         */
+        post: operations["RoomsController_leaveRoom"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rooms/{id}/choice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Choose a movie
+         * @description Records a user's movie choice and broadcasts the update via WebSocket. Requires authentication.
+         */
+        post: operations["RoomsController_chooseMovie"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rooms/{id}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get room members
+         * @description Retrieves list of room members with their roles and names. Only room members can view this list. Requires authentication.
+         */
+        get: operations["RoomsController_getRoomMembers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rooms/{id}/members/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove user from room
+         * @description Removes a user from the room. Only the room creator can remove users. Requires authentication.
+         */
+        delete: operations["RoomsController_removeUserFromRoom"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rooms/{id}/chat/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get chat history (WebSocket recommended)
+         * @description Retrieves chat history for a room. Note: Chat history is automatically sent via WebSocket when joining a room. This HTTP endpoint is provided for reference. Requires authentication and room membership.
+         */
+        get: operations["RoomsController_getChatHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rooms/{id}/members/{userId}/mute": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mute a user in room chat
+         * @description Mutes a user in the room chat for specified duration (1, 5, or 10 minutes). Only the room creator can mute users. Requires authentication.
+         */
+        post: operations["RoomsController_muteUser"];
+        /**
+         * Unmute a user in room chat
+         * @description Removes mute from a user in the room chat. Only the room creator can unmute users. Requires authentication.
+         */
+        delete: operations["RoomsController_unmuteUser"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+}
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: never;
+    schemas: {
+        LoginDto: {
+            /**
+             * @description User name for login
+             * @example John Doe
+             */
+            name: string;
+        };
+        LoginResponseDto: {
+            /**
+             * @description User ID generated by server (UUID)
+             * @example 123e4567-e89b-12d3-a456-426614174000
+             */
+            userId: string;
+            /**
+             * @description User name
+             * @example John Doe
+             */
+            name: string;
+        };
+        ErrorResponseDto: {
+            /**
+             * @description HTTP status code
+             * @example 400
+             */
+            statusCode: number;
+            /**
+             * @description Error message or array of error messages
+             * @example Invalid room code. Code must be exactly 6 digits.
+             */
+            message: string | string[];
+            /**
+             * @description Error type name
+             * @example Bad Request
+             */
+            error: string;
+            /**
+             * @description ISO timestamp when error occurred
+             * @example 2024-01-15T10:30:00.000Z
+             */
+            timestamp: string;
+            /**
+             * @description Request path
+             * @example /rooms/join
+             */
+            path: string;
+            /**
+             * @description HTTP method
+             * @example POST
+             */
+            method: string;
+        };
+        RefreshTokenDto: {
+            /**
+             * @description Refresh token (optional if provided in cookie)
+             * @example eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+             */
+            refreshToken?: string;
+        };
+        AuthResponseDto: Record<string, never>;
+        CreateRedisUserDto: {
+            /**
+             * @description User name
+             * @example John Doe
+             */
+            name?: string;
+            /**
+             * @description User ID (UUID). If not provided, a new UUID will be generated
+             * @example 123e4567-e89b-12d3-a456-426614174000
+             */
+            userId?: string;
+        };
+        RedisUserResponseDto: {
+            /**
+             * @description Unique user identifier (UUID)
+             * @example 123e4567-e89b-12d3-a456-426614174000
+             */
+            userId: string;
+            /**
+             * @description User name
+             * @example John Doe
+             */
+            name: string;
+            /**
+             * @description Last active timestamp (Unix timestamp in milliseconds)
+             * @example 1704067200000
+             */
+            lastActive: number;
+            /**
+             * @description User role
+             * @example user
+             * @enum {string}
+             */
+            role: "user" | "admin";
+            /**
+             * @description Array of recently visited room IDs (max 10)
+             * @example [
+             *       "123e4567-e89b-12d3-a456-426614174000",
+             *       "123e4567-e89b-12d3-a456-426614174001"
+             *     ]
+             */
+            recentRooms?: string[];
+        };
+        RoomResponseDto: {
+            /**
+             * @description Room ID (UUID)
+             * @example 123e4567-e89b-12d3-a456-426614174000
+             */
+            roomId: string;
+            /**
+             * @description Public room code (6 digits)
+             * @example 123456
+             */
+            publicCode: string;
+            /**
+             * @description User ID of the room creator (UUID)
+             * @example 123e4567-e89b-12d3-a456-426614174000
+             */
+            createdBy?: Record<string, never> | null;
+            /**
+             * @description List of user IDs in the room
+             * @example [
+             *       "user1",
+             *       "user2"
+             *     ]
+             */
+            users: string[];
+            /**
+             * @description User roles in the room (userId -> role)
+             * @example {
+             *       "user1": "room_creator",
+             *       "user2": "room_member"
+             *     }
+             */
+            userRoles: {
+                [key: string]: "room_creator" | "room_member";
+            };
+            /**
+             * @description User choices (userId -> movieId)
+             * @example {
+             *       "user1": "movie-123",
+             *       "user2": "movie-456"
+             *     }
+             */
+            choices: {
+                [key: string]: string;
+            };
+            /**
+             * @description Is current user a member of this room
+             * @example true
+             */
+            isMember?: boolean;
+            /**
+             * @description Is current user the creator of this room
+             * @example false
+             */
+            isCreator?: boolean;
+            /**
+             * @description Can current user manage the room (creator or admin). Use this field to determine if user can delete the room.
+             * @example false
+             */
+            canManage?: boolean;
+            /**
+             * @description Current user's role in the room
+             * @example room_member
+             * @enum {string}
+             */
+            currentUserRole?: "room_creator" | "room_member";
+            /**
+             * @description Is current user muted in this room
+             * @example false
+             */
+            isMuted?: boolean;
+            /**
+             * @description When mute expires (timestamp in milliseconds)
+             * @example 1704067800000
+             */
+            muteExpiresAt?: number;
+            /**
+             * @description Room creation timestamp
+             * @example 1704067200000
+             */
+            createdAt?: number;
+            /**
+             * @description Room last update timestamp
+             * @example 1704067200000
+             */
+            updatedAt?: number;
+        };
+        UserProfileResponseDto: {
+            /**
+             * @description User ID (UUID)
+             * @example 123e4567-e89b-12d3-a456-426614174000
+             */
+            userId: string;
+            /**
+             * @description User name
+             * @example John Doe
+             */
+            name: string;
+            /**
+             * @description User role
+             * @example user
+             * @enum {string}
+             */
+            role?: "user" | "admin";
+            /**
+             * @description Last active timestamp (milliseconds)
+             * @example 1704067200000
+             */
+            lastActive?: number;
+            /**
+             * @description List of recent room IDs
+             * @example [
+             *       "room-1",
+             *       "room-2"
+             *     ]
+             */
+            recentRooms?: string[];
+            /** @description List of rooms where user is a member */
+            rooms: components["schemas"]["RoomResponseDto"][];
+        };
+        CreateRoomDto: {
+            /**
+             * @description Optional room name
+             * @example Movie Night
+             */
+            name?: string;
+        };
+        JoinRoomDto: {
+            /**
+             * @description Public room code (6 digits)
+             * @example 123456
+             */
+            publicCode: string;
+            /**
+             * @description User ID (UUID)
+             * @example 123e4567-e89b-12d3-a456-426614174000
+             */
+            userId: string;
+        };
+        RoomMembersResponseDto: {
+            /**
+             * @description List of room members with their roles and names
+             * @example [
+             *       {
+             *         "userId": "123e4567-e89b-12d3-a456-426614174000",
+             *         "role": "room_creator",
+             *         "name": "John Doe"
+             *       },
+             *       {
+             *         "userId": "123e4567-e89b-12d3-a456-426614174001",
+             *         "role": "room_member",
+             *         "name": "Jane Smith"
+             *       }
+             *     ]
+             */
+            members: {
+                /** @example 123e4567-e89b-12d3-a456-426614174000 */
+                userId?: string;
+                /**
+                 * @example room_member
+                 * @enum {string}
+                 */
+                role?: "room_creator" | "room_member";
+                /** @example John Doe */
+                name?: string;
+            }[];
+        };
+    };
     responses: never;
     parameters: never;
     requestBodies: never;
@@ -14,4 +666,1132 @@ export interface components {
     pathItems: never;
 }
 export type $defs = Record<string, never>;
-export type operations = Record<string, never>;
+export interface operations {
+    AppController_getHello: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Service is healthy */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AppController_healthCheck: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Service is healthy */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_login: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description User name for login */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginDto"];
+            };
+        };
+        responses: {
+            /** @description Login successful. Returns userId and name. JWT tokens are set in HTTP-only cookies. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoginResponseDto"];
+                };
+            };
+            /** @description Invalid input data (name is required) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Login failed */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AuthController_refreshToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Refresh token (optional - token is read from cookie by default) */
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["RefreshTokenDto"];
+            };
+        };
+        responses: {
+            /** @description Access token refreshed successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthResponseDto"];
+                };
+            };
+            /** @description Refresh token is required */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Invalid or expired refresh token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AuthController_logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Logged out successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication required. JWT token missing or invalid. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    UsersController_createUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateRedisUserDto"];
+            };
+        };
+        responses: {
+            /** @description User successfully created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedisUserResponseDto"];
+                };
+            };
+            /** @description Invalid input data */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description User with the provided userId or name already exists */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    UsersController_getProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description User profile with rooms */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserProfileResponseDto"];
+                };
+            };
+            /** @description Authentication required. JWT token missing or invalid. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied. Invalid token or user not found. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    UsersController_getUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description User ID (UUID) */
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description User found */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedisUserResponseDto"];
+                };
+            };
+            /** @description Authentication required. JWT token missing or invalid. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied. Only admins can view other users' data. Use /users/profile for your own profile. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description User not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    UsersController_deleteUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description User ID (UUID) */
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description User successfully deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication required. JWT token missing or invalid. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description User not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    UsersController_updateName: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description User ID (UUID) */
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description New user name
+                     * @example Jane Doe
+                     */
+                    name: string;
+                };
+            };
+        };
+        responses: {
+            /** @description User name updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedisUserResponseDto"];
+                };
+            };
+            /** @description Invalid input data */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Authentication required. JWT token missing or invalid. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description User not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description User with the provided name already exists */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RoomsController_createRoom: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CreateRoomDto"];
+            };
+        };
+        responses: {
+            /** @description Room successfully created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @example 123e4567-e89b-12d3-a456-426614174000 */
+                        roomId?: string;
+                        /**
+                         * @description 6-digit public code for joining the room
+                         * @example 123456
+                         */
+                        publicCode?: string;
+                    };
+                };
+            };
+            /** @description Authentication required. JWT token missing or invalid. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RoomsController_getMyRooms: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of user rooms */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomResponseDto"][];
+                };
+            };
+            /** @description Authentication required. JWT token missing or invalid. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RoomsController_getRoom: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Room ID (UUID) */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Room found */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomResponseDto"];
+                };
+            };
+            /** @description Authentication required. JWT token missing or invalid. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Room not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RoomsController_joinRoom: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JoinRoomDto"];
+            };
+        };
+        responses: {
+            /** @description User successfully joined the room */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomResponseDto"];
+                };
+            };
+            /** @description Invalid input data (public code must be exactly 6 digits) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Authentication required. JWT token missing or invalid. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Room not found. Please check the room code. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RoomsController_leaveRoom: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Room ID (UUID) */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description User ID (UUID)
+                     * @example 123e4567-e89b-12d3-a456-426614174000
+                     */
+                    userId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description User successfully left the room */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomResponseDto"];
+                };
+            };
+            /** @description Room not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RoomsController_chooseMovie: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Room ID (UUID) */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description User ID (UUID)
+                     * @example 123e4567-e89b-12d3-a456-426614174000
+                     */
+                    userId: string;
+                    /**
+                     * @description Movie ID
+                     * @example movie-123
+                     */
+                    movieId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Movie choice recorded */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomResponseDto"];
+                };
+            };
+            /** @description Invalid input data or user not in room */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Authentication required. JWT token missing or invalid. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Room not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RoomsController_getRoomMembers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Room ID (UUID) */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Room members list retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomMembersResponseDto"];
+                };
+            };
+            /** @description Authentication required. JWT token missing or invalid. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description You must be a member of the room to view its members */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Room not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RoomsController_removeUserFromRoom: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Room ID (UUID) */
+                id: string;
+                /** @description User ID to remove (UUID) */
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description User successfully removed from room */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomResponseDto"];
+                };
+            };
+            /** @description Cannot remove the room creator */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Authentication required. JWT token missing or invalid. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Only the room creator can remove users */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Room not found or user is not a member */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RoomsController_getChatHistory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Room ID (UUID) */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Chat history retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @example 123e4567-e89b-12d3-a456-426614174000 */
+                        roomId?: string;
+                        messages?: {
+                            /** @example msg-id */
+                            id?: string;
+                            /** @example room-id */
+                            roomId?: string;
+                            /** @example user-id */
+                            userId?: string;
+                            /** @example John Doe */
+                            userName?: string;
+                            /** @example Hello! */
+                            message?: string;
+                            /** @example 1704067200000 */
+                            createdAt?: number;
+                        }[];
+                    };
+                };
+            };
+            /** @description Authentication required. JWT token missing or invalid. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description You must be a member of the room to view chat history */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Room not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RoomsController_muteUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Room ID (UUID) */
+                id: string;
+                /** @description User ID to mute (UUID) */
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description Mute duration in minutes
+                     * @example 5
+                     * @enum {number}
+                     */
+                    durationMinutes: 1 | 5 | 10;
+                };
+            };
+        };
+        responses: {
+            /** @description User successfully muted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomResponseDto"];
+                };
+            };
+            /** @description Invalid mute duration or cannot mute creator */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Authentication required. JWT token missing or invalid. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Only the room creator can mute users */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Room not found or user is not a member */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RoomsController_unmuteUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Room ID (UUID) */
+                id: string;
+                /** @description User ID to unmute (UUID) */
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description User successfully unmuted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomResponseDto"];
+                };
+            };
+            /** @description User is not muted */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Authentication required. JWT token missing or invalid. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Only the room creator can unmute users */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Room not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+}
