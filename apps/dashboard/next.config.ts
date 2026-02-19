@@ -7,6 +7,14 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["primereact"],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/api/v1/:path*",
+        destination: "https://mm-admin.onrender.com/api/v1/:path*",
+      },
+    ];
+  },
   webpack: (config, { isServer }) => {
     // For pnpm, we need to ensure modules are resolved correctly
     // pnpm uses symlinks and a different node_modules structure
