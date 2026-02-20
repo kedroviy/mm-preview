@@ -53,7 +53,7 @@ export function useRoomsController_createRoom() {
 /**
  * Get current user rooms
  */
-export function useRoomsController_getMyRooms(options?: UseQueryOptions<RoomResponseDto[]>) {
+export function useRoomsController_getMyRooms(options?: Omit<UseQueryOptions<RoomResponseDto[]>, 'queryKey' | 'queryFn'>) {
   return useQuery({
     queryKey: roomsKeys.RoomsController_getMyRooms(),
     queryFn: async () => {

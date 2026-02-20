@@ -95,6 +95,18 @@ export function isAllowedUrl(url: string): boolean {
 }
 
 /**
+ * Проверяет, является ли домен localhost (для dev режима)
+ */
+function isLocalhost(hostname: string): boolean {
+  const hostnameWithoutPort = hostname.split(":")[0];
+  return (
+    hostnameWithoutPort === "localhost" ||
+    hostnameWithoutPort === "127.0.0.1" ||
+    /^(\d{1,3}\.){3}\d{1,3}$/.test(hostnameWithoutPort)
+  );
+}
+
+/**
  * Определяет, нужно ли использовать SameSite=None для куки
  * Возвращает true, если запрос кросс-доменный и домен разрешен
  */
@@ -102,14 +114,9 @@ export function shouldUseSameSiteNone(
   requestHost: string,
   apiUrl: string,
 ): boolean {
-  // В dev режиме не используем SameSite=None
   const isDev =
     process.env.NODE_ENV === "development" ||
     (!process.env.NODE_ENV && !process.env.VERCEL);
-
-  if (isDev) {
-    return false;
-  }
 
   // Проверяем, являются ли домены разными
   try {
@@ -121,18 +128,30 @@ export function shouldUseSameSiteNone(
       return false;
     }
 
-    // Проверяем, разрешен ли API домен
-    if (!isAllowedDomain(apiHost)) {
-      return false;
+    // В dev режиме на localhost используем SameSite=None для кросс-портовых запросов
+    // Браузеры делают исключение для localhost и позволяют SameSite=None без Secure
+    if (isDev && isLocalhost(requestHostname) && isLocalhost(apiHost)) {
+      return true;
     }
 
-    // Проверяем, разрешен ли домен приложения
-    if (!isAllowedDomain(requestHostname)) {
-      return false;
+    // В production проверяем, разрешен ли домен
+    if (!isDev) {
+      // Проверяем, разрешен ли API домен
+      if (!isAllowedDomain(apiHost)) {
+        return false;
+      }
+
+      // Проверяем, разрешен ли домен приложения
+      if (!isAllowedDomain(requestHostname)) {
+        return false;
+      }
+
+      // Если оба домена разрешены и они разные - используем SameSite=None
+      return true;
     }
 
-    // Если оба домена разрешены и они разные - используем SameSite=None
-    return true;
+    // В dev режиме для не-localhost доменов не используем SameSite=None
+    return false;
   } catch {
     // Если не удалось распарсить URL, не используем SameSite=None
     return false;
@@ -150,10 +169,19 @@ export function getSameSiteConfig(
   secure: boolean;
 } {
   const useNone = shouldUseSameSiteNone(requestHost, apiUrl);
+  const requestHostname = requestHost.split(":")[0];
+  const isDev =
+    process.env.NODE_ENV === "development" ||
+    (!process.env.NODE_ENV && !process.env.VERCEL);
+
+  // Для localhost в dev режиме SameSite=None работает без Secure
+  // Браузеры делают исключение для localhost
+  const isLocalhostDev = isDev && isLocalhost(requestHostname);
 
   return {
     sameSite: useNone ? "none" : "lax",
-    secure: useNone, // SameSite=None требует Secure
+    // SameSite=None требует Secure, но для localhost в dev режиме можно без Secure
+    secure: useNone && !isLocalhostDev,
   };
 }
 

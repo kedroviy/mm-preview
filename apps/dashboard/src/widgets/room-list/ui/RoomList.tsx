@@ -9,26 +9,26 @@ import {
   DeleteIcon,
   SpeedDial,
 } from "@mm-preview/ui";
-import { useSearchParams } from "next/navigation";
+import { useRoomsController_getMyRooms } from "@mm-preview/sdk";
 import { type MouseEvent, useMemo } from "react";
 import type { Room } from "@/src/entities/room";
-import { useWebSocketMyRooms } from "@/src/shared/hooks/useWebSocketMyRooms";
 import type { RoomListProps } from "../model/types";
 import styles from "./RoomList.module.css";
 
 export function RoomList({
+  userId,
   initialRooms = [],
   onConnect,
   onDelete,
 }: RoomListProps) {
-  const searchParams = useSearchParams();
-  const userId = searchParams?.get("userId") || "";
-  const { rooms: wsRooms, isLoading: isWsLoading } = useWebSocketMyRooms(
-    userId,
-    !!userId,
+  // Используем REST запрос вместо WebSocket
+  const { data: restRooms, isLoading: isRestLoading } = useRoomsController_getMyRooms(
+    !!userId ? undefined : { enabled: false }
   );
-  const rooms = wsRooms.length > 0 ? wsRooms : initialRooms;
-  const isRoomsLoading = isWsLoading;
+  
+  // Используем данные из REST запроса, если они есть, иначе initialRooms
+  const rooms = (restRooms && restRooms.length > 0) ? restRooms as Room[] : initialRooms;
+  const isRoomsLoading = isRestLoading;
 
   if (isRoomsLoading && rooms.length === 0) {
     return (

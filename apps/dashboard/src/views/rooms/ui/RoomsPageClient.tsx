@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, Card, notificationService } from "@mm-preview/ui";
-import { useSearchParams } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import type { Room } from "@/src/entities/room";
 import { CreateRoomForm } from "@/src/features/create-room";
@@ -11,7 +11,6 @@ import {
   ViewTransition,
 } from "@/src/shared/components/ViewTransition";
 import { useTokenRefresh } from "@/src/shared/hooks/useTokenRefresh";
-import { useWebSocketMyRooms } from "@/src/shared/hooks/useWebSocketMyRooms";
 import { RoomList } from "@/src/widgets/room-list";
 
 type ViewMode = "menu" | "create" | "join";
@@ -25,15 +24,16 @@ export function RoomsPageClient({
   userId,
   initialRooms,
 }: RoomsPageClientProps) {
-  const {
-    rooms: myRooms,
-    isLoading: isMyRoomsLoading,
-    refreshRooms,
-  } = useWebSocketMyRooms(userId, !!userId);
+  const queryClient = useQueryClient();
   const [viewMode, setViewMode] = useState<ViewMode>("menu");
   const { navigate, isPending } = useViewTransition();
 
   useTokenRefresh();
+
+  const refreshRooms = () => {
+    // Инвалидируем запрос для обновления списка комнат
+    queryClient.invalidateQueries({ queryKey: ["rooms", "RoomsController_getMyRooms"] });
+  };
 
   const handleCreateSuccess = (result: any) => {
     refreshRooms();
@@ -112,6 +112,7 @@ export function RoomsPageClient({
             </div>
 
             <RoomList
+              userId={userId}
               initialRooms={initialRooms}
               onConnect={handleConnect}
               onDelete={handleDelete}
