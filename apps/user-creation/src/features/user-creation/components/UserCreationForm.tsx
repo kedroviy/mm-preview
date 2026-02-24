@@ -4,11 +4,11 @@ import type { User } from "@mm-preview/sdk";
 import { Button, InputText, notificationService } from "@mm-preview/ui";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { getAppUrls } from "@/src/shared/config/constants";
 import { useTranslation } from "@/src/shared/i18n/useTranslation";
 import { NAME_MIN_LENGTH, NAME_PATTERN } from "../constants/validation";
 import { useCreateUser } from "../hooks/useCreateUser";
 import { getErrorMessage } from "../utils/error";
-import { getAppUrls } from "@/src/shared/config/constants";
 
 interface UserFormData {
   name: string;
@@ -17,7 +17,7 @@ interface UserFormData {
 export function UserCreationForm() {
   const { t } = useTranslation();
   const [createdUser, setCreatedUser] = useState<User | null>(null);
-  
+
   const {
     control,
     handleSubmit,
@@ -34,8 +34,10 @@ export function UserCreationForm() {
   const { mutate, isPending } = useCreateUser();
 
   const handleContinue = () => {
-    if (!createdUser?.userId) return;
-    
+    if (!createdUser?.userId) {
+      return;
+    }
+
     const dashboardUrl = getAppUrls().DASHBOARD;
     window.location.href = `${dashboardUrl}/${createdUser.userId}`;
   };
@@ -70,7 +72,10 @@ export function UserCreationForm() {
 
   if (createdUser) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-4" suppressHydrationWarning>
+      <div
+        className="flex items-center justify-center min-h-screen p-4"
+        suppressHydrationWarning
+      >
         <div className="card w-full max-w-md" suppressHydrationWarning>
           <div className="flex flex-col items-center gap-6">
             <div className="text-center">
@@ -93,7 +98,10 @@ export function UserCreationForm() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4" suppressHydrationWarning>
+    <div
+      className="flex items-center justify-center min-h-screen p-4"
+      suppressHydrationWarning
+    >
       <div className="card w-full max-w-md" suppressHydrationWarning>
         <h1 className="text-3xl font-bold mb-6 text-center">{t("title")}</h1>
 

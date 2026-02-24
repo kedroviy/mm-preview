@@ -14,13 +14,18 @@ interface AnimateOnScrollProps {
   leaveClassName?: string;
 }
 
-function AnimateOnScroll({ children, className, enterClassName }: AnimateOnScrollProps) {
+function AnimateOnScroll({
+  children,
+  className,
+  enterClassName,
+}: AnimateOnScrollProps) {
   return (
     <div className={className} data-animate-on-scroll>
       {children}
     </div>
   );
 }
+
 import { getAppUrls } from "@/src/shared/config/constants";
 
 export default function MainBlock() {
@@ -31,7 +36,7 @@ export default function MainBlock() {
 
   return (
     <div className="card flex flex-col items-center overflow-hidden pt-16">
-      <div className="h-[30rem]"></div>
+      <div className="h-[30rem]" />
       <div className="flex flex-wrap justify-center gap-8">
         <AnimateOnScroll
           className="flex flex-col bg-primary text-primary-contrast border-primary shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
@@ -39,7 +44,7 @@ export default function MainBlock() {
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
           <div className="rounded-full bg-primary text-primary-contrast w-12 h-12 flex items-center justify-center">
-            <i className="pi pi-user !text-2xl"></i>
+            <i className="pi pi-user !text-2xl" />
           </div>
           <span className="text-2xl font-bold">Индивидуальный подбор</span>
           <span className="text-muted-color text-center">
@@ -54,7 +59,7 @@ export default function MainBlock() {
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
           <div className="rounded-full bg-primary text-primary-contrast w-12 h-12 flex items-center justify-center">
-            <i className="pi pi-users !text-2xl"></i>
+            <i className="pi pi-users !text-2xl" />
           </div>
           <span className="text-2xl font-bold">С друзьями — интереснее</span>
           <span className="text-muted-color text-center">
@@ -69,7 +74,7 @@ export default function MainBlock() {
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
           <div className="rounded-full bg-primary text-primary-contrast w-12 h-12 flex items-center justify-center">
-            <i className="pi pi-building !text-2xl"></i>
+            <i className="pi pi-building !text-2xl" />
           </div>
           <span className="text-2xl font-bold">Продвинутые рекомендации</span>
           <span className="text-muted-color text-center">
@@ -79,14 +84,14 @@ export default function MainBlock() {
           <Ripple />
         </AnimateOnScroll>
       </div>
-      <div className="h-[30rem]"></div>
+      <div className="h-[30rem]" />
       <div className="flex flex-wrap justify-center gap-8">
         <AnimateOnScroll
           className="flex flex-col shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
           enterClassName="animate-enter fade-in-10 slide-in-from-t-20 animate-duration-1000"
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
-          <Avatar shape="circle" size="xlarge"></Avatar>
+          <Avatar shape="circle" size="xlarge" />
           <span className="text-2xl font-medium">Jenna Thompson</span>
           <span className="text-muted-color text-center">
             Не знаю как я жила без этого раньше!
@@ -98,7 +103,7 @@ export default function MainBlock() {
           enterClassName="animate-enter fade-in-10 slide-in-from-b-20 animate-duration-1000"
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
-          <Avatar shape="circle" size="xlarge"></Avatar>
+          <Avatar shape="circle" size="xlarge" />
           <span className="text-2xl font-medium">Isabel Garcia</span>
           <span className="text-muted-color text-center">
             Никогда бы не узнал про генеральские котлы без этого приложения
@@ -110,13 +115,13 @@ export default function MainBlock() {
           enterClassName="animate-enter fade-in-10 slide-in-from-t-20 animate-duration-1000"
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
-          <Avatar shape="circle" size="xlarge"></Avatar>
+          <Avatar shape="circle" size="xlarge" />
           <span className="text-2xl font-medium">Xavier Mason</span>
           <span className="text-muted-color text-center">Паааааа</span>
           <Ripple />
         </AnimateOnScroll>
       </div>
-      <div className="h-[30rem]"></div>
+      <div className="h-[30rem]" />
       <div className="flex flex-wrap justify-center gap-8">
         <AnimateOnScroll
           className="flex flex-col bg-primary text-primary-contrast border-primary shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
@@ -161,7 +166,7 @@ export default function MainBlock() {
           <Ripple />
         </AnimateOnScroll>
       </div>
-      <div className="h-[30rem]"></div>
+      <div className="h-[30rem]" />
       <div className="flex flex-wrap justify-center gap-8">
         <AnimateOnScroll
           className="flex flex-col bg-purple-500 text-white border-purple-500 shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
@@ -169,7 +174,7 @@ export default function MainBlock() {
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
           <div className="rounded-full border-2 border-white w-12 h-12 flex items-center justify-center">
-            <i className="pi pi-wifi !text-2xl"></i>
+            <i className="pi pi-wifi !text-2xl" />
           </div>
           <span className="text-2xl font-bold">Bandwidth</span>
           <span className="text-center">
@@ -183,7 +188,7 @@ export default function MainBlock() {
           leaveClassName="animate-leave fade-out-0 animate-duration-1000"
         >
           <div className="rounded-full border-2 border-white w-12 h-12 flex items-center justify-center">
-            <i className="pi pi-database !text-2xl"></i>
+            <i className="pi pi-database !text-2xl" />
           </div>
           <span className="text-2xl font-bold">Storage</span>
           <span className="text-center">
@@ -198,7 +203,7 @@ export default function MainBlock() {
           leaveClassName="animate-leave fade-out-0 animate-duration-100"
         >
           <div className="rounded-full border-2 border-white w-12 h-12 flex items-center justify-center">
-            <i className="pi pi-arrows-v !text-2xl"></i>
+            <i className="pi pi-arrows-v !text-2xl" />
           </div>
           <span className="text-2xl font-bold">Requests</span>
           <span className="text-center">
@@ -207,7 +212,7 @@ export default function MainBlock() {
           <Ripple />
         </AnimateOnScroll>
       </div>
-      <div className="h-[30rem]"></div>
+      <div className="h-[30rem]" />
       <div className="flex flex-col items-center gap-8 w-full">
         <AnimateOnScroll
           enterClassName="animate-enter fade-in-10 slide-in-from-b-16 animate-duration-1000"
@@ -249,7 +254,7 @@ export default function MainBlock() {
           </div>
         </AnimateOnScroll>
       </div>
-      <div className="h-[15rem]"></div>
+      <div className="h-[15rem]" />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
-import type { PropsWithChildren, ReactNode } from "react";
 import { PrimeReactProviderWrapper } from "@mm-preview/ui";
+import type { PropsWithChildren, ReactNode } from "react";
 import QueryProvider from "./QueryProvider";
 
 type Props = {

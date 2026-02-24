@@ -2,12 +2,12 @@
 
 import { useUsersController_getProfile } from "@mm-preview/sdk";
 import { Button, ProgressSpinner } from "@mm-preview/ui";
+import type { Room } from "@/src/entities/room";
 import {
   useViewTransition,
   ViewTransition,
 } from "@/src/shared/components/ViewTransition";
 import { useWebSocketMyRooms } from "@/src/shared/hooks/useWebSocketMyRooms";
-import type { Room } from "@/src/entities/room";
 
 interface DashboardClientProps {
   userId: string;
@@ -100,9 +100,9 @@ export function DashboardClient({
                 {...(!isMyRoomsLoading &&
                   myRooms &&
                   myRooms.length > 0 && {
-                  badge: String(myRooms.length),
-                  badgeSeverity: "warning",
-                })}
+                    badge: String(myRooms.length),
+                    badgeSeverity: "warning",
+                  })}
                 tooltip="Создайте комнату, присоединитесь к существующей или вернитесь в недавнюю комнату"
                 tooltipOptions={{ position: "bottom" }}
                 onClick={() => {

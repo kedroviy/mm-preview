@@ -1,6 +1,6 @@
 "use client";
 
-import { Toast, PrimeReactProviderWrapper } from "@mm-preview/ui";
+import { PrimeReactProviderWrapper, Toast } from "@mm-preview/ui";
 import type { PropsWithChildren, ReactNode } from "react";
 import QueryProvider from "./QueryProvider";
 

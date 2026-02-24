@@ -1,6 +1,5 @@
 "use client";
 
-import type { ChatMessage } from "@mm-preview/sdk";
 import { Button, Card, InputText } from "@mm-preview/ui";
 import { useEffect, useRef, useState } from "react";
 import type { ChatWindowProps } from "../model/types";
@@ -21,10 +20,12 @@ export function ChatWindow({
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [scrollToBottom]);
 
   const handleSend = () => {
-    if (message.trim().length === 0) return;
+    if (message.trim().length === 0) {
+      return;
+    }
     if (message.length > 1000) {
       alert("Сообщение слишком длинное (максимум 1000 символов)");
       return;

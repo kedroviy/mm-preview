@@ -163,7 +163,7 @@ export async function getLanguageFromHeaders(): Promise<SupportedLocale> {
   const { headers } = await import("next/headers");
   const headersList = await headers();
   const acceptLanguage = headersList.get("accept-language");
-  
+
   // В Next.js 13+ pathname можно получить из headers или использовать дефолтный
   // Для более точного определения можно использовать middleware
   const pathname = "/"; // По умолчанию корневой путь
@@ -188,4 +188,3 @@ export async function generateMetadataFromHeaders(
     },
   };
 }
-

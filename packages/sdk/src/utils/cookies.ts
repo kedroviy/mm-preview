@@ -48,9 +48,9 @@ export function setCookie(name: string, value: string, days = 30): void {
   // Определяем настройки SameSite на основе разрешенных доменов
   const hostname = window.location.hostname;
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-  
+
   const cookieConfig = getSameSiteConfig(hostname, apiUrl);
-  
+
   const sameSite = cookieConfig.sameSite === "none" ? "None" : "Lax";
   const secure = cookieConfig.secure ? "Secure;" : "";
 

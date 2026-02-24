@@ -5,11 +5,13 @@ import type { SVGProps } from "react";
 export function DeleteIcon({ className, ...props }: SVGProps<SVGSVGElement>) {
   return (
     <svg
+      aria-hidden
       viewBox="0 0 24 24"
       fill="none"
       className={className}
       {...props}
     >
+      <title>Delete</title>
       <path
         d="M10 12V17"
         stroke="currentColor"
@@ -48,4 +50,3 @@ export function DeleteIcon({ className, ...props }: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
-

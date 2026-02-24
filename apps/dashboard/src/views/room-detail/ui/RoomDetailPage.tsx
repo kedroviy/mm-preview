@@ -7,7 +7,6 @@ import {
   useUsersController_getProfile,
 } from "@mm-preview/sdk";
 import { Button, notificationService, ProgressSpinner } from "@mm-preview/ui";
-import { useParams, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useMemo } from "react";
 import { ChatWindow, useChat } from "@/src/features/chat";
 import {
@@ -59,13 +58,15 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
   });
 
   const handleLeaveRoom = useCallback(async () => {
-    if (!userId || !roomId) return;
+    if (!userId || !roomId) {
+      return;
+    }
 
     try {
       await leaveRoom.mutateAsync({ roomId, userId });
       notificationService.showSuccess("Вы покинули комнату");
       navigate(`/${userId}/rooms`);
-    } catch (error) {
+    } catch (_error) {
       notificationService.showError("Не удалось покинуть комнату");
     }
   }, [userId, roomId, leaveRoom, navigate]);
@@ -74,7 +75,7 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
     () => navigate(`/${userId}/rooms`),
     [navigate, userId],
   );
-  const handleRemoveMember = useCallback((memberUserId: string) => {
+  const handleRemoveMember = useCallback((_memberUserId: string) => {
     notificationService.showInfo("Функция удаления участника будет добавлена");
   }, []);
 
@@ -211,7 +212,6 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
     handleBack,
     handleLeaveRoom,
     handleRemoveMember,
-    navigate,
   ]);
 
   return viewConfig.render();

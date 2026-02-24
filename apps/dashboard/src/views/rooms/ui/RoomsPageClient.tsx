@@ -1,5 +1,6 @@
 "use client";
 
+import { roomKeys } from "@mm-preview/sdk";
 import { Button, Card, notificationService } from "@mm-preview/ui";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -31,8 +32,7 @@ export function RoomsPageClient({
   useTokenRefresh();
 
   const refreshRooms = () => {
-    // Инвалидируем запрос для обновления списка комнат
-    queryClient.invalidateQueries({ queryKey: ["rooms", "RoomsController_getMyRooms"] });
+    queryClient.invalidateQueries({ queryKey: roomKeys.myRooms() });
   };
 
   const handleCreateSuccess = (result: any) => {
@@ -49,7 +49,7 @@ export function RoomsPageClient({
     navigate(`/${userId}/rooms/${roomId}`);
   };
 
-  const handleDelete = (roomId: string) => {
+  const handleDelete = (_roomId: string) => {
     // TODO: Implement room deletion
     notificationService.showInfo("Удаление комнаты будет реализовано позже");
   };

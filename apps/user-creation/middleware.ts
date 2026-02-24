@@ -10,24 +10,28 @@ function getDashboardUrl(request: NextRequest): string {
 
   // Try to detect URL from request
   const hostname = request.headers.get("host") || "";
-  const protocol = request.headers.get("x-forwarded-proto") || 
-                   (request.url.startsWith("https") ? "https" : "http");
-  
+  const protocol =
+    request.headers.get("x-forwarded-proto") ||
+    (request.url.startsWith("https") ? "https" : "http");
+
   // Extract hostname without port
   const hostnameWithoutPort = hostname.split(":")[0];
-  
+
   // Check if we're in dev mode with IP address
-  const isIPAddress = /^(\d{1,3}\.){3}\d{1,3}$/.test(hostnameWithoutPort) || 
-                       hostnameWithoutPort === "localhost" || 
-                       hostnameWithoutPort === "127.0.0.1";
-  
+  const isIPAddress =
+    /^(\d{1,3}\.){3}\d{1,3}$/.test(hostnameWithoutPort) ||
+    hostnameWithoutPort === "localhost" ||
+    hostnameWithoutPort === "127.0.0.1";
+
   if (isIPAddress) {
     return `${protocol}://${hostnameWithoutPort}:3002`;
   }
 
   // If no environment variable and not in dev mode, throw error
   // Environment variable must be set for production
-  throw new Error(`NEXT_PUBLIC_DASHBOARD_URL must be set for non-dev environments`);
+  throw new Error(
+    "NEXT_PUBLIC_DASHBOARD_URL must be set for non-dev environments",
+  );
 }
 
 export async function middleware(request: NextRequest) {
@@ -55,13 +59,15 @@ export async function middleware(request: NextRequest) {
       // Есть refresh_token, но нет access_token - пытаемся обновить
       try {
         const refreshCookieString = `refresh_token=${refreshToken.value}`;
-        
+
         const refreshResponse = await fetch(`${apiUrl}/auth/refresh`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Cookie: refreshCookieString,
-            Origin: request.headers.get("origin") || request.url.split("/").slice(0, 3).join("/"),
+            Origin:
+              request.headers.get("origin") ||
+              request.url.split("/").slice(0, 3).join("/"),
           },
           credentials: "include",
           cache: "no-store",
@@ -71,7 +77,7 @@ export async function middleware(request: NextRequest) {
           // Получаем новый access_token из Set-Cookie
           const setCookieHeaders = refreshResponse.headers.getSetCookie();
           let newAccessToken: string | null = null;
-          
+
           for (const cookie of setCookieHeaders) {
             const accessMatch = cookie.match(/access_token=([^;]+)/);
             if (accessMatch) {
@@ -79,34 +85,44 @@ export async function middleware(request: NextRequest) {
               break;
             }
           }
-          
+
           if (newAccessToken) {
             // Декодируем новый access_token и извлекаем userId
             const { decodeJWT } = await import("@mm-preview/sdk");
             const decoded = decodeJWT(newAccessToken);
             const userId = decoded?.sub || decoded?.userId;
-            
+
             if (userId && typeof userId === "string") {
               const dashboardUrl = getDashboardUrl(request);
-              console.log("[user-creation middleware] Token refreshed, redirecting to dashboard with userId:", userId);
-              return NextResponse.redirect(new URL(`${dashboardUrl}/${userId}`));
+              console.log(
+                "[user-creation middleware] Token refreshed, redirecting to dashboard with userId:",
+                userId,
+              );
+              return NextResponse.redirect(
+                new URL(`${dashboardUrl}/${userId}`),
+              );
             }
           }
         } else {
           // Refresh не удался (refresh_token невалидный) - очищаем refresh_token и показываем форму
-          console.log("[user-creation middleware] Refresh failed, clearing refresh_token and showing form");
+          console.log(
+            "[user-creation middleware] Refresh failed, clearing refresh_token and showing form",
+          );
           const response = NextResponse.next();
           response.cookies.delete("refresh_token");
           return response;
         }
       } catch (error) {
         // Ошибка при refresh - очищаем refresh_token и показываем форму
-        console.error("[user-creation middleware] Error refreshing token:", error);
+        console.error(
+          "[user-creation middleware] Error refreshing token:",
+          error,
+        );
         const response = NextResponse.next();
         response.cookies.delete("refresh_token");
         return response;
       }
-      
+
       // Если refresh не удался или не получили userId, очищаем refresh_token и показываем форму
       const nextResponse = NextResponse.next();
       nextResponse.cookies.delete("refresh_token");
@@ -117,13 +133,16 @@ export async function middleware(request: NextRequest) {
     try {
       const { decodeJWT } = await import("@mm-preview/sdk");
       const decoded = decodeJWT(accessToken.value);
-      
+
       // Извлекаем userId из поля sub (стандартное поле JWT для subject/userId)
       const userId = decoded?.sub || decoded?.userId;
-      
+
       if (userId && typeof userId === "string") {
         const dashboardUrl = getDashboardUrl(request);
-        console.log("[user-creation middleware] Access token found, redirecting to dashboard with userId:", userId);
+        console.log(
+          "[user-creation middleware] Access token found, redirecting to dashboard with userId:",
+          userId,
+        );
         return NextResponse.redirect(new URL(`${dashboardUrl}/${userId}`));
       }
     } catch (error) {
@@ -148,4 +167,3 @@ export const config = {
     "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };
-

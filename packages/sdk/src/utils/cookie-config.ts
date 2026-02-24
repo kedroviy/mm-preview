@@ -30,7 +30,7 @@ function getAllowedDomains(): string[] {
  * Получает список разрешенных URL из переменных окружения
  * Формат: ALLOWED_COOKIE_URLS=https://api.example.com,https://backend.vercel.app
  */
-function getAllowedUrls(): string[] {
+function _getAllowedUrls(): string[] {
   const envValue = process.env.ALLOWED_COOKIE_URLS;
   if (envValue) {
     return envValue.split(",").map((url) => url.trim());
@@ -192,21 +192,24 @@ export function getSameSiteConfig(
  */
 export function getCookieDomain(hostname: string): string | undefined {
   const hostnameWithoutPort = hostname.split(":")[0];
-  
+
   // Проверяем, находимся ли мы на moviematch.space
-  if (hostnameWithoutPort.endsWith(".moviematch.space") || hostnameWithoutPort === "moviematch.space") {
+  if (
+    hostnameWithoutPort.endsWith(".moviematch.space") ||
+    hostnameWithoutPort === "moviematch.space"
+  ) {
     // Для moviematch.space поддоменов используем общий домен ".moviematch.space"
     // Точка в начале означает, что куки будут доступны для всех поддоменов
     return ".moviematch.space";
   }
-  
+
   // Проверяем, находимся ли мы на Vercel
   if (hostnameWithoutPort.endsWith(".vercel.app")) {
     // Для Vercel поддоменов используем общий домен ".vercel.app"
     // Точка в начале означает, что куки будут доступны для всех поддоменов
     return ".vercel.app";
   }
-  
+
   // // Для localhost и IP адресов не устанавливаем домен
   // // Браузеры автоматически делают куки доступными для всех портов на localhost
   // // Указание domain: "localhost" может вызвать проблемы в некоторых браузерах
@@ -217,9 +220,8 @@ export function getCookieDomain(hostname: string): string | undefined {
   // ) {
   //   return undefined;
   // }
-  
+
   // Для других доменов можно попробовать извлечь базовый домен
   // Но это сложно, поэтому возвращаем undefined
   return undefined;
 }
-

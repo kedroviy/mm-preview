@@ -125,9 +125,8 @@ export function syncTokensFromCookiesToStorage(): void {
         }
       }
     }
-  } catch (error) {
+  } catch (_error) {
     // Игнорируем ошибки, если cookies недоступны (например, HttpOnly)
     // В этом случае токены уже установлены бэкендом через Set-Cookie
   }
 }
-

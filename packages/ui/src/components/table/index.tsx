@@ -1,19 +1,14 @@
 "use client";
 
-import { useState, useMemo } from "react";
 import { DataTable as PrimeDataTable } from "primereact/datatable";
+import type { ReactNode } from "react";
+import { useMemo, useState } from "react";
+import { Paginator } from "../pagination-shadcn";
 import { Column } from "./Column";
-import { Paginator } from "../paginator";
-import type {
-  ReactNode,
-} from "react";
 
+export type { ColumnProps } from "./Column";
 // Re-export Column for convenience
 export { Column } from "./Column";
-export type { ColumnProps } from "./Column";
-
-// Static import - webpack will resolve this from the app's node_modules
-// @ts-ignore - Module resolution happens at build time via webpack
 
 export interface DataTableProps<T = any> {
   value?: T[];
@@ -33,7 +28,12 @@ export interface DataTableProps<T = any> {
   rows?: number;
   rowsPerPageOptions?: number[];
   first?: number;
-  onPage?: (event: { first: number; rows: number; page: number; pageCount: number }) => void;
+  onPage?: (event: {
+    first: number;
+    rows: number;
+    page: number;
+    pageCount: number;
+  }) => void;
   [key: string]: any; // Allow any other props from PrimeReact DataTable
 }
 
@@ -56,11 +56,18 @@ export function DataTable<T = any>({
   const [currentRows, setCurrentRows] = useState(rows || 10);
 
   const paginatedData = useMemo(() => {
-    if (!paginator || !tableData) return tableData;
+    if (!paginator || !tableData) {
+      return tableData;
+    }
     return tableData.slice(currentFirst, currentFirst + currentRows);
   }, [tableData, paginator, currentFirst, currentRows]);
 
-  const handlePageChange = (event: { first: number; rows: number; page: number; pageCount: number }) => {
+  const handlePageChange = (event: {
+    first: number;
+    rows: number;
+    page: number;
+    pageCount: number;
+  }) => {
     setCurrentFirst(event.first);
     setCurrentRows(event.rows);
     onPage?.(event);
@@ -89,17 +96,14 @@ export function DataTable<T = any>({
         {children}
       </PrimeDataTable>
       {paginator && (
-        <>
-          <Paginator
-            first={currentFirst}
-            rows={currentRows}
-            totalRecords={tableData?.length || 0}
-            rowsPerPageOptions={rowsPerPageOptions || [5, 10, 20]}
-            onPageChange={handlePageChange}
-          />
-        </>
+        <Paginator
+          first={currentFirst}
+          rows={currentRows}
+          totalRecords={tableData?.length || 0}
+          rowsPerPageOptions={rowsPerPageOptions || [5, 10, 20]}
+          onPageChange={handlePageChange}
+        />
       )}
     </div>
   );
 }
-

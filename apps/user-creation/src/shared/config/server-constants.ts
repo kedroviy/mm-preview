@@ -18,8 +18,9 @@ function getServerAppUrl(
   // Try to detect URL from request if available (for middleware)
   if (request) {
     const hostname = request.headers.get("host") || "";
-    const protocol = request.headers.get("x-forwarded-proto") || 
-                     (request.url.startsWith("https") ? "https" : "http");
+    const protocol =
+      request.headers.get("x-forwarded-proto") ||
+      (request.url.startsWith("https") ? "https" : "http");
     const hostnameWithoutPort = hostname.split(":")[0];
 
     // Mode 2: Production - moviematch.space
@@ -31,28 +32,28 @@ function getServerAppUrl(
       };
       return `https://${appNames[key]}`;
     }
-    
+
     // Mode 2.1: Production - Vercel (fallback для обратной совместимости)
     if (hostnameWithoutPort.includes("vercel.app")) {
       const parts = hostnameWithoutPort.split(".");
-      const baseDomain = parts.length >= 2 
-        ? parts.slice(-2).join(".")
-        : "vercel.app";
-      
+      const baseDomain =
+        parts.length >= 2 ? parts.slice(-2).join(".") : "vercel.app";
+
       const appNames: Record<string, string> = {
         LANDING: "mm-preview-landing",
         USER_CREATION: "mm-preview-user-creation",
         DASHBOARD: "mm-preview-dashboard",
       };
-      
+
       return `https://${appNames[key]}.${baseDomain}`;
     }
 
     // Mode 1: Dev mode - IP address or localhost
-    const isDevMode = /^(\d{1,3}\.){3}\d{1,3}$/.test(hostnameWithoutPort) || 
-                       hostnameWithoutPort === "localhost" || 
-                       hostnameWithoutPort === "127.0.0.1";
-    
+    const isDevMode =
+      /^(\d{1,3}\.){3}\d{1,3}$/.test(hostnameWithoutPort) ||
+      hostnameWithoutPort === "localhost" ||
+      hostnameWithoutPort === "127.0.0.1";
+
     if (isDevMode) {
       const devPorts: Record<string, string> = {
         LANDING: "3000",
@@ -64,14 +65,18 @@ function getServerAppUrl(
   }
 
   // If no environment variable and not in dev/production mode, throw error
-  throw new Error(`NEXT_PUBLIC_${key}_URL must be set for non-dev environments`);
+  throw new Error(
+    `NEXT_PUBLIC_${key}_URL must be set for non-dev environments`,
+  );
 }
 
-export function getServerAppUrls(request?: { headers: { get: (name: string) => string | null }; url: string }) {
+export function getServerAppUrls(request?: {
+  headers: { get: (name: string) => string | null };
+  url: string;
+}) {
   return {
     LANDING: getServerAppUrl("LANDING", request),
     USER_CREATION: getServerAppUrl("USER_CREATION", request),
     DASHBOARD: getServerAppUrl("DASHBOARD", request),
   } as const;
 }
-

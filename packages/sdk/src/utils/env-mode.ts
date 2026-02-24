@@ -26,4 +26,3 @@ export function isProduction(): boolean {
 export function getEnvMode(): "development" | "production" {
   return isDevelopment() ? "development" : "production";
 }
-

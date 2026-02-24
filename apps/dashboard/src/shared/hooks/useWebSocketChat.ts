@@ -36,7 +36,6 @@ export function useWebSocketChat({
     sendMessage: wsSendMessage,
     getCurrentRoomId,
     on,
-    off,
   } = useWebSocket();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isMuted, setIsMuted] = useState(false);
@@ -63,9 +62,44 @@ export function useWebSocketChat({
     }
   }, [roomId]);
 
+  // Периодическая проверка состояния присоединения к комнате
+  // На случай, если событие joinedRoom не пришло, но мы уже присоединены
+  useEffect(() => {
+    if (!enabled || !roomId || !isConnected) {
+      return;
+    }
+
+    const checkRoomStatus = () => {
+      const currentRoomId = getCurrentRoomId();
+      if (currentRoomId === roomId && joinedRoomRef.current !== roomId) {
+        console.log(
+          "✅ Обнаружено присоединение через периодическую проверку, обновляем состояние",
+        );
+        joinedRoomRef.current = roomId;
+        joiningRoomRef.current = null;
+        if (joinTimeoutRef.current) {
+          clearTimeout(joinTimeoutRef.current);
+          joinTimeoutRef.current = null;
+        }
+      }
+    };
+
+    // Проверяем сразу
+    checkRoomStatus();
+
+    // Проверяем каждые 2 секунды
+    const interval = setInterval(checkRoomStatus, 2000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [enabled, roomId, isConnected, getCurrentRoomId]);
+
   // Подписываемся на события чата
   useEffect(() => {
-    if (!enabled || !userId) return;
+    if (!enabled || !userId) {
+      return;
+    }
 
     const handleChatHistory = (data: {
       roomId: string;
@@ -92,7 +126,17 @@ export function useWebSocketChat({
       publicCode: string;
       room: Room;
     }) => {
+      console.log("🎉 Событие joinedRoom получено:", {
+        eventRoomId: data.roomId,
+        expectedRoomId: roomId,
+        match: roomId && data.roomId === roomId,
+        currentJoinedRoom: joinedRoomRef.current,
+        currentJoiningRoom: joiningRoomRef.current,
+      });
+
+      // Если roomId из пропсов совпадает с roomId из события
       if (roomId && data.roomId === roomId) {
+        console.log("✅ Присоединение к комнате подтверждено:", roomId);
         joinedRoomRef.current = data.roomId;
         joiningRoomRef.current = null; // Сбрасываем флаг присоединения
         // Очищаем таймаут присоединения
@@ -107,6 +151,34 @@ export function useWebSocketChat({
           );
           console.warn(`⚠️ Вы заглушены на ${minutesLeft} минут(ы)`);
         }
+      } else if (roomId) {
+        // Если roomId не совпадает, но мы присоединяемся к этой комнате
+        // Возможно, сервер вернул другой формат UUID или произошла ошибка
+        console.warn("⚠️ Несоответствие roomId:", {
+          expected: roomId,
+          received: data.roomId,
+          publicCode: data.publicCode,
+        });
+
+        // Если мы присоединяемся к этой комнате (по publicCode), но roomId не совпадает,
+        // все равно считаем, что присоединились (возможно, сервер вернул другой UUID)
+        if (joiningRoomRef.current === roomId || !joinedRoomRef.current) {
+          console.log(
+            "⚠️ Принимаем присоединение, несмотря на несоответствие roomId",
+          );
+          joinedRoomRef.current = data.roomId; // Используем roomId из события
+          joiningRoomRef.current = null;
+          if (joinTimeoutRef.current) {
+            clearTimeout(joinTimeoutRef.current);
+            joinTimeoutRef.current = null;
+          }
+          setIsMuted(data.room.isMuted || false);
+        }
+      } else {
+        // Если roomId не указан в пропсах, но событие пришло
+        console.log(
+          "ℹ️ Событие joinedRoom получено, но roomId не указан в пропсах",
+        );
       }
     };
 
@@ -158,24 +230,48 @@ export function useWebSocketChat({
       joiningRoomRef.current !== roomId;
 
     if (shouldJoin) {
-      // Очищаем предыдущий таймаут, если он есть
-      if (joinTimeoutRef.current) {
-        clearTimeout(joinTimeoutRef.current);
-      }
-      
-      joiningRoomRef.current = roomId; // Устанавливаем флаг присоединения
-      joinRoom(publicCode, userId);
-      
-      // Таймаут для присоединения (10 секунд)
-      // Если присоединение не завершилось за это время, сбрасываем флаг
-      joinTimeoutRef.current = setTimeout(() => {
-        if (joiningRoomRef.current === roomId && joinedRoomRef.current !== roomId) {
-          console.warn("⚠️ Таймаут присоединения к комнате:", roomId);
-          joiningRoomRef.current = null;
-          joinTimeoutRef.current = null;
-          onError?.(new Error("Не удалось присоединиться к комнате. Пожалуйста, попробуйте еще раз."));
+      // Проверяем, может быть мы уже присоединены к этой комнате через WebSocket сервис
+      const currentRoomId = getCurrentRoomId();
+      if (currentRoomId === roomId) {
+        console.log(
+          "✅ Уже присоединены к комнате через WebSocket сервис, обновляем состояние",
+        );
+        joinedRoomRef.current = roomId;
+        joiningRoomRef.current = null;
+      } else {
+        // Очищаем предыдущий таймаут, если он есть
+        if (joinTimeoutRef.current) {
+          clearTimeout(joinTimeoutRef.current);
         }
-      }, 10000);
+
+        console.log("🚪 Присоединение к комнате:", {
+          roomId,
+          publicCode,
+          userId,
+          currentRoomId,
+        });
+
+        joiningRoomRef.current = roomId; // Устанавливаем флаг присоединения
+        joinRoom(publicCode, userId);
+
+        // Таймаут для присоединения (10 секунд)
+        // Если присоединение не завершилось за это время, сбрасываем флаг
+        joinTimeoutRef.current = setTimeout(() => {
+          if (
+            joiningRoomRef.current === roomId &&
+            joinedRoomRef.current !== roomId
+          ) {
+            console.warn("⚠️ Таймаут присоединения к комнате:", roomId);
+            joiningRoomRef.current = null;
+            joinTimeoutRef.current = null;
+            onError?.(
+              new Error(
+                "Не удалось присоединиться к комнате. Пожалуйста, попробуйте еще раз.",
+              ),
+            );
+          }
+        }, 10000);
+      }
     }
 
     return () => {
@@ -199,7 +295,6 @@ export function useWebSocketChat({
     joinRoom,
     getCurrentRoomId,
     on,
-    off,
     onMessage,
     onHistory,
     onRoomUpdate,
@@ -214,34 +309,79 @@ export function useWebSocketChat({
       }
 
       // Проверяем, что roomId - это UUID, а не publicCode
-      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(roomId);
+      const isUUID =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          roomId,
+        );
       const isPublicCode = /^\d{6}$/.test(roomId);
-      
+
       if (isPublicCode) {
-        console.error("❌ ОШИБКА: В sendMessage передан publicCode вместо roomId:", roomId);
-        onError?.(new Error("Ошибка: передан код комнаты вместо ID. Пожалуйста, обновите страницу."));
+        console.error(
+          "❌ ОШИБКА: В sendMessage передан publicCode вместо roomId:",
+          roomId,
+        );
+        onError?.(
+          new Error(
+            "Ошибка: передан код комнаты вместо ID. Пожалуйста, обновите страницу.",
+          ),
+        );
         return;
       }
-      
+
       if (!isUUID) {
         console.warn("⚠️ roomId не похож на UUID:", roomId);
       }
 
       if (!isConnected) {
-        onError?.(new Error("WebSocket не подключен. Пожалуйста, подождите подключения."));
+        onError?.(
+          new Error(
+            "WebSocket не подключен. Пожалуйста, подождите подключения.",
+          ),
+        );
         return;
       }
 
       // Проверяем, присоединились ли мы к комнате или присоединяемся
-      if (joinedRoomRef.current !== roomId && joiningRoomRef.current !== roomId) {
-        onError?.(new Error("Вы еще не присоединились к этой комнате. Пожалуйста, подождите."));
+      if (
+        joinedRoomRef.current !== roomId &&
+        joiningRoomRef.current !== roomId
+      ) {
+        onError?.(
+          new Error(
+            "Вы еще не присоединились к этой комнате. Пожалуйста, подождите.",
+          ),
+        );
         return;
       }
 
-      // Если мы еще присоединяемся, ждем завершения
-      if (joiningRoomRef.current === roomId && joinedRoomRef.current !== roomId) {
-        onError?.(new Error("Присоединение к комнате в процессе. Пожалуйста, подождите."));
-        return;
+      // Если мы еще присоединяемся, проверяем текущий roomId из WebSocket сервиса
+      // Возможно, мы уже присоединились, но событие еще не обработано
+      const currentRoomId = getCurrentRoomId();
+      if (
+        joiningRoomRef.current === roomId &&
+        joinedRoomRef.current !== roomId
+      ) {
+        // Если WebSocket сервис говорит, что мы в этой комнате, обновляем состояние
+        if (currentRoomId === roomId) {
+          console.log(
+            "✅ Обнаружено присоединение через getCurrentRoomId, обновляем состояние",
+          );
+          joinedRoomRef.current = roomId;
+          joiningRoomRef.current = null;
+        } else {
+          console.log("⏳ Присоединение к комнате в процессе...", {
+            joiningRoom: joiningRoomRef.current,
+            joinedRoom: joinedRoomRef.current,
+            currentRoomId,
+            targetRoomId: roomId,
+          });
+          onError?.(
+            new Error(
+              "Присоединение к комнате в процессе. Пожалуйста, подождите.",
+            ),
+          );
+          return;
+        }
       }
 
       if (isMuted) {
@@ -249,10 +389,16 @@ export function useWebSocketChat({
         return;
       }
 
-      console.log("💬 Отправка сообщения, roomId:", roomId, isUUID ? "(UUID)" : "(не UUID)");
+      console.log("💬 Отправка сообщения:", {
+        roomId,
+        isUUID,
+        joinedRoom: joinedRoomRef.current,
+        joiningRoom: joiningRoomRef.current,
+        currentRoomId: getCurrentRoomId(),
+      });
       wsSendMessage(roomId, message);
     },
-    [roomId, isMuted, isConnected, wsSendMessage, onError],
+    [roomId, isMuted, isConnected, wsSendMessage, onError, getCurrentRoomId],
   );
 
   return {

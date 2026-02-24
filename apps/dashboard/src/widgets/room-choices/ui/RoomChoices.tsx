@@ -1,7 +1,6 @@
 "use client";
 
 import { Card } from "@mm-preview/ui";
-import type { Room } from "@/src/entities/room";
 import type { RoomChoicesProps } from "../model/types";
 
 export function RoomChoices({ room, currentUserId }: RoomChoicesProps) {

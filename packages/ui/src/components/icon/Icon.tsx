@@ -1,7 +1,5 @@
 "use client";
 
-import { type ComponentProps } from "react";
-
 export interface IconProps {
   name: string;
   className?: string;
@@ -23,13 +21,8 @@ function cn(...classes: (string | undefined | null | false)[]): string {
 export function Icon({ name, className, style, size = "md" }: IconProps) {
   return (
     <i
-      className={cn(
-        `pi pi-${name}`,
-        sizeClasses[size],
-        className
-      )}
+      className={cn(`pi pi-${name}`, sizeClasses[size], className)}
       style={style}
     />
   );
 }
-

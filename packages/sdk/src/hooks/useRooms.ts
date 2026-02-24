@@ -8,9 +8,21 @@ import {
 export const roomKeys = {
   all: ["rooms"] as const,
   lists: () => [...roomKeys.all, "list"] as const,
+  myRooms: () => [...roomKeys.all, "my-rooms"] as const,
   details: () => [...roomKeys.all, "detail"] as const,
   detail: (id: string) => [...roomKeys.details(), id] as const,
 };
+
+export function useMyRooms(options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: roomKeys.myRooms(),
+    queryFn: async () => {
+      const response = await roomsApi.getMyRooms();
+      return response.data ?? [];
+    },
+    enabled: options?.enabled !== false,
+  });
+}
 
 export function useRoom(roomId: string) {
   return useQuery({

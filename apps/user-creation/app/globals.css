@@ -4,14 +4,14 @@
 
 :root {
   height: 100vh;
-  
+
   /* Custom Color Palette */
   --color-platinum: #e7ecef;
   --color-dusk-blue: #274c77;
   --color-steel-blue: #6096ba;
   --color-icy-blue: #a3cef1;
   --color-grey-olive: #8b8c89;
-  
+
   /* Semantic color mappings */
   --color-primary: var(--color-dusk-blue);
   --color-secondary: var(--color-steel-blue);

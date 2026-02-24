@@ -18,7 +18,7 @@ export function CreateRoomForm({ onSuccess, onCancel }: CreateRoomFormProps) {
         `Комната создана! Код: ${result.publicCode}`,
       );
       onSuccess?.(result);
-    } catch (error) {
+    } catch (_error) {
       notificationService.showError(
         "Не удалось создать комнату. Попробуйте еще раз.",
       );

@@ -1,7 +1,11 @@
 "use client";
 
 import type { ChatMessage } from "@mm-preview/sdk";
-import { getAccessToken, getWebSocketUrl, setAccessToken } from "@mm-preview/sdk";
+import {
+  getAccessToken,
+  getWebSocketUrl,
+  setAccessToken,
+} from "@mm-preview/sdk";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { io, type Socket } from "socket.io-client";
 
@@ -35,7 +39,9 @@ export function useSocketIOChat({
   const currentRoomIdRef = useRef<string | null>(null);
 
   const connect = useCallback(() => {
-    if (!enabled || !userId) return;
+    if (!enabled || !userId) {
+      return;
+    }
 
     try {
       // Пытаемся получить токен из cookies
@@ -252,7 +258,9 @@ export function useSocketIOChat({
   );
 
   const leaveRoom = useCallback(() => {
-    if (!socketRef.current || !currentRoomIdRef.current || !userId) return;
+    if (!socketRef.current || !currentRoomIdRef.current || !userId) {
+      return;
+    }
 
     socketRef.current.emit("leaveRoom", {
       roomId: currentRoomIdRef.current,

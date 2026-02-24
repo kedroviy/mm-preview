@@ -1,6 +1,5 @@
 "use client";
 // In PrimeReact 10, PrimeReactProvider is imported from primereact/api
-// @ts-ignore - Module resolution happens at build time via webpack
 import { PrimeReactProvider } from "primereact/api";
 import type * as React from "react";
 import { AppPreset } from "../presets/app-preset";
@@ -19,15 +18,16 @@ export function PrimeReactProviderWrapper({
   // Similar to Ant Design's ConfigProvider pattern
   return (
     <PrimeReactProvider
-      value={{
-        theme: {
-          preset,
-        },
-        ripple: true,
-      } as any}
+      value={
+        {
+          theme: {
+            preset,
+          },
+          ripple: true,
+        } as any
+      }
     >
       {children}
     </PrimeReactProvider>
   );
 }
-

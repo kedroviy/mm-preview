@@ -5,12 +5,14 @@ import { useEffect, useState } from "react";
 import { useWebSocket } from "../contexts/WebSocketContext";
 
 export function useWebSocketMyRooms(userId: string, enabled = true) {
-  const { isConnected, getMyRooms, on, off } = useWebSocket();
+  const { isConnected, getMyRooms, on } = useWebSocket();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!enabled || !userId) return;
+    if (!enabled || !userId) {
+      return;
+    }
 
     const handleMyRooms = (data: { rooms: Room[] }) => {
       setRooms(data.rooms || []);
@@ -35,7 +37,7 @@ export function useWebSocketMyRooms(userId: string, enabled = true) {
       unsubscribeMyRooms();
       unsubscribeError();
     };
-  }, [enabled, userId, on, off]);
+  }, [enabled, userId, on]);
 
   // Запрашиваем комнаты при подключении
   useEffect(() => {

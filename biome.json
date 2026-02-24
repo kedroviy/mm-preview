@@ -7,12 +7,26 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!node_modules", "!.next", "!dist", "!build", "!**/generated/**", "!**/packages/sdk/src/generated/**", "!**/packages/sdk/swagger.json"]
+    "includes": [
+      "**",
+      "!node_modules",
+      "!.next",
+      "!dist",
+      "!build",
+      "!**/generated",
+      "!**/packages/sdk/src/generated",
+      "!**/packages/sdk/swagger.json"
+    ]
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2
+  },
+  "css": {
+    "parser": {
+      "cssModules": true
+    }
   },
   "linter": {
     "enabled": true,
@@ -69,6 +83,12 @@
                 "selector": {
                   "kind": "variable"
                 },
+                "formats": ["CONSTANT_CASE", "camelCase", "PascalCase"]
+              },
+              {
+                "selector": {
+                  "kind": "objectLiteralProperty"
+                },
                 "formats": ["CONSTANT_CASE", "camelCase"]
               }
             ]
@@ -96,5 +116,18 @@
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["**/apps/dashboard/app/globals.css"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnknownProperty": "off",
+            "noUnknownTypeSelector": "off"
+          }
+        }
+      }
+    }
+  ]
 }

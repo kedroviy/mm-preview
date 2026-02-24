@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tailwindcss-primeui";
 @import "@mm-preview/ui/styles";
 
 /* InputOtp styles - ensure component is visible and styled */
@@ -336,6 +335,6 @@ body {
   color: white;
 } */
 /* 
-/* Badge severity colors are handled by PrimeReact theme */
+/* Badge severity colors are handled by shadcn/ui theme */
 
 /* Button with Badge - Position in top right corner */

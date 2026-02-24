@@ -20,7 +20,8 @@ export const metadataByLang: Record<SupportedLocale, MetadataConfig> = {
       "Ваш личный кабинет для управления комнатами, выбора фильмов и взаимодействия с друзьями.",
     openGraph: {
       title: "Личный кабинет - Movie Match",
-      description: "Ваш личный кабинет для управления комнатами и выбора фильмов",
+      description:
+        "Ваш личный кабинет для управления комнатами и выбора фильмов",
       siteName: "Movie Match",
     },
   },
@@ -30,7 +31,8 @@ export const metadataByLang: Record<SupportedLocale, MetadataConfig> = {
       "Your personal dashboard for managing rooms, selecting movies and interacting with friends.",
     openGraph: {
       title: "Dashboard - Movie Match",
-      description: "Your personal dashboard for managing rooms and selecting movies",
+      description:
+        "Your personal dashboard for managing rooms and selecting movies",
       siteName: "Movie Match",
     },
   },
@@ -111,7 +113,7 @@ export async function getLanguageFromHeaders(): Promise<SupportedLocale> {
   const { headers } = await import("next/headers");
   const headersList = await headers();
   const acceptLanguage = headersList.get("accept-language");
-  
+
   // В Next.js 13+ pathname можно получить из headers или использовать дефолтный
   // Для более точного определения можно использовать middleware
   const pathname = "/"; // По умолчанию корневой путь
@@ -136,4 +138,3 @@ export async function generateMetadataFromHeaders(
     },
   };
 }
-

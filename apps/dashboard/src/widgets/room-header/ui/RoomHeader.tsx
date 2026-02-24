@@ -2,7 +2,6 @@
 
 import type { RoomRole } from "@mm-preview/sdk";
 import { Button } from "@mm-preview/ui";
-import type { Room } from "@/src/entities/room";
 import type { RoomHeaderProps } from "../model/types";
 
 function getRoleLabel(role?: RoomRole) {

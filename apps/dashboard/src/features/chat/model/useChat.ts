@@ -2,7 +2,6 @@
 
 import { notificationService } from "@mm-preview/ui";
 import { useWebSocketChat } from "@/src/shared/hooks/useWebSocketChat";
-import type { ChatWindowProps } from "./types";
 
 export function useChat({
   roomId,

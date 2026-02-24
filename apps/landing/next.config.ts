@@ -1,14 +1,12 @@
+import fs from "node:fs";
+import path from "node:path";
 import type { NextConfig } from "next";
-import path from "path";
-import fs from "fs";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@mm-preview/ui", "@mm-preview/sdk"],
-  experimental: {
-    optimizePackageImports: ["primereact"],
-  },
   async rewrites() {
-    const backendUrl = process.env.BACKEND_URL || "https://mm-admin.onrender.com";
+    const backendUrl =
+      process.env.BACKEND_URL || "https://mm-admin.onrender.com";
     return [
       {
         source: "/api/v1/:path*",
@@ -32,46 +30,45 @@ const nextConfig: NextConfig = {
     // pnpm uses symlinks and a different node_modules structure
     const appNodeModules = path.resolve(__dirname, "node_modules");
     const rootNodeModules = path.resolve(__dirname, "../../node_modules");
-    
-    // Helper to find primereact module
-    const findPrimeReactModule = (moduleName: string) => {
-      const appPath = path.resolve(appNodeModules, "primereact", moduleName);
-      const rootPath = path.resolve(rootNodeModules, "primereact", moduleName);
-      
-      // Check if exists, return the first found
+
+    // Helper to find legacy module (for backward compatibility)
+    const findLegacyModule = (packageName: string, moduleName: string) => {
+      const appPath = path.resolve(appNodeModules, packageName, moduleName);
+      const rootPath = path.resolve(rootNodeModules, packageName, moduleName);
+
       if (fs.existsSync(appPath)) {
         return appPath;
       }
       if (fs.existsSync(rootPath)) {
         return rootPath;
       }
-      // Return app path anyway - webpack will handle the error
       return appPath;
     };
-    
-    // Add node_modules to resolve.modules so webpack can find primereact
-    // This works for both npm and pnpm
+
+    // Add node_modules to resolve.modules
     config.resolve.modules = [
       ...(config.resolve.modules || []),
       appNodeModules,
       rootNodeModules,
-      "node_modules", // Default webpack resolution
+      "node_modules",
     ];
-    
+
     // For pnpm, we need to ensure symlinks are followed
     config.resolve.symlinks = true;
-    
-    // Ensure webpack can resolve primereact modules from the app's node_modules
-    // This is critical for monorepo setups where packages/ui imports primereact
+
+    // Legacy module resolution (for backward compatibility with old components)
     config.resolve.alias = {
       ...config.resolve.alias,
-      // Explicitly resolve primereact modules to ensure they're found
-      "primereact/animateonscroll": findPrimeReactModule("animateonscroll"),
-      "primereact/avatar": findPrimeReactModule("avatar"),
-      "primereact/button": findPrimeReactModule("button"),
-      "primereact/badge": findPrimeReactModule("badge"),
+      // Legacy components still use these modules
+      "primereact/animateonscroll": findLegacyModule(
+        "primereact",
+        "animateonscroll",
+      ),
+      "primereact/avatar": findLegacyModule("primereact", "avatar"),
+      "primereact/button": findLegacyModule("primereact", "button"),
+      "primereact/badge": findLegacyModule("primereact", "badge"),
     };
-    
+
     return config;
   },
 };

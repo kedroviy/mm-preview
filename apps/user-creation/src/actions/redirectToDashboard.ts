@@ -28,4 +28,3 @@ export async function redirectToDashboard(userId: string) {
   // Куки должны передаваться автоматически, если они установлены без domain (undefined для localhost)
   redirect(`${dashboardUrl}/${userId}`);
 }
-

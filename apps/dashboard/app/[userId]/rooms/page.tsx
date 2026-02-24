@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { Suspense } from "react";
-import { RoomsPageClient } from "@/src/views/rooms/ui/RoomsPageClient";
 import type { Room } from "@/src/entities/room";
+import { RoomsPageClient } from "@/src/views/rooms/ui/RoomsPageClient";
 
 async function getProfileFromServer() {
   const cookieStore = await cookies();

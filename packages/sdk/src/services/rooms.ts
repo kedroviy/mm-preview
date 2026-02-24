@@ -101,7 +101,9 @@ export const roomsApi = {
    * Получить список участников комнаты с ролями
    */
   getRoomMembers: async (roomId: string) => {
-    return api.get<{ members: RoomMember[] }>(`/api/v1/rooms/${roomId}/members`);
+    return api.get<{ members: RoomMember[] }>(
+      `/api/v1/rooms/${roomId}/members`,
+    );
   },
 
   /**
@@ -118,5 +120,12 @@ export const roomsApi = {
     return api.get<{ messages: ChatMessage[] }>(
       `/api/v1/rooms/${roomId}/chat/history`,
     );
+  },
+
+  /**
+   * Получить список комнат текущего пользователя
+   */
+  getMyRooms: async () => {
+    return api.get<Room[]>("/api/v1/rooms/my-rooms");
   },
 };

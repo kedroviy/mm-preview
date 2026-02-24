@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode, CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 // In PrimeReact 10, Column is exported from the datatable module
 // We define ColumnProps manually to avoid TypeScript resolution issues
@@ -38,10 +38,8 @@ export interface ColumnProps {
 
 // Static import - webpack will resolve this from the app's node_modules
 // In PrimeReact 10, Column is imported from primereact/column
-// @ts-ignore - TypeScript can't resolve this in packages/ui, but webpack will at build time
 import { Column as PrimeColumn } from "primereact/column";
 
 export function Column(props: ColumnProps) {
   return <PrimeColumn {...props} />;
 }
-

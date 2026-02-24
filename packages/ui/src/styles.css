@@ -1,53 +1,64 @@
 @import "tailwindcss";
-@import "tailwindcss-primeui";
 
-/* Button Styles - Applied automatically from packages/ui */
-/* Primary button uses colors from preset (colorScheme.primary) */
-/* Colors from AppPreset: primary.color = #274c77 (Dusk Blue) */
-.p-button {
-  transition: all 0.2s ease;
-  /* Primary button background from preset: #274c77 (Dusk Blue) */
-  background-color: #274c77;
-  color: #ffffff;
-  border: 1px solid #274c77;
-  border-radius: 6px;
-  padding: 0.5rem 1rem;
-  font-weight: 500;
-  cursor: pointer;
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
 }
 
-.p-button:hover:not(:disabled) {
-  background-color: #1f3c5f; /* primary.hoverColor from preset */
-  border-color: #1f3c5f;
-}
-
-.p-button:active:not(:disabled) {
-  background-color: #172c47; /* primary.activeColor from preset */
-  border-color: #172c47;
-}
-
-.p-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.p-button.p-button-outlined {
-  background-color: transparent;
-  border-color: #274c77;
-  color: #274c77;
-}
-
-.p-button.p-button-outlined:hover:not(:disabled) {
-  background-color: #274c77;
-  color: #ffffff;
-}
-
-.p-button.p-button-text {
-  background-color: transparent;
-  border-color: transparent;
-  color: #274c77;
-}
-
-.p-button.p-button-text:hover:not(:disabled) {
-  background-color: rgba(39, 76, 119, 0.1);
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+  /* Tailwind v4 switched from cursor: pointer to cursor: default for buttons */
+  /* Add cursor: pointer for better UX */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }

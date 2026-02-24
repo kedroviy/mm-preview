@@ -26,7 +26,7 @@ function getAppUrl(key: "LANDING" | "USER_CREATION" | "DASHBOARD"): string {
       };
       return `https://${appNames[key]}`;
     }
-    
+
     // Mode 2.1: Production - Vercel (fallback для обратной совместимости)
     if (hostname.includes("vercel.app")) {
       const parts = hostname.split(".");

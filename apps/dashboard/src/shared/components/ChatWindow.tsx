@@ -32,10 +32,12 @@ export function ChatWindow({
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [scrollToBottom]);
 
   const handleSend = () => {
-    if (message.trim().length === 0) return;
+    if (message.trim().length === 0) {
+      return;
+    }
     if (message.length > 1000) {
       alert("Сообщение слишком длинное (максимум 1000 символов)");
       return;

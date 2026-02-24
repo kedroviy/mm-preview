@@ -7,7 +7,8 @@ const http = require("node:http");
 
 // Swagger JSON endpoint
 // Если ваш бэкенд использует другой путь, установите переменную окружения SWAGGER_URL
-const SWAGGER_URL = process.env.SWAGGER_URL || "http://localhost:4000/api/docs-json";
+const _SWAGGER_URL =
+  process.env.SWAGGER_URL || "http://localhost:4000/api/docs-json";
 const OUTPUT_PATH = path.join(__dirname, "../swagger.json");
 
 function downloadSwagger(url) {
@@ -77,7 +78,6 @@ async function main() {
       return;
     } catch (error) {
       console.log(`✗ Failed: ${error.message}`);
-      continue;
     }
   }
 

@@ -1,16 +1,16 @@
 "use client";
 
+import { useMyRooms } from "@mm-preview/sdk";
 import {
-  Button,
+  ButtonShadcnWrapper as Button,
   Card,
-  Column,
+  ColumnShadcn as Column,
   ConnectIcon,
-  DataTable,
+  DataTableShadcn as DataTable,
   DeleteIcon,
   SpeedDial,
 } from "@mm-preview/ui";
-import { useRoomsController_getMyRooms } from "@mm-preview/sdk";
-import { type MouseEvent, useMemo } from "react";
+import type { MouseEvent } from "react";
 import type { Room } from "@/src/entities/room";
 import type { RoomListProps } from "../model/types";
 import styles from "./RoomList.module.css";
@@ -22,12 +22,13 @@ export function RoomList({
   onDelete,
 }: RoomListProps) {
   // Используем REST запрос вместо WebSocket
-  const { data: restRooms, isLoading: isRestLoading } = useRoomsController_getMyRooms(
-    !!userId ? undefined : { enabled: false }
+  const { data: restRooms, isLoading: isRestLoading } = useMyRooms(
+    userId ? undefined : { enabled: false },
   );
-  
+
   // Используем данные из REST запроса, если они есть, иначе initialRooms
-  const rooms = (restRooms && restRooms.length > 0) ? restRooms as Room[] : initialRooms;
+  const rooms =
+    restRooms && restRooms.length > 0 ? (restRooms as Room[]) : initialRooms;
   const isRoomsLoading = isRestLoading;
 
   if (isRoomsLoading && rooms.length === 0) {
@@ -142,66 +143,63 @@ export function RoomList({
           <Column
             header="Действия"
             body={(room: Room) => {
-              const items = useMemo(() => {
-                const actions = [];
+              // Создаем actions без useMemo (хуки нельзя вызывать в колбэках)
+              const actions = [];
 
-                // Подключиться - слева
+              // Подключиться - слева
+              actions.push({
+                label: "Подключиться",
+                icon: <ConnectIcon className="w-4 h-4" />,
+                command: () => onConnect(room.roomId),
+                template: (item: any, _options: any) => {
+                  return (
+                    <Button
+                      rounded
+                      text
+                      raised
+                      icon={<ConnectIcon className="w-4 h-4" />}
+                      onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                        e.preventDefault();
+                        item.command();
+                      }}
+                      aria-label="Подключиться"
+                    />
+                  );
+                },
+              });
+
+              // Удалить - справа (если создатель)
+              if (room.isCreator && onDelete) {
                 actions.push({
-                  label: "Подключиться",
-                  icon: <ConnectIcon className="w-4 h-4" />,
-                  command: () => onConnect(room.roomId),
-                  template: (item: any, options: any) => {
+                  label: "Удалить",
+                  icon: <DeleteIcon className="w-4 h-4" />,
+                  command: () => onDelete(room.roomId),
+                  template: (item: any, _options: any) => {
                     return (
                       <Button
                         rounded
                         text
                         raised
-                        icon={<ConnectIcon className="w-4 h-4" />}
+                        icon={<DeleteIcon className="w-4 h-4" />}
                         onClick={(e: MouseEvent<HTMLButtonElement>) => {
                           e.preventDefault();
                           item.command();
                         }}
-                        aria-label="Подключиться"
+                        aria-label="Удалить"
                       />
                     );
                   },
                 });
-
-                // Удалить - справа (если создатель)
-                if (room.isCreator && onDelete) {
-                  actions.push({
-                    label: "Удалить",
-                    icon: <DeleteIcon className="w-4 h-4" />,
-                    command: () => onDelete(room.roomId),
-                    template: (item: any, options: any) => {
-                      return (
-                        <Button
-                          rounded
-                          text
-                          raised
-                          icon={<DeleteIcon className="w-4 h-4" />}
-                          onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                            e.preventDefault();
-                            item.command();
-                          }}
-                          aria-label="Удалить"
-                        />
-                      );
-                    },
-                  });
-                }
-
-                return actions;
-              }, [room.roomId, room.isCreator, onConnect, onDelete]);
+              }
 
               return (
                 <div className={styles.speeddialContainer}>
                   <div className={styles.speeddialWrapper}>
                     <SpeedDial
-                      model={items}
+                      model={actions}
                       direction="down"
                       radius={80}
-                       type="circle"
+                      type="circle"
                       mask
                       buttonClassName="p-button-warning"
                       buttonStyle={{ width: "2rem", height: "2rem" }}

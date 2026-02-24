@@ -24,11 +24,12 @@ export function Toast() {
     return unsubscribe;
   }, []);
 
-  // biome-ignore lint/suspicious/noExplicitAny: PrimeReact 10 Toast type is not fully typed yet
   return (
     <div className="mm-toast">
-      <PrimeToast ref={toastRef as any} />
+      <PrimeToast
+        // biome-ignore lint/suspicious/noExplicitAny: PrimeReact Toast ref type
+        ref={toastRef as any}
+      />
     </div>
   );
 }
-

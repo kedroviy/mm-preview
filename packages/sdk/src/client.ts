@@ -1,6 +1,6 @@
 import type { ApiError, ApiResponse, RequestConfig } from "./types";
-import { getAccessToken } from "./utils/cookies";
 import { getClientApiUrl } from "./utils/api-url";
+import { getAccessToken } from "./utils/cookies";
 
 class ApiClient {
   private baseURL: string;
@@ -25,10 +25,10 @@ class ApiClient {
   private buildURL(url: string, params?: RequestConfig["params"]): string {
     // Если baseURL заканчивается на /api/v1, а url начинается с /api/v1, убираем дублирование
     let base = this.baseURL;
-    if (base.endsWith('/api/v1') && url.startsWith('/api/v1')) {
-      base = base.replace(/\/api\/v1\/?$/, '');
+    if (base.endsWith("/api/v1") && url.startsWith("/api/v1")) {
+      base = base.replace(/\/api\/v1\/?$/, "");
     }
-    
+
     const fullURL = url.startsWith("http") ? url : `${base}${url}`;
 
     if (!params || Object.keys(params).length === 0) {

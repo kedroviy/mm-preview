@@ -31,7 +31,7 @@ export function generateLoadingFromStructure(
     cardCount = 3,
     hasForm = false,
     hasList = false,
-    listItems = 5,
+    listItems: _listItems = 5,
   } = structure;
 
   return (

@@ -31,7 +31,7 @@ export function JoinRoomForm({
       });
       notificationService.showSuccess("Вы успешно присоединились к комнате!");
       onSuccess?.(result);
-    } catch (error) {
+    } catch (_error) {
       notificationService.showError(
         "Не удалось присоединиться к комнате. Проверьте код.",
       );

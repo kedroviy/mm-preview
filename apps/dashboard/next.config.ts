@@ -1,14 +1,12 @@
-import fs from "fs";
+import fs from "node:fs";
+import path from "node:path";
 import type { NextConfig } from "next";
-import path from "path";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@mm-preview/ui", "@mm-preview/sdk"],
-  experimental: {
-    optimizePackageImports: ["primereact"],
-  },
   async rewrites() {
-    const backendUrl = process.env.BACKEND_URL || "https://mm-admin.onrender.com";
+    const backendUrl =
+      process.env.BACKEND_URL || "https://mm-admin.onrender.com";
     return [
       {
         source: "/api/v1/:path*",
@@ -27,55 +25,52 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer: _isServer }) => {
     // For pnpm, we need to ensure modules are resolved correctly
     // pnpm uses symlinks and a different node_modules structure
     const appNodeModules = path.resolve(__dirname, "node_modules");
     const rootNodeModules = path.resolve(__dirname, "../../node_modules");
 
-    // Helper to find primereact module
-    const findPrimeReactModule = (moduleName: string) => {
-      const appPath = path.resolve(appNodeModules, "primereact", moduleName);
-      const rootPath = path.resolve(rootNodeModules, "primereact", moduleName);
+    // Helper to find legacy module (for backward compatibility)
+    const findLegacyModule = (packageName: string, moduleName: string) => {
+      const appPath = path.resolve(appNodeModules, packageName, moduleName);
+      const rootPath = path.resolve(rootNodeModules, packageName, moduleName);
 
-      // Check if exists, return the first found
       if (fs.existsSync(appPath)) {
         return appPath;
       }
       if (fs.existsSync(rootPath)) {
         return rootPath;
       }
-      // Return app path anyway - webpack will handle the error
       return appPath;
     };
 
-    // Add node_modules to resolve.modules so webpack can find primereact
+    // Add node_modules to resolve.modules
     // This works for both npm and pnpm
     config.resolve.modules = [
       ...(config.resolve.modules || []),
       appNodeModules,
       rootNodeModules,
-      "node_modules", // Default webpack resolution
+      "node_modules",
     ];
 
     // For pnpm, we need to ensure symlinks are followed
     config.resolve.symlinks = true;
 
-    // Ensure webpack can resolve primereact modules from the app's node_modules
-    // This is critical for monorepo setups where packages/ui imports primereact
+    // Legacy module resolution (for backward compatibility with old components)
     config.resolve.alias = {
       ...config.resolve.alias,
-      // Explicitly resolve primereact modules to ensure they're found
-      "primereact/column": findPrimeReactModule("column"),
-      "primereact/datatable": findPrimeReactModule("datatable"),
-      "primereact/button": findPrimeReactModule("button"),
-      "primereact/api": findPrimeReactModule("api"),
-      "primereact/card": findPrimeReactModule("card"),
-      "primereact/inputtext": findPrimeReactModule("inputtext"),
-      "primereact/paginator": findPrimeReactModule("paginator"),
-      "primereact/speeddial": findPrimeReactModule("speeddial"),
-      "primereact/tooltip": findPrimeReactModule("tooltip"),
-      "primereact/badge": findPrimeReactModule("badge"),
+      // Legacy components still use these modules
+      "primereact/column": findLegacyModule("primereact", "column"),
+      "primereact/datatable": findLegacyModule("primereact", "datatable"),
+      "primereact/button": findLegacyModule("primereact", "button"),
+      "primereact/api": findLegacyModule("primereact", "api"),
+      "primereact/card": findLegacyModule("primereact", "card"),
+      "primereact/inputtext": findLegacyModule("primereact", "inputtext"),
+      "primereact/paginator": findLegacyModule("primereact", "paginator"),
+      "primereact/speeddial": findLegacyModule("primereact", "speeddial"),
+      "primereact/tooltip": findLegacyModule("primereact", "tooltip"),
+      "primereact/badge": findLegacyModule("primereact", "badge"),
     };
 
     return config;

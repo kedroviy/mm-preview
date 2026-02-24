@@ -1,5 +1,6 @@
 "use client";
 
+import { type WebSocketServiceEvents, webSocketService } from "@mm-preview/sdk";
 import {
   createContext,
   type PropsWithChildren,
@@ -8,10 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  type WebSocketServiceEvents,
-  webSocketService,
-} from "../services/websocket-service";
+import { getAppUrls } from "../config/constants";
 
 interface WebSocketContextValue {
   isConnected: boolean;
@@ -43,19 +41,12 @@ export function WebSocketProvider({
 
   useEffect(() => {
     if (autoConnect && !isInitialized.current) {
-      console.log("🔌 Инициализация WebSocket провайдера...");
       webSocketService.connect();
       isInitialized.current = true;
     }
 
-    // Подписываемся на события подключения/отключения для реактивного обновления состояния
-    const handleConnect = () => {
-      setIsConnected(true);
-    };
-
-    const handleDisconnect = () => {
-      setIsConnected(false);
-    };
+    const handleConnect = () => setIsConnected(true);
+    const handleDisconnect = () => setIsConnected(false);
 
     const unsubscribeConnect = webSocketService.on("connect", handleConnect);
     const unsubscribeDisconnect = webSocketService.on(
@@ -63,16 +54,25 @@ export function WebSocketProvider({
       handleDisconnect,
     );
 
-    // Устанавливаем начальное состояние
     setIsConnected(webSocketService.isConnected());
 
     return () => {
       unsubscribeConnect();
       unsubscribeDisconnect();
-      // Не отключаемся при размонтировании, т.к. это singleton
-      // Отключение будет происходить только при явном вызове disconnect()
     };
   }, [autoConnect]);
+
+  useEffect(() => {
+    const handleError = (error: { code: string }) => {
+      if (error.code === "UNAUTHORIZED" && typeof window !== "undefined") {
+        const userCreationUrl = getAppUrls().USER_CREATION;
+        window.location.href = userCreationUrl;
+      }
+    };
+
+    const unsubscribe = webSocketService.on("error", handleError);
+    return () => unsubscribe();
+  }, []);
 
   const value: WebSocketContextValue = {
     isConnected,

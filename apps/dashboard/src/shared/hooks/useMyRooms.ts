@@ -1,7 +1,11 @@
 "use client";
 
 import type { Room } from "@mm-preview/sdk";
-import { getAccessToken, getWebSocketUrl, setAccessToken } from "@mm-preview/sdk";
+import {
+  getAccessToken,
+  getWebSocketUrl,
+  setAccessToken,
+} from "@mm-preview/sdk";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { io, type Socket } from "socket.io-client";
 
@@ -15,16 +19,22 @@ export function useMyRooms(userId: string, enabled = true) {
   const [isConnected, setIsConnected] = useState(false);
   const socketRef = useRef<Socket | null>(null);
 
-  const getCookie = useCallback((name: string) => {
-    if (typeof document === "undefined") return null;
+  const _getCookie = useCallback((name: string) => {
+    if (typeof document === "undefined") {
+      return null;
+    }
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(";").shift();
+    if (parts.length === 2) {
+      return parts.pop()?.split(";").shift();
+    }
     return null;
   }, []);
 
   const connect = useCallback(() => {
-    if (!enabled || !userId) return;
+    if (!enabled || !userId) {
+      return;
+    }
 
     try {
       const token = getAccessToken();
@@ -94,7 +104,7 @@ export function useMyRooms(userId: string, enabled = true) {
       );
       setIsLoading(false);
     }
-  }, [enabled, userId, getCookie]);
+  }, [enabled, userId]);
 
   useEffect(() => {
     if (enabled && userId) {

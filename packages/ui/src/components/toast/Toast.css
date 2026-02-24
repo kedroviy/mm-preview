@@ -18,94 +18,93 @@
 
 /* Success Toast */
 .mm-toast .p-toast-message-success {
-  background-color: #22c55e !important;
-  border-color: #16a34a !important;
-  color: #ffffff !important;
+  background-color: #22c55e;
+  border-color: #16a34a;
+  color: #ffffff;
 }
 
 .mm-toast .p-toast-message-success .p-toast-message-icon,
 .mm-toast .p-toast-message-success .p-toast-icon-close {
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
 .mm-toast .p-toast-message-success .p-toast-summary {
-  color: #ffffff !important;
+  color: #ffffff;
   font-weight: 600;
 }
 
 .mm-toast .p-toast-message-success .p-toast-detail {
-  color: #ffffff !important;
+  color: #ffffff;
   opacity: 0.95;
 }
 
 /* Error Toast */
 .mm-toast .p-toast-message-error,
 .mm-toast .p-toast-message-danger {
-  background-color: #ef4444 !important;
-  border-color: #dc2626 !important;
-  color: #ffffff !important;
+  background-color: #ef4444;
+  border-color: #dc2626;
+  color: #ffffff;
 }
 
 .mm-toast .p-toast-message-error .p-toast-message-icon,
 .mm-toast .p-toast-message-error .p-toast-icon-close,
 .mm-toast .p-toast-message-danger .p-toast-message-icon,
 .mm-toast .p-toast-message-danger .p-toast-icon-close {
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
 .mm-toast .p-toast-message-error .p-toast-summary,
 .mm-toast .p-toast-message-danger .p-toast-summary {
-  color: #ffffff !important;
+  color: #ffffff;
   font-weight: 600;
 }
 
 .mm-toast .p-toast-message-error .p-toast-detail,
 .mm-toast .p-toast-message-danger .p-toast-detail {
-  color: #ffffff !important;
+  color: #ffffff;
   opacity: 0.95;
 }
 
 /* Info Toast */
 .mm-toast .p-toast-message-info {
-  background-color: #3b82f6 !important;
-  border-color: #2563eb !important;
-  color: #ffffff !important;
+  background-color: #3b82f6;
+  border-color: #2563eb;
+  color: #ffffff;
 }
 
 .mm-toast .p-toast-message-info .p-toast-message-icon,
 .mm-toast .p-toast-message-info .p-toast-icon-close {
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
 .mm-toast .p-toast-message-info .p-toast-summary {
-  color: #ffffff !important;
+  color: #ffffff;
   font-weight: 600;
 }
 
 .mm-toast .p-toast-message-info .p-toast-detail {
-  color: #ffffff !important;
+  color: #ffffff;
   opacity: 0.95;
 }
 
 /* Warning Toast */
 .mm-toast .p-toast-message-warn {
-  background-color: #f59e0b !important;
-  border-color: #d97706 !important;
-  color: #ffffff !important;
+  background-color: #f59e0b;
+  border-color: #d97706;
+  color: #ffffff;
 }
 
 .mm-toast .p-toast-message-warn .p-toast-message-icon,
 .mm-toast .p-toast-message-warn .p-toast-icon-close {
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
 .mm-toast .p-toast-message-warn .p-toast-summary {
-  color: #ffffff !important;
+  color: #ffffff;
   font-weight: 600;
 }
 
 .mm-toast .p-toast-message-warn .p-toast-detail {
-  color: #ffffff !important;
+  color: #ffffff;
   opacity: 0.95;
 }
-

@@ -19,14 +19,14 @@ export function ViewTransition({
   className,
   name,
 }: ViewTransitionProps) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const _router = useRouter();
+  const [_isPending, startTransition] = useTransition();
 
   // Check if View Transitions are supported
   const supportsViewTransitions =
     typeof document !== "undefined" && "startViewTransition" in document;
 
-  const handleTransition = (callback: () => void) => {
+  const _handleTransition = (callback: () => void) => {
     if (supportsViewTransitions && document.startViewTransition) {
       document.startViewTransition(() => {
         startTransition(callback);
