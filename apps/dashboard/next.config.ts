@@ -31,22 +31,20 @@ const nextConfig: NextConfig = {
     const appNodeModules = path.resolve(__dirname, "node_modules");
     const rootNodeModules = path.resolve(__dirname, "../../node_modules");
 
-    // Helper to find legacy module (for backward compatibility)
-    const findLegacyModule = (packageName: string, moduleName: string) => {
+    // Helper to find legacy module (for backward compatibility).
+    // Only returns a path when it exists; otherwise undefined so we don't alias to missing paths (avoids MODULE_NOT_FOUND on Vercel).
+    const findLegacyModule = (
+      packageName: string,
+      moduleName: string,
+    ): string | undefined => {
       const appPath = path.resolve(appNodeModules, packageName, moduleName);
       const rootPath = path.resolve(rootNodeModules, packageName, moduleName);
-
-      if (fs.existsSync(appPath)) {
-        return appPath;
-      }
-      if (fs.existsSync(rootPath)) {
-        return rootPath;
-      }
-      return appPath;
+      if (fs.existsSync(appPath)) return appPath;
+      if (fs.existsSync(rootPath)) return rootPath;
+      return undefined;
     };
 
-    // Add node_modules to resolve.modules
-    // This works for both npm and pnpm
+    // Add node_modules to resolve.modules so primereact can be resolved from root in monorepo (npm on Vercel).
     config.resolve.modules = [
       ...(config.resolve.modules || []),
       appNodeModules,
@@ -54,24 +52,27 @@ const nextConfig: NextConfig = {
       "node_modules",
     ];
 
-    // For pnpm, we need to ensure symlinks are followed
     config.resolve.symlinks = true;
 
-    // Legacy module resolution (for backward compatibility with old components)
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      // Legacy components still use these modules
-      "primereact/column": findLegacyModule("primereact", "column"),
-      "primereact/datatable": findLegacyModule("primereact", "datatable"),
-      "primereact/button": findLegacyModule("primereact", "button"),
-      "primereact/api": findLegacyModule("primereact", "api"),
-      "primereact/card": findLegacyModule("primereact", "card"),
-      "primereact/inputtext": findLegacyModule("primereact", "inputtext"),
-      "primereact/paginator": findLegacyModule("primereact", "paginator"),
-      "primereact/speeddial": findLegacyModule("primereact", "speeddial"),
-      "primereact/tooltip": findLegacyModule("primereact", "tooltip"),
-      "primereact/badge": findLegacyModule("primereact", "badge"),
-    };
+    // Legacy aliases only when paths exist; otherwise resolution uses resolve.modules above.
+    const legacyAliases: Record<string, string> = {};
+    const primereactSubmodules = [
+      "column",
+      "datatable",
+      "button",
+      "api",
+      "card",
+      "inputtext",
+      "paginator",
+      "speeddial",
+      "tooltip",
+      "badge",
+    ];
+    for (const name of primereactSubmodules) {
+      const target = findLegacyModule("primereact", name);
+      if (target) legacyAliases[`primereact/${name}`] = target;
+    }
+    config.resolve.alias = { ...config.resolve.alias, ...legacyAliases };
 
     return config;
   },

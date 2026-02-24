@@ -9,6 +9,8 @@
     "NEXT_PUBLIC_LANDING_URL",
     "NEXT_PUBLIC_USER_CREATION_URL",
     "NEXT_PUBLIC_DASHBOARD_URL",
+    "BACKEND_URL",
+    "API_URL",
     "ALLOWED_COOKIE_DOMAINS",
     "ALLOWED_COOKIE_URLS",
     "ALLOW_CROSS_ORIGIN_COOKIES"
@@ -16,7 +18,8 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**"],
+      "env": ["BACKEND_URL", "API_URL"]
     },
     "@mm-preview/ui#build": {
       "dependsOn": ["^build"],
