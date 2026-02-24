@@ -39,10 +39,12 @@ export function useWebSocketChat({
   } = useWebSocket();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isMuted, setIsMuted] = useState(false);
+  const [isJoinedToRoom, setIsJoinedToRoom] = useState(false);
   const joinedRoomRef = useRef<string | null>(null);
   const previousRoomIdRef = useRef<string | undefined>(undefined);
-  const joiningRoomRef = useRef<string | null>(null); // Отслеживаем, к какой комнате мы присоединяемся
-  const joinTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Таймаут для присоединения
+  const joiningRoomRef = useRef<string | null>(null);
+  const joinTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingMessagesRef = useRef<string[]>([]);
 
   // Очищаем состояние при изменении roomId
   useEffect(() => {
@@ -58,7 +60,9 @@ export function useWebSocketChat({
       }
       previousRoomIdRef.current = roomId;
       joinedRoomRef.current = null;
-      joiningRoomRef.current = null; // Сбрасываем флаг присоединения
+      joiningRoomRef.current = null;
+      pendingMessagesRef.current = [];
+      setIsJoinedToRoom(false);
     }
   }, [roomId]);
 
@@ -77,6 +81,7 @@ export function useWebSocketChat({
         );
         joinedRoomRef.current = roomId;
         joiningRoomRef.current = null;
+        setIsJoinedToRoom(true);
         if (joinTimeoutRef.current) {
           clearTimeout(joinTimeoutRef.current);
           joinTimeoutRef.current = null;
@@ -138,13 +143,20 @@ export function useWebSocketChat({
       if (roomId && data.roomId === roomId) {
         console.log("✅ Присоединение к комнате подтверждено:", roomId);
         joinedRoomRef.current = data.roomId;
-        joiningRoomRef.current = null; // Сбрасываем флаг присоединения
-        // Очищаем таймаут присоединения
+        joiningRoomRef.current = null;
+        setIsJoinedToRoom(true);
         if (joinTimeoutRef.current) {
           clearTimeout(joinTimeoutRef.current);
           joinTimeoutRef.current = null;
         }
         setIsMuted(data.room.isMuted || false);
+        const pending = pendingMessagesRef.current.splice(0);
+        for (const text of pending) {
+          wsSendMessage(data.roomId, text);
+        }
+        if (pending.length > 0) {
+          console.log("📤 Отправлено отложенных сообщений:", pending.length);
+        }
         if (data.room.muteExpiresAt && data.room.isMuted) {
           const minutesLeft = Math.ceil(
             (data.room.muteExpiresAt - Date.now()) / (60 * 1000),
@@ -166,13 +178,18 @@ export function useWebSocketChat({
           console.log(
             "⚠️ Принимаем присоединение, несмотря на несоответствие roomId",
           );
-          joinedRoomRef.current = data.roomId; // Используем roomId из события
+          joinedRoomRef.current = data.roomId;
           joiningRoomRef.current = null;
+          setIsJoinedToRoom(true);
           if (joinTimeoutRef.current) {
             clearTimeout(joinTimeoutRef.current);
             joinTimeoutRef.current = null;
           }
           setIsMuted(data.room.isMuted || false);
+          const pending = pendingMessagesRef.current.splice(0);
+          for (const text of pending) {
+            wsSendMessage(data.roomId, text);
+          }
         }
       } else {
         // Если roomId не указан в пропсах, но событие пришло
@@ -238,6 +255,7 @@ export function useWebSocketChat({
         );
         joinedRoomRef.current = roomId;
         joiningRoomRef.current = null;
+        setIsJoinedToRoom(true);
       } else {
         // Очищаем предыдущий таймаут, если он есть
         if (joinTimeoutRef.current) {
@@ -264,6 +282,7 @@ export function useWebSocketChat({
             console.warn("⚠️ Таймаут присоединения к комнате:", roomId);
             joiningRoomRef.current = null;
             joinTimeoutRef.current = null;
+            pendingMessagesRef.current = [];
             onError?.(
               new Error(
                 "Не удалось присоединиться к комнате. Пожалуйста, попробуйте еще раз.",
@@ -354,32 +373,21 @@ export function useWebSocketChat({
         return;
       }
 
-      // Если мы еще присоединяемся, проверяем текущий roomId из WebSocket сервиса
-      // Возможно, мы уже присоединились, но событие еще не обработано
+      // Если мы еще присоединяемся, ставим сообщение в очередь или проверяем getCurrentRoomId
       const currentRoomId = getCurrentRoomId();
       if (
         joiningRoomRef.current === roomId &&
         joinedRoomRef.current !== roomId
       ) {
-        // Если WebSocket сервис говорит, что мы в этой комнате, обновляем состояние
         if (currentRoomId === roomId) {
           console.log(
             "✅ Обнаружено присоединение через getCurrentRoomId, обновляем состояние",
           );
           joinedRoomRef.current = roomId;
           joiningRoomRef.current = null;
+          setIsJoinedToRoom(true);
         } else {
-          console.log("⏳ Присоединение к комнате в процессе...", {
-            joiningRoom: joiningRoomRef.current,
-            joinedRoom: joinedRoomRef.current,
-            currentRoomId,
-            targetRoomId: roomId,
-          });
-          onError?.(
-            new Error(
-              "Присоединение к комнате в процессе. Пожалуйста, подождите.",
-            ),
-          );
+          pendingMessagesRef.current.push(message);
           return;
         }
       }
@@ -405,6 +413,7 @@ export function useWebSocketChat({
     messages,
     isConnected,
     isMuted,
+    isReadyToSend: isJoinedToRoom,
     sendMessage,
   };
 }

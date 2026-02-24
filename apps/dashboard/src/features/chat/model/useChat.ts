@@ -14,7 +14,8 @@ export function useChat({
   userId: string;
   enabled: boolean;
 }) {
-  const { messages, isConnected, isMuted, sendMessage } = useWebSocketChat({
+  const { messages, isConnected, isMuted, isReadyToSend, sendMessage } =
+    useWebSocketChat({
     roomId,
     publicCode,
     userId,
@@ -31,6 +32,7 @@ export function useChat({
     messages,
     isConnected,
     isMuted,
+    isReadyToSend,
     sendMessage,
   };
 }

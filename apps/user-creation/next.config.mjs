@@ -1,6 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   transpilePackages: ["@mm-preview/ui", "@mm-preview/sdk"],
   async rewrites() {
     const backendUrl =
@@ -10,9 +9,6 @@ const nextConfig: NextConfig = {
         source: "/api/v1/:path*",
         destination: `${backendUrl}/api/v1/:path*`,
       },
-      // WebSocket rewrites (для локальной разработки)
-      // Внимание: Vercel не поддерживает WebSocket через rewrites
-      // В продакшене WebSocket должен использовать прямой URL к бэкенду
       {
         source: "/socket.io/:path*",
         destination: `${backendUrl}/socket.io/:path*`,

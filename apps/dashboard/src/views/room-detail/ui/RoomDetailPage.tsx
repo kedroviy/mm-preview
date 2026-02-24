@@ -49,6 +49,7 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
     messages: chatMessages,
     isConnected: isChatConnected,
     isMuted,
+    isReadyToSend,
     sendMessage: sendChatMessage,
   } = useChat({
     roomId,
@@ -188,7 +189,7 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
                   userId={profile.userId}
                   messages={chatMessages}
                   onSendMessage={sendChatMessage}
-                  isLoading={!isChatConnected}
+                  isLoading={!isChatConnected || !isReadyToSend}
                   isMuted={isMuted}
                 />
               )}
