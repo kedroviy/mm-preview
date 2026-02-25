@@ -4,8 +4,10 @@ import { type WebSocketServiceEvents, webSocketService } from "@mm-preview/sdk";
 import {
   createContext,
   type PropsWithChildren,
+  useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -74,21 +76,76 @@ export function WebSocketProvider({
     return () => unsubscribe();
   }, []);
 
-  const value: WebSocketContextValue = {
-    isConnected,
-    getMyRooms: () => webSocketService.getMyRooms(),
-    joinRoom: (publicCode, userId) =>
+  const getMyRooms = useCallback(() => webSocketService.getMyRooms(), []);
+  const joinRoom = useCallback(
+    (publicCode: string, userId: string) =>
       webSocketService.joinRoom(publicCode, userId),
-    leaveRoom: (roomId, userId) => webSocketService.leaveRoom(roomId, userId),
-    sendMessage: (roomId, message) =>
+    [],
+  );
+  const leaveRoom = useCallback(
+    (roomId: string, userId: string) =>
+      webSocketService.leaveRoom(roomId, userId),
+    [],
+  );
+  const sendMessage = useCallback(
+    (roomId: string, message: string) =>
       webSocketService.sendMessage(roomId, message),
-    reconnectToRoom: (roomId, publicCode, userId) =>
+    [],
+  );
+  const reconnectToRoom = useCallback(
+    (roomId: string, publicCode: string, userId: string) =>
       webSocketService.reconnectToRoom(roomId, publicCode, userId),
-    getCurrentRoomId: () => webSocketService.getCurrentRoomId(),
-    refreshTokenAndReconnect: () => webSocketService.refreshTokenAndReconnect(),
-    on: (event, listener) => webSocketService.on(event, listener),
-    off: (event, listener) => webSocketService.off(event, listener),
-  };
+    [],
+  );
+  const getCurrentRoomId = useCallback(
+    () => webSocketService.getCurrentRoomId(),
+    [],
+  );
+  const refreshTokenAndReconnect = useCallback(
+    () => webSocketService.refreshTokenAndReconnect(),
+    [],
+  );
+  const on = useCallback(
+    <T extends keyof WebSocketServiceEvents>(
+      event: T,
+      listener: WebSocketServiceEvents[T],
+    ) => webSocketService.on(event, listener),
+    [],
+  );
+  const off = useCallback(
+    <T extends keyof WebSocketServiceEvents>(
+      event: T,
+      listener: WebSocketServiceEvents[T],
+    ) => webSocketService.off(event, listener),
+    [],
+  );
+
+  const value = useMemo<WebSocketContextValue>(
+    () => ({
+      isConnected,
+      getMyRooms,
+      joinRoom,
+      leaveRoom,
+      sendMessage,
+      reconnectToRoom,
+      getCurrentRoomId,
+      refreshTokenAndReconnect,
+      on,
+      off,
+    }),
+    [
+      isConnected,
+      getMyRooms,
+      joinRoom,
+      leaveRoom,
+      sendMessage,
+      reconnectToRoom,
+      getCurrentRoomId,
+      refreshTokenAndReconnect,
+      on,
+      off,
+    ],
+  );
 
   return (
     <WEB_SOCKET_CONTEXT.Provider value={value}>

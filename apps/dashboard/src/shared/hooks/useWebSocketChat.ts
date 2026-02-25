@@ -45,6 +45,18 @@ export function useWebSocketChat({
   const joiningRoomRef = useRef<string | null>(null);
   const joinTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pendingMessagesRef = useRef<string[]>([]);
+  const prevConnectedRef = useRef(false);
+
+  // При переподключении сбрасываем состояние присоединения, чтобы переподключиться к комнате
+  useEffect(() => {
+    if (isConnected && !prevConnectedRef.current && joinedRoomRef.current) {
+      joinedRoomRef.current = null;
+      joiningRoomRef.current = null;
+      pendingMessagesRef.current = [];
+      setIsJoinedToRoom(false);
+    }
+    prevConnectedRef.current = isConnected;
+  }, [isConnected]);
 
   // Очищаем состояние при изменении roomId
   useEffect(() => {
@@ -361,10 +373,7 @@ export function useWebSocketChat({
       }
 
       // Проверяем, присоединились ли мы к комнате или присоединяемся
-      if (
-        joinedRoomRef.current !== roomId &&
-        joiningRoomRef.current !== roomId
-      ) {
+      if (!joinedRoomRef.current && joiningRoomRef.current !== roomId) {
         onError?.(
           new Error(
             "Вы еще не присоединились к этой комнате. Пожалуйста, подождите.",
@@ -375,15 +384,12 @@ export function useWebSocketChat({
 
       // Если мы еще присоединяемся, ставим сообщение в очередь или проверяем getCurrentRoomId
       const currentRoomId = getCurrentRoomId();
-      if (
-        joiningRoomRef.current === roomId &&
-        joinedRoomRef.current !== roomId
-      ) {
-        if (currentRoomId === roomId) {
+      if (!joinedRoomRef.current && joiningRoomRef.current === roomId) {
+        if (currentRoomId) {
           console.log(
             "✅ Обнаружено присоединение через getCurrentRoomId, обновляем состояние",
           );
-          joinedRoomRef.current = roomId;
+          joinedRoomRef.current = currentRoomId;
           joiningRoomRef.current = null;
           setIsJoinedToRoom(true);
         } else {
@@ -397,14 +403,16 @@ export function useWebSocketChat({
         return;
       }
 
+      // Используем roomId подтверждённый сервером (joinedRoomRef.current)
+      const actualRoomId = joinedRoomRef.current || roomId;
       console.log("💬 Отправка сообщения:", {
-        roomId,
+        actualRoomId,
         isUUID,
         joinedRoom: joinedRoomRef.current,
         joiningRoom: joiningRoomRef.current,
         currentRoomId: getCurrentRoomId(),
       });
-      wsSendMessage(roomId, message);
+      wsSendMessage(actualRoomId, message);
     },
     [roomId, isMuted, isConnected, wsSendMessage, onError, getCurrentRoomId],
   );
