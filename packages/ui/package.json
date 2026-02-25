@@ -23,6 +23,7 @@
     "build": "npm exec -- tsup"
   },
   "dependencies": {
+    "typescript": "^5",
     "@primeuix/themes": "^1.2.5",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
