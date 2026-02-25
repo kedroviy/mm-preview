@@ -15,12 +15,12 @@
   },
   "scripts": {
     "lint": "biome check",
-    "type-check": "npm exec -- tsc --noEmit",
+    "type-check": "tsc --noEmit",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "build": "npm exec -- tsup"
+    "build": "tsup"
   },
   "dependencies": {
     "typescript": "^5",
