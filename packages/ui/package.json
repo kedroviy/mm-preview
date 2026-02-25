@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "typescript": "^5",
+    "tsup": "^8.4.0",
     "@primeuix/themes": "^1.2.5",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
@@ -62,7 +63,6 @@
     "@vitejs/plugin-react": "^4.3.4",
     "jsdom": "^25.0.1",
     "storybook": "^8.4.5",
-    "tsup": "^8.4.0",
     "typescript": "^5",
     "vite": "^5.4.10",
     "vitest": "^2.1.8"
