@@ -47,32 +47,36 @@ function downloadSwagger(url) {
 }
 
 async function main() {
-  // Если SWAGGER_URL установлен, используем его, иначе пробуем несколько вариантов
+  // Build the list of URLs to try
+  const urlsToTry = [];
+
   if (process.env.SWAGGER_URL) {
-    try {
-      console.log(`Downloading Swagger from ${process.env.SWAGGER_URL}...`);
-      const swagger = await downloadSwagger(process.env.SWAGGER_URL);
-      fs.writeFileSync(OUTPUT_PATH, JSON.stringify(swagger, null, 2));
-      console.log(`✓ Swagger saved to ${OUTPUT_PATH}`);
-      return;
-    } catch (error) {
-      console.warn(`⚠ Failed to download from SWAGGER_URL: ${error.message}`);
+    const base = process.env.SWAGGER_URL.replace(/\/$/, "");
+    // If the env var already looks like a full docs-json URL, use it directly.
+    // Otherwise expand it with common swagger path suffixes.
+    if (base.includes("docs-json") || base.includes("swagger.json") || base.includes("api-json")) {
+      urlsToTry.push(base);
+    } else {
+      urlsToTry.push(
+        `${base}/api/docs-json`,
+        `${base}/api/docs/api-json`,
+        `${base}/api/docs/swagger.json`,
+        base,
+      );
     }
   }
 
-  // Попробуем несколько вариантов пути для Swagger JSON
-  const possibleUrls = [
+  // Always include localhost fallbacks for local development
+  urlsToTry.push(
     "http://localhost:4000/api/docs-json",
     "http://localhost:4000/api/docs/api-json",
     "http://localhost:4000/api/docs/swagger.json",
-    "http://localhost:4000/api/docs",
-  ];
+  );
 
-  for (const url of possibleUrls) {
+  for (const url of urlsToTry) {
     try {
       console.log(`Trying to download Swagger from ${url}...`);
       const swagger = await downloadSwagger(url);
-
       fs.writeFileSync(OUTPUT_PATH, JSON.stringify(swagger, null, 2));
       console.log(`✓ Swagger saved to ${OUTPUT_PATH}`);
       return;
@@ -81,11 +85,19 @@ async function main() {
     }
   }
 
-  // Если все варианты не сработали
+  // Fallback: use committed swagger.json from apps/dashboard if it exists
+  const committedSwaggerPath = path.join(__dirname, "../../../apps/dashboard/swagger.json");
+  if (fs.existsSync(committedSwaggerPath)) {
+    console.log("⚠ Using committed apps/dashboard/swagger.json as fallback...");
+    fs.copyFileSync(committedSwaggerPath, OUTPUT_PATH);
+    console.log(`✓ Swagger copied from committed file to ${OUTPUT_PATH}`);
+    return;
+  }
+
+  // Last resort: create a minimal stub
   console.warn("⚠ Failed to download Swagger from all tried URLs");
   console.log("Creating minimal stub swagger.json...");
 
-  // Create minimal stub swagger.json to allow generation to continue
   const stubSwagger = {
     openapi: "3.0.0",
     info: {
