@@ -4,6 +4,7 @@ import type { User } from "@mm-preview/sdk";
 import { Button, InputText, notificationService } from "@mm-preview/ui";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { setAuthCookiesWithDomain } from "@/src/actions/setAuthCookies";
 import { getAppUrls } from "@/src/shared/config/constants";
 import { useTranslation } from "@/src/shared/i18n/useTranslation";
 import { NAME_MIN_LENGTH, NAME_PATTERN } from "../constants/validation";
@@ -48,8 +49,11 @@ export function UserCreationForm() {
         name: data.name,
       },
       {
-        onSuccess: (user: unknown) => {
+        onSuccess: async (user: unknown) => {
           setCreatedUser(user as User);
+          // Re-issue cookies with domain=.moviematch.space so they are
+          // accessible on dashboard.moviematch.space after redirect.
+          await setAuthCookiesWithDomain();
           Promise.resolve().then(() => {
             notificationService.showSuccess(t("successNotification"));
           });
