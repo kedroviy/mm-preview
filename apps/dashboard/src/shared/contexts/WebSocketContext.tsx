@@ -65,10 +65,14 @@ export function WebSocketProvider({
   }, [autoConnect]);
 
   useEffect(() => {
-    const handleError = (error: { code: string }) => {
-      if (error.code === "UNAUTHORIZED" && typeof window !== "undefined") {
-        const userCreationUrl = getAppUrls().USER_CREATION;
-        window.location.href = userCreationUrl;
+    const handleError = (error: { code: string; message?: string }) => {
+      // WebSocket auth errors should NOT redirect the user — the page can
+      // function without a live WebSocket connection. The HTTP-only cookies
+      // are sent automatically by the browser on the WS handshake, so the
+      // backend handles auth via cookies (withCredentials: true). If the
+      // socket still fails, we simply stay on the page.
+      if (error.code === "UNAUTHORIZED") {
+        console.warn("[WebSocket] Auth error — staying on page:", error.message);
       }
     };
 

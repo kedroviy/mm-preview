@@ -152,7 +152,9 @@ export class WebSocketService {
         this.shouldStopReconnecting = true;
         this.authErrorCount = this.maxAuthErrors;
         this.cleanupSocket();
-        removeAllAuthTokens();
+        // Do NOT remove auth tokens here — they may be HttpOnly cookies that
+        // the browser sends automatically; clearing them via document.cookie
+        // would break other requests.
         this.emit("error", { message: msg, code: "UNAUTHORIZED" });
         return;
       }
@@ -187,7 +189,6 @@ export class WebSocketService {
         this.shouldStopReconnecting = true;
         this.authErrorCount = this.maxAuthErrors;
         this.cleanupSocket();
-        removeAllAuthTokens();
       }
       this.emit("error", error);
     });
