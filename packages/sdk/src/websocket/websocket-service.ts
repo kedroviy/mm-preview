@@ -66,15 +66,18 @@ export class WebSocketService {
   private shouldStopReconnecting = false;
 
   /**
-   * Подключение к WebSocket namespace /rooms
+   * Подключение к WebSocket namespace /rooms.
+   * @param tokenOverride - explicit token to use (e.g. retrieved from a
+   *   server-side API route when the cookie is HttpOnly and unavailable in JS).
+   *   Falls back to document.cookie read if not provided.
    */
-  connect(): void {
+  connect(tokenOverride?: string): void {
     if (this.socket?.connected || this.isConnecting) {
       return;
     }
 
     this.isConnecting = true;
-    const token = getAccessToken();
+    const token = tokenOverride ?? getAccessToken();
     const roomsUrl = getWebSocketRoomsUrl();
 
     if (this.shouldStopReconnecting) {

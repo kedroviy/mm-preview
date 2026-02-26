@@ -42,11 +42,6 @@ export function WebSocketProvider({
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    if (autoConnect && !isInitialized.current) {
-      webSocketService.connect();
-      isInitialized.current = true;
-    }
-
     const handleConnect = () => setIsConnected(true);
     const handleDisconnect = () => setIsConnected(false);
 
@@ -57,6 +52,23 @@ export function WebSocketProvider({
     );
 
     setIsConnected(webSocketService.isConnected());
+
+    if (autoConnect && !isInitialized.current) {
+      isInitialized.current = true;
+
+      // Fetch the HttpOnly access_token via a server-side API route so it can
+      // be passed as socket.io auth.token for proper backend authentication.
+      fetch("/api/auth/token", { credentials: "include" })
+        .then((res) => res.json())
+        .then(({ accessToken }: { accessToken: string | null }) => {
+          webSocketService.connect(accessToken ?? undefined);
+        })
+        .catch(() => {
+          // If the fetch fails, connect without a token — the browser will
+          // still send HttpOnly cookies in the handshake (withCredentials).
+          webSocketService.connect();
+        });
+    }
 
     return () => {
       unsubscribeConnect();
