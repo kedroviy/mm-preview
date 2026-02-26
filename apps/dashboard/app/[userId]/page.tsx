@@ -6,7 +6,6 @@ async function getProfileFromServer() {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("access_token");
   const refreshToken = cookieStore.get("refresh_token");
-  // Server component - используем прямой URL (не прокси)
   const { getServerApiUrl } = await import("@mm-preview/sdk");
   const apiUrl = getServerApiUrl();
 
@@ -15,18 +14,13 @@ async function getProfileFromServer() {
   }
 
   try {
-    // Формируем строку кук
     const cookieString = [
-      accessToken ? `access_token=${accessToken.value}` : "",
+      `access_token=${accessToken.value}`,
       refreshToken ? `refresh_token=${refreshToken.value}` : "",
     ]
       .filter(Boolean)
       .join("; ");
 
-    // Делаем запрос к профилю с токеном в Authorization и Cookie
-    // Для серверных запросов добавляем Origin заголовок
-    const origin =
-      process.env.NEXT_PUBLIC_DASHBOARD_URL || "http://localhost:3002";
     const response = await fetch(`${apiUrl}/api/v1/users/profile`, {
       method: "GET",
       headers: {
@@ -35,10 +29,7 @@ async function getProfileFromServer() {
         Authorization: `Bearer ${accessToken.value}`,
         // biome-ignore lint/style/useNamingConvention: HTTP headers must be capitalized
         Cookie: cookieString,
-        // biome-ignore lint/style/useNamingConvention: HTTP headers must be capitalized
-        Origin: origin,
       },
-      credentials: "include",
       cache: "no-store",
     });
 
@@ -46,6 +37,12 @@ async function getProfileFromServer() {
       const profile = await response.json();
       return profile;
     }
+
+    console.error(
+      "[dashboard page] Profile fetch failed:",
+      response.status,
+      await response.text().catch(() => ""),
+    );
   } catch (error) {
     console.error("[dashboard page] Error fetching profile:", error);
   }
@@ -60,7 +57,6 @@ export default async function UserDashboardPage({
 }) {
   const { userId } = await params;
 
-  // Серверный запрос профиля
   const initialProfile = await getProfileFromServer();
 
   return (
