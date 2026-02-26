@@ -155,13 +155,18 @@ export {};
 `;
         // Add specific stub exports for useUsers
         if (fileName === "useUsers") {
-          stubContent = `// This file is a stub. Run "npm run generate:swagger" and "npm run generate:hooks" to generate actual hooks.
-import type { UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
+          stubContent = `// This file is a stub. Run "npm run generate:all" to generate actual hooks.
+import { useQuery, type UseQueryOptions, type UseQueryResult } from '@tanstack/react-query';
 
 export function useUsersController_getProfile(
-  _options?: UseQueryOptions<unknown, Error, unknown, readonly unknown[]>
+  options?: UseQueryOptions<unknown, Error, unknown, readonly unknown[]>
 ): UseQueryResult<unknown, Error> {
-  throw new Error('This is a stub. Run "npm run generate:all" to generate actual hooks.');
+  return useQuery({
+    queryKey: ['users', 'UsersController_getProfile', '__stub__'],
+    queryFn: () => Promise.resolve(null),
+    enabled: false,
+    ...options,
+  }) as UseQueryResult<unknown, Error>;
 }
 
 export const usersKeys = {
@@ -194,18 +199,23 @@ export const usersKeys = {
       // Create stub files for each expected hook file
       const stubFiles = ["useHealth", "useAuth", "useUsers", "useRooms"];
       stubFiles.forEach((fileName) => {
-        let stubContent = `// This file is a stub. Run "npm run generate:swagger" and "npm run generate:hooks" to generate actual hooks.
+        let stubContent = `// This file is a stub. Run "npm run generate:all" to generate actual hooks.
 export {};
 `;
         // Add specific stub exports for useUsers
         if (fileName === "useUsers") {
-          stubContent = `// This file is a stub. Run "npm run generate:swagger" and "npm run generate:hooks" to generate actual hooks.
-import type { UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
+          stubContent = `// This file is a stub. Run "npm run generate:all" to generate actual hooks.
+import { useQuery, type UseQueryOptions, type UseQueryResult } from '@tanstack/react-query';
 
 export function useUsersController_getProfile(
-  _options?: UseQueryOptions<unknown, Error, unknown, readonly unknown[]>
+  options?: UseQueryOptions<unknown, Error, unknown, readonly unknown[]>
 ): UseQueryResult<unknown, Error> {
-  throw new Error('This is a stub. Run "npm run generate:all" to generate actual hooks.');
+  return useQuery({
+    queryKey: ['users', 'UsersController_getProfile', '__stub__'],
+    queryFn: () => Promise.resolve(null),
+    enabled: false,
+    ...options,
+  }) as UseQueryResult<unknown, Error>;
 }
 
 export const usersKeys = {
@@ -328,12 +338,17 @@ export {};
       // Add specific stub exports for useUsers
       if (fileName === "useUsers") {
         stubContent = `// This file is a stub. Generation failed: ${error.message}
-import type { UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
+import { useQuery, type UseQueryOptions, type UseQueryResult } from '@tanstack/react-query';
 
 export function useUsersController_getProfile(
-  _options?: UseQueryOptions<unknown, Error, unknown, readonly unknown[]>
+  options?: UseQueryOptions<unknown, Error, unknown, readonly unknown[]>
 ): UseQueryResult<unknown, Error> {
-  throw new Error('This is a stub. Run "npm run generate:all" to generate actual hooks.');
+  return useQuery({
+    queryKey: ['users', 'UsersController_getProfile', '__stub__'],
+    queryFn: () => Promise.resolve(null),
+    enabled: false,
+    ...options,
+  }) as UseQueryResult<unknown, Error>;
 }
 
 export const usersKeys = {

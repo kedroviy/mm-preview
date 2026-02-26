@@ -1,5 +1,5 @@
 {
-  "buildCommand": "turbo run build",
+  "buildCommand": "npm run sdk:generate && turbo run build",
   "devCommand": "turbo run dev",
   "installCommand": "npm install",
   "framework": null
