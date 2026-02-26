@@ -35,8 +35,7 @@ function generateHook(operation, path, method, tag) {
   const returnType = getReturnType(operation.responses);
 
   if (isMutation) {
-    // Generate mutation hook
-    const bodyType = hasBody ? getBodyType(operation.requestBody) : "void";
+    // Use `any` for data type to avoid importing generated DTO types
 
     return `
 /**
@@ -46,9 +45,9 @@ export function ${hookName}() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (${hasBody ? `data: ${bodyType}` : ""}) => {
+    mutationFn: async (${hasBody ? "data: any" : ""}) => {
       ${pathParams.length > 0 ? `const { ${pathParams.join(", ")}, ...rest } = data as any;` : ""}
-      const response: ApiResponse<${returnType}> = await ${functionName}(${[
+      const response: ApiResponse<any> = await ${functionName}(${[
         pathParams.length > 0 ? `{ ${pathParams.join(", ")} }` : "",
         queryParams.length > 0 ? "rest" : "",
         hasBody && pathParams.length === 0 ? "data" : hasBody ? "rest" : "",
@@ -72,11 +71,11 @@ export function ${hookName}() {
 /**
  * ${operation.summary || operation.description || `${method.toUpperCase()} ${path}`}
  */
-export function ${hookName}(${pathParams.length > 0 ? `path: { ${pathParams.map((p) => `${p}: string`).join(", ")} }, ` : ""}${queryParams.length > 0 ? `params?: { ${queryParams.map((p) => `${p.name}?: ${getTypeFromSchema(p.schema)}`).join(", ")} }, ` : ""}options?: UseQueryOptions<${returnType}>) {
+export function ${hookName}(${pathParams.length > 0 ? `path: { ${pathParams.map((p) => `${p}: string`).join(", ")} }, ` : ""}${queryParams.length > 0 ? `params?: { ${queryParams.map((p) => `${p.name}?: any`).join(", ")} }, ` : ""}options?: UseQueryOptions<any>) {
   return useQuery({
     queryKey: ${queryKeyName}.${functionName}(${pathParams.length > 0 ? "path" : ""}${queryParams.length > 0 ? ", params" : ""}),
     queryFn: async () => {
-      const response: ApiResponse<${returnType}> = await ${functionName}(${[
+      const response: ApiResponse<any> = await ${functionName}(${[
         pathParams.length > 0 ? "path" : "",
         queryParams.length > 0 ? "params" : "",
       ]

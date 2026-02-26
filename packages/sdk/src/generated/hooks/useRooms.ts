@@ -16,7 +16,7 @@ export function useRoomsController_createRoom() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (data: CreateRoomDto) => {
+    mutationFn: async (data: any) => {
       
       const response: ApiResponse<any> = await RoomsController_createRoom(data);
       return response.data;
@@ -32,11 +32,11 @@ export function useRoomsController_createRoom() {
 /**
  * Get current user rooms
  */
-export function useRoomsController_getMyRooms(options?: UseQueryOptions<RoomResponseDto[]>) {
+export function useRoomsController_getMyRooms(options?: UseQueryOptions<any>) {
   return useQuery({
     queryKey: roomsKeys.RoomsController_getMyRooms(),
     queryFn: async () => {
-      const response: ApiResponse<RoomResponseDto[]> = await RoomsController_getMyRooms();
+      const response: ApiResponse<any> = await RoomsController_getMyRooms();
       return response.data;
     },
     ...options,
@@ -47,11 +47,11 @@ export function useRoomsController_getMyRooms(options?: UseQueryOptions<RoomResp
 /**
  * Get room by ID
  */
-export function useRoomsController_getRoom(path: { id: string }, options?: UseQueryOptions<RoomResponseDto>) {
+export function useRoomsController_getRoom(path: { id: string }, options?: UseQueryOptions<any>) {
   return useQuery({
     queryKey: roomsKeys.RoomsController_getRoom(path),
     queryFn: async () => {
-      const response: ApiResponse<RoomResponseDto> = await RoomsController_getRoom(path);
+      const response: ApiResponse<any> = await RoomsController_getRoom(path);
       return response.data;
     },
     ...options,
@@ -66,9 +66,9 @@ export function useRoomsController_joinRoom() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (data: JoinRoomDto) => {
+    mutationFn: async (data: any) => {
       
-      const response: ApiResponse<RoomResponseDto> = await RoomsController_joinRoom(data);
+      const response: ApiResponse<any> = await RoomsController_joinRoom(data);
       return response.data;
     },
     onSuccess: () => {
@@ -88,7 +88,7 @@ export function useRoomsController_leaveRoom() {
   return useMutation({
     mutationFn: async (data: any) => {
       const { id, ...rest } = data as any;
-      const response: ApiResponse<RoomResponseDto> = await RoomsController_leaveRoom({ id }, rest);
+      const response: ApiResponse<any> = await RoomsController_leaveRoom({ id }, rest);
       return response.data;
     },
     onSuccess: () => {
@@ -108,7 +108,7 @@ export function useRoomsController_chooseMovie() {
   return useMutation({
     mutationFn: async (data: any) => {
       const { id, ...rest } = data as any;
-      const response: ApiResponse<RoomResponseDto> = await RoomsController_chooseMovie({ id }, rest);
+      const response: ApiResponse<any> = await RoomsController_chooseMovie({ id }, rest);
       return response.data;
     },
     onSuccess: () => {
@@ -122,11 +122,11 @@ export function useRoomsController_chooseMovie() {
 /**
  * Get room members
  */
-export function useRoomsController_getRoomMembers(path: { id: string }, options?: UseQueryOptions<RoomMembersResponseDto>) {
+export function useRoomsController_getRoomMembers(path: { id: string }, options?: UseQueryOptions<any>) {
   return useQuery({
     queryKey: roomsKeys.RoomsController_getRoomMembers(path),
     queryFn: async () => {
-      const response: ApiResponse<RoomMembersResponseDto> = await RoomsController_getRoomMembers(path);
+      const response: ApiResponse<any> = await RoomsController_getRoomMembers(path);
       return response.data;
     },
     ...options,
@@ -143,7 +143,7 @@ export function useRoomsController_removeUserFromRoom() {
   return useMutation({
     mutationFn: async () => {
       const { id, userId, ...rest } = data as any;
-      const response: ApiResponse<RoomResponseDto> = await RoomsController_removeUserFromRoom({ id, userId });
+      const response: ApiResponse<any> = await RoomsController_removeUserFromRoom({ id, userId });
       return response.data;
     },
     onSuccess: () => {
@@ -178,7 +178,7 @@ export function useRoomsController_muteUser() {
   return useMutation({
     mutationFn: async (data: any) => {
       const { id, userId, ...rest } = data as any;
-      const response: ApiResponse<RoomResponseDto> = await RoomsController_muteUser({ id, userId }, rest);
+      const response: ApiResponse<any> = await RoomsController_muteUser({ id, userId }, rest);
       return response.data;
     },
     onSuccess: () => {
@@ -198,7 +198,7 @@ export function useRoomsController_unmuteUser() {
   return useMutation({
     mutationFn: async () => {
       const { id, userId, ...rest } = data as any;
-      const response: ApiResponse<RoomResponseDto> = await RoomsController_unmuteUser({ id, userId });
+      const response: ApiResponse<any> = await RoomsController_unmuteUser({ id, userId });
       return response.data;
     },
     onSuccess: () => {

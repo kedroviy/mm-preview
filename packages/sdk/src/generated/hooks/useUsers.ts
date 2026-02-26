@@ -14,9 +14,9 @@ export function useUsersController_createUser() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (data: CreateRedisUserDto) => {
+    mutationFn: async (data: any) => {
       
-      const response: ApiResponse<RedisUserResponseDto> = await UsersController_createUser(data);
+      const response: ApiResponse<any> = await UsersController_createUser(data);
       return response.data;
     },
     onSuccess: () => {
@@ -30,11 +30,11 @@ export function useUsersController_createUser() {
 /**
  * Get current user profile
  */
-export function useUsersController_getProfile(options?: UseQueryOptions<UserProfileResponseDto>) {
+export function useUsersController_getProfile(options?: UseQueryOptions<any>) {
   return useQuery({
     queryKey: usersKeys.UsersController_getProfile(),
     queryFn: async () => {
-      const response: ApiResponse<UserProfileResponseDto> = await UsersController_getProfile();
+      const response: ApiResponse<any> = await UsersController_getProfile();
       return response.data;
     },
     ...options,
@@ -45,11 +45,11 @@ export function useUsersController_getProfile(options?: UseQueryOptions<UserProf
 /**
  * Get user by ID (admin only)
  */
-export function useUsersController_getUser(path: { userId: string }, options?: UseQueryOptions<RedisUserResponseDto>) {
+export function useUsersController_getUser(path: { userId: string }, options?: UseQueryOptions<any>) {
   return useQuery({
     queryKey: usersKeys.UsersController_getUser(path),
     queryFn: async () => {
-      const response: ApiResponse<RedisUserResponseDto> = await UsersController_getUser(path);
+      const response: ApiResponse<any> = await UsersController_getUser(path);
       return response.data;
     },
     ...options,
@@ -86,7 +86,7 @@ export function useUsersController_updateName() {
   return useMutation({
     mutationFn: async (data: any) => {
       const { userId, ...rest } = data as any;
-      const response: ApiResponse<RedisUserResponseDto> = await UsersController_updateName({ userId }, rest);
+      const response: ApiResponse<any> = await UsersController_updateName({ userId }, rest);
       return response.data;
     },
     onSuccess: () => {

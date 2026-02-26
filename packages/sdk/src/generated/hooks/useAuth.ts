@@ -9,9 +9,9 @@ export function useAuthController_login() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (data: LoginDto) => {
+    mutationFn: async (data: any) => {
       
-      const response: ApiResponse<LoginResponseDto> = await AuthController_login(data);
+      const response: ApiResponse<any> = await AuthController_login(data);
       return response.data;
     },
     onSuccess: () => {
@@ -29,9 +29,9 @@ export function useAuthController_refreshToken() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (data: RefreshTokenDto) => {
+    mutationFn: async (data: any) => {
       
-      const response: ApiResponse<AuthResponseDto> = await AuthController_refreshToken(data);
+      const response: ApiResponse<any> = await AuthController_refreshToken(data);
       return response.data;
     },
     onSuccess: () => {
