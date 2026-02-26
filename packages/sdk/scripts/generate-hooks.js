@@ -45,7 +45,7 @@ export function ${hookName}() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (${hasBody ? "data: any" : ""}) => {
+    mutationFn: async (${hasBody || pathParams.length > 0 ? "data: any" : ""}) => {
       ${pathParams.length > 0 ? `const { ${pathParams.join(", ")}, ...rest } = data as any;` : ""}
       const response: ApiResponse<any> = await ${functionName}(${[
         pathParams.length > 0 ? `{ ${pathParams.join(", ")} }` : "",

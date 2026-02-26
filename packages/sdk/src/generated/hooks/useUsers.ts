@@ -64,7 +64,7 @@ export function useUsersController_deleteUser() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async (data: any) => {
       const { userId, ...rest } = data as any;
       const response: ApiResponse<any> = await UsersController_deleteUser({ userId });
       return response.data;

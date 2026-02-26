@@ -141,7 +141,7 @@ export function useRoomsController_removeUserFromRoom() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async (data: any) => {
       const { id, userId, ...rest } = data as any;
       const response: ApiResponse<any> = await RoomsController_removeUserFromRoom({ id, userId });
       return response.data;
@@ -196,7 +196,7 @@ export function useRoomsController_unmuteUser() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async (data: any) => {
       const { id, userId, ...rest } = data as any;
       const response: ApiResponse<any> = await RoomsController_unmuteUser({ id, userId });
       return response.data;
