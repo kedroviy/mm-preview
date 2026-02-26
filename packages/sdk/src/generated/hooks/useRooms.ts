@@ -3,10 +3,10 @@ import { RoomsController_createRoom, RoomsController_getMyRooms, RoomsController
 import type { ApiResponse } from '../../types';
 
 export const roomsKeys = {
-  RoomsController_getMyRooms: () => ['rooms', 'RoomsController_getMyRooms'],
-  RoomsController_getRoom: (id: string) => ['rooms', 'RoomsController_getRoom', ...Object.values({ id })],
-  RoomsController_getRoomMembers: (id: string) => ['rooms', 'RoomsController_getRoomMembers', ...Object.values({ id })],
-  RoomsController_getChatHistory: (id: string) => ['rooms', 'RoomsController_getChatHistory', ...Object.values({ id })],
+  RoomsController_getMyRooms: (...args: any[]) => ['rooms', 'RoomsController_getMyRooms', ...args] as const,
+  RoomsController_getRoom: (...args: any[]) => ['rooms', 'RoomsController_getRoom', ...args] as const,
+  RoomsController_getRoomMembers: (...args: any[]) => ['rooms', 'RoomsController_getRoomMembers', ...args] as const,
+  RoomsController_getChatHistory: (...args: any[]) => ['rooms', 'RoomsController_getChatHistory', ...args] as const,
 } as const;
 
 /**

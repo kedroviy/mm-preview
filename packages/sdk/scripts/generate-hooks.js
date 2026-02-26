@@ -293,13 +293,7 @@ export const usersKeys = {
       if (queryKeys.length > 0) {
         queryKeysCode = `\nexport const ${toCamelCase(tag)}Keys = {\n`;
         queryKeys.forEach(({ functionName, pathParams, queryParams }) => {
-          const keyParams = [
-            ...pathParams.map((p) => `${p}: string`),
-            ...queryParams.map(
-              (p) => `${p.name}?: ${getTypeFromSchema(p.schema)}`,
-            ),
-          ];
-          queryKeysCode += `  ${functionName}: (${keyParams.length > 0 ? keyParams.join(", ") : ""}) => ['${tag}', '${functionName}'${pathParams.length > 0 ? `, ...Object.values({ ${pathParams.join(", ")} })` : ""}${queryParams.length > 0 ? ", params" : ""}],\n`;
+              queryKeysCode += `  ${functionName}: (...args: any[]) => ['${tag}', '${functionName}', ...args] as const,\n`;
         });
         queryKeysCode += "} as const;\n";
       }

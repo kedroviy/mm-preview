@@ -3,8 +3,8 @@ import { UsersController_createUser, UsersController_getProfile, UsersController
 import type { ApiResponse } from '../../types';
 
 export const usersKeys = {
-  UsersController_getProfile: () => ['users', 'UsersController_getProfile'],
-  UsersController_getUser: (userId: string) => ['users', 'UsersController_getUser', ...Object.values({ userId })],
+  UsersController_getProfile: (...args: any[]) => ['users', 'UsersController_getProfile', ...args] as const,
+  UsersController_getUser: (...args: any[]) => ['users', 'UsersController_getUser', ...args] as const,
 } as const;
 
 /**

@@ -3,8 +3,8 @@ import { AppController_getHello, AppController_healthCheck } from '../requests/h
 import type { ApiResponse } from '../../types';
 
 export const healthKeys = {
-  AppController_getHello: () => ['health', 'AppController_getHello'],
-  AppController_healthCheck: () => ['health', 'AppController_healthCheck'],
+  AppController_getHello: (...args: any[]) => ['health', 'AppController_getHello', ...args] as const,
+  AppController_healthCheck: (...args: any[]) => ['health', 'AppController_healthCheck', ...args] as const,
 } as const;
 
 /**
