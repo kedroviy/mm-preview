@@ -286,7 +286,7 @@ export const usersKeys = {
       const fileName = `use${toPascalCase(tag)}.ts`;
       const filePath = path.join(OUTPUT_DIR, fileName);
 
-      const imports = `import { useMutation, useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query';\nimport { ${hooks.map((h) => h.functionName).join(", ")} } from '../requests/${toCamelCase(tag)}';\nimport type { ApiResponse } from '../types';\n`;
+      const imports = `import { useMutation, useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query';\nimport { ${hooks.map((h) => h.functionName).join(", ")} } from '../requests/${toCamelCase(tag)}';\nimport type { ApiResponse } from '../../types';\n`;
 
       // Generate query keys
       const queryKeys = queryKeysByTag[tag] || [];
