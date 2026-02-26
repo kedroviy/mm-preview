@@ -1,5 +1,4 @@
 import { api } from '../../client';
-import type { ApiResponse } from '../../types';
 
 /**
  * Health check endpoint

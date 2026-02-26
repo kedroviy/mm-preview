@@ -1,5 +1,4 @@
 import { api } from '../../client';
-import type { ApiResponse } from '../../types';
 
 /**
  * Create a new room
@@ -7,7 +6,7 @@ import type { ApiResponse } from '../../types';
  * @param body - Request body
  * @returns any
  */
-export async function RoomsController_createRoom(body: CreateRoomDto) {
+export async function RoomsController_createRoom(body: any) {
   const url = `/api/v1/rooms`;
   const fullUrl = url;
   
@@ -19,13 +18,13 @@ export async function RoomsController_createRoom(body: CreateRoomDto) {
 /**
  * Get current user rooms
  * Retrieves all rooms where the current user is a member. Requires authentication.
- * @returns RoomResponseDto[]
+ * @returns any[]
  */
 export async function RoomsController_getMyRooms() {
   const url = `/api/v1/rooms/my-rooms`;
   const fullUrl = url;
   
-  const response = await api.get<RoomResponseDto[]>(url);
+  const response = await api.get<any[]>(url);
   return response;
 }
 
@@ -34,13 +33,13 @@ export async function RoomsController_getMyRooms() {
  * Get room by ID
  * Retrieves room data by room ID. Requires authentication.
  * @param params - Request parameters
- * @returns RoomResponseDto
+ * @returns any
  */
 export async function RoomsController_getRoom(path: { id: string }) {
-  const url = `/api/v1/rooms/${id}`;
+  const url = `/api/v1/rooms/${path.id}`;
   const fullUrl = url;
   
-  const response = await api.get<RoomResponseDto>(url);
+  const response = await api.get<any>(url);
   return response;
 }
 
@@ -49,13 +48,13 @@ export async function RoomsController_getRoom(path: { id: string }) {
  * Join a room by public code
  * Adds a user to a room using 6-digit public code and broadcasts the update via WebSocket. Requires authentication.
  * @param body - Request body
- * @returns RoomResponseDto
+ * @returns any
  */
-export async function RoomsController_joinRoom(body: JoinRoomDto) {
+export async function RoomsController_joinRoom(body: any) {
   const url = `/api/v1/rooms/join`;
   const fullUrl = url;
   
-  const response = await api.post<RoomResponseDto>(url, body);
+  const response = await api.post<any>(url, body);
   return response;
 }
 
@@ -65,13 +64,13 @@ export async function RoomsController_joinRoom(body: JoinRoomDto) {
  * Removes a user from a room and broadcasts the update via WebSocket. Requires authentication.
  * @param params - Request parameters
  * @param body - Request body
- * @returns RoomResponseDto
+ * @returns any
  */
 export async function RoomsController_leaveRoom(path: { id: string }, body: any) {
-  const url = `/api/v1/rooms/${id}/leave`;
+  const url = `/api/v1/rooms/${path.id}/leave`;
   const fullUrl = url;
   
-  const response = await api.post<RoomResponseDto>(url, body);
+  const response = await api.post<any>(url, body);
   return response;
 }
 
@@ -81,13 +80,13 @@ export async function RoomsController_leaveRoom(path: { id: string }, body: any)
  * Records a user's movie choice and broadcasts the update via WebSocket. Requires authentication.
  * @param params - Request parameters
  * @param body - Request body
- * @returns RoomResponseDto
+ * @returns any
  */
 export async function RoomsController_chooseMovie(path: { id: string }, body: any) {
-  const url = `/api/v1/rooms/${id}/choice`;
+  const url = `/api/v1/rooms/${path.id}/choice`;
   const fullUrl = url;
   
-  const response = await api.post<RoomResponseDto>(url, body);
+  const response = await api.post<any>(url, body);
   return response;
 }
 
@@ -96,13 +95,13 @@ export async function RoomsController_chooseMovie(path: { id: string }, body: an
  * Get room members
  * Retrieves list of room members with their roles and names. Only room members can view this list. Requires authentication.
  * @param params - Request parameters
- * @returns RoomMembersResponseDto
+ * @returns any
  */
 export async function RoomsController_getRoomMembers(path: { id: string }) {
-  const url = `/api/v1/rooms/${id}/members`;
+  const url = `/api/v1/rooms/${path.id}/members`;
   const fullUrl = url;
   
-  const response = await api.get<RoomMembersResponseDto>(url);
+  const response = await api.get<any>(url);
   return response;
 }
 
@@ -111,13 +110,13 @@ export async function RoomsController_getRoomMembers(path: { id: string }) {
  * Remove user from room
  * Removes a user from the room. Only the room creator can remove users. Requires authentication.
  * @param params - Request parameters
- * @returns RoomResponseDto
+ * @returns any
  */
 export async function RoomsController_removeUserFromRoom(path: { id: string, userId: string }) {
-  const url = `/api/v1/rooms/${id}/members/${userId}`;
+  const url = `/api/v1/rooms/${path.id}/members/${path.userId}`;
   const fullUrl = url;
   
-  const response = await api.delete<RoomResponseDto>(url);
+  const response = await api.delete<any>(url);
   return response;
 }
 
@@ -129,7 +128,7 @@ export async function RoomsController_removeUserFromRoom(path: { id: string, use
  * @returns any
  */
 export async function RoomsController_getChatHistory(path: { id: string }) {
-  const url = `/api/v1/rooms/${id}/chat/history`;
+  const url = `/api/v1/rooms/${path.id}/chat/history`;
   const fullUrl = url;
   
   const response = await api.get<any>(url);
@@ -142,13 +141,13 @@ export async function RoomsController_getChatHistory(path: { id: string }) {
  * Mutes a user in the room chat for specified duration (1, 5, or 10 minutes). Only the room creator can mute users. Requires authentication.
  * @param params - Request parameters
  * @param body - Request body
- * @returns RoomResponseDto
+ * @returns any
  */
 export async function RoomsController_muteUser(path: { id: string, userId: string }, body: any) {
-  const url = `/api/v1/rooms/${id}/members/${userId}/mute`;
+  const url = `/api/v1/rooms/${path.id}/members/${path.userId}/mute`;
   const fullUrl = url;
   
-  const response = await api.post<RoomResponseDto>(url, body);
+  const response = await api.post<any>(url, body);
   return response;
 }
 
@@ -157,12 +156,12 @@ export async function RoomsController_muteUser(path: { id: string, userId: strin
  * Unmute a user in room chat
  * Removes mute from a user in the room chat. Only the room creator can unmute users. Requires authentication.
  * @param params - Request parameters
- * @returns RoomResponseDto
+ * @returns any
  */
 export async function RoomsController_unmuteUser(path: { id: string, userId: string }) {
-  const url = `/api/v1/rooms/${id}/members/${userId}/mute`;
+  const url = `/api/v1/rooms/${path.id}/members/${path.userId}/mute`;
   const fullUrl = url;
   
-  const response = await api.delete<RoomResponseDto>(url);
+  const response = await api.delete<any>(url);
   return response;
 }

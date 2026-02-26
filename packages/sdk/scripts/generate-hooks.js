@@ -108,8 +108,7 @@ function getTypeFromSchema(schema) {
     return `${itemsType}[]`;
   }
   if (schema.$ref) {
-    const refName = schema.$ref.split("/").pop();
-    return refName;
+    return "any";
   }
   return "any";
 }
