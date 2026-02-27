@@ -48,7 +48,6 @@ export {
   getClientApiUrl,
   getServerApiUrl,
   getWebSocketRoomsUrl,
-  getWebSocketUrl,
 } from "./utils/api-url";
 export {
   getCookieDomain,
