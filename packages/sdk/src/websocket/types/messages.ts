@@ -47,8 +47,8 @@ export interface LeftRoomMessage {
  */
 export interface RoomUpdateMessage {
   roomId: string;
-  room: Room;
-  event: "userJoined" | "userLeft" | "movieChosen";
+  room?: Room;
+  event: "userJoined" | "userLeft" | "movieChosen" | "userConnected" | "userDisconnected";
   userId?: string;
   movieId?: string;
 }

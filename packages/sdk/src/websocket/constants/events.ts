@@ -34,6 +34,8 @@ export const ROOM_UPDATE_EVENTS = {
   USER_JOINED: "userJoined",
   USER_LEFT: "userLeft",
   MOVIE_CHOSEN: "movieChosen",
+  USER_CONNECTED: "userConnected",
+  USER_DISCONNECTED: "userDisconnected",
 } as const;
 
 export type ClientEventName =

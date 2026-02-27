@@ -55,19 +55,9 @@ export function WebSocketProvider({
 
     if (autoConnect && !isInitialized.current) {
       isInitialized.current = true;
-
-      // Fetch the HttpOnly access_token via a server-side API route so it can
-      // be passed as socket.io auth.token for proper backend authentication.
-      fetch("/api/auth/token", { credentials: "include" })
-        .then((res) => res.json())
-        .then(({ accessToken }: { accessToken: string | null }) => {
-          webSocketService.connect(accessToken ?? undefined);
-        })
-        .catch(() => {
-          // If the fetch fails, connect without a token — the browser will
-          // still send HttpOnly cookies in the handshake (withCredentials).
-          webSocketService.connect();
-        });
+      // Auth via cookie access_token is automatic (withCredentials: true).
+      // Server also auto-refreshes token via refresh_token cookie.
+      webSocketService.connect();
     }
 
     return () => {
@@ -78,13 +68,12 @@ export function WebSocketProvider({
 
   useEffect(() => {
     const handleError = (error: { code: string; message?: string }) => {
-      // WebSocket auth errors should NOT redirect the user — the page can
-      // function without a live WebSocket connection. The HTTP-only cookies
-      // are sent automatically by the browser on the WS handshake, so the
-      // backend handles auth via cookies (withCredentials: true). If the
-      // socket still fails, we simply stay on the page.
       if (error.code === "UNAUTHORIZED") {
-        console.warn("[WebSocket] Auth error — staying on page:", error.message);
+        // Both tokens are truly expired — redirect to login (user-creation app).
+        const userCreationUrl = getAppUrls().USER_CREATION;
+        if (typeof window !== "undefined") {
+          window.location.href = userCreationUrl;
+        }
       }
     };
 

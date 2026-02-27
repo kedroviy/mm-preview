@@ -2,11 +2,7 @@
 
 import { io, type Socket } from "socket.io-client";
 import { getWebSocketRoomsUrl } from "../utils/api-url";
-import {
-  getAccessToken,
-  removeAllAuthTokens,
-  setAccessToken,
-} from "../utils/cookies";
+import { setAccessToken } from "../utils/cookies";
 import { CLIENT_EVENTS, SERVER_EVENTS } from "./constants/events";
 import type {
   ChatHistoryMessage,
@@ -67,17 +63,15 @@ export class WebSocketService {
 
   /**
    * Подключение к WebSocket namespace /rooms.
-   * @param tokenOverride - explicit token to use (e.g. retrieved from a
-   *   server-side API route when the cookie is HttpOnly and unavailable in JS).
-   *   Falls back to document.cookie read if not provided.
+   * Авторизация происходит автоматически через cookie access_token (withCredentials: true).
+   * Сервер автоматически обновляет токен через refresh_token при необходимости.
    */
-  connect(tokenOverride?: string): void {
+  connect(): void {
     if (this.socket?.connected || this.isConnecting) {
       return;
     }
 
     this.isConnecting = true;
-    const token = tokenOverride ?? getAccessToken();
     const roomsUrl = getWebSocketRoomsUrl();
 
     if (this.shouldStopReconnecting) {
@@ -87,14 +81,13 @@ export class WebSocketService {
 
     try {
       this.socket = io(roomsUrl, {
-        transports: ["websocket", "polling"],
+        transports: ["websocket"],
         reconnection: true,
         reconnectionDelay: 1000,
         reconnectionAttempts: this.maxReconnectAttempts,
         reconnectionDelayMax: 5000,
         timeout: 20000,
         withCredentials: true,
-        ...(token ? { auth: { token } } : {}),
       });
 
       this.setupEventHandlers();
@@ -464,39 +457,12 @@ export class WebSocketService {
   }
 
   /**
-   * Обновить токен и переподключиться (для использования из приложения)
+   * Переподключиться к WebSocket.
+   * Токен обновляется автоматически сервером через refresh_token cookie.
    */
   async refreshTokenAndReconnect(): Promise<void> {
-    const { getRefreshToken } = await import("../utils/cookies");
-    const { authApi } = await import("../services/auth");
-    try {
-      const refreshToken = getRefreshToken();
-      if (!refreshToken) {
-        const response = await authApi.refreshToken();
-        if (response.data?.accessToken) {
-          setAccessToken(response.data.accessToken);
-          this.disconnect();
-          this.connect();
-        }
-      } else {
-        this.disconnect();
-        this.connect();
-      }
-    } catch (err: unknown) {
-      const status = (err as { status?: number })?.status;
-      if (status === 401 || status === 403) {
-        removeAllAuthTokens();
-        this.emit("error", {
-          message: "Требуется повторный вход",
-          code: "UNAUTHORIZED",
-        });
-      } else {
-        this.emit("error", {
-          message: "Не удалось обновить токен",
-          code: "INTERNAL_ERROR",
-        });
-      }
-    }
+    this.disconnect();
+    this.connect();
   }
 }
 
