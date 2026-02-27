@@ -2,7 +2,7 @@
 
 import { io, type Socket } from "socket.io-client";
 import { getWebSocketRoomsUrl } from "../utils/api-url";
-import { setAccessToken } from "../utils/cookies";
+import { removeAllAuthTokens, setAccessToken } from "../utils/cookies";
 import { CLIENT_EVENTS, SERVER_EVENTS } from "./constants/events";
 import type {
   ChatHistoryMessage,
@@ -63,31 +63,25 @@ export class WebSocketService {
 
   /**
    * Подключение к WebSocket namespace /rooms.
-   * Авторизация происходит автоматически через cookie access_token (withCredentials: true).
-   * Сервер автоматически обновляет токен через refresh_token при необходимости.
+   * @param token - JWT access token. Обязателен для cross-domain (onrender.com ≠ moviematch.space),
+   *   так как cookies браузером туда не отправляются. Получается через /api/auth/token на сервере.
    */
-  connect(): void {
+  connect(token?: string): void {
     if (this.socket?.connected || this.isConnecting) {
       return;
     }
 
     this.isConnecting = true;
+    this.shouldStopReconnecting = false;
     const roomsUrl = getWebSocketRoomsUrl();
-
-    if (this.shouldStopReconnecting) {
-      this.isConnecting = false;
-      return;
-    }
 
     try {
       this.socket = io(roomsUrl, {
         transports: ["websocket"],
-        reconnection: true,
-        reconnectionDelay: 1000,
-        reconnectionAttempts: this.maxReconnectAttempts,
-        reconnectionDelayMax: 5000,
+        reconnection: false,
         timeout: 20000,
         withCredentials: true,
+        ...(token ? { auth: { token } } : {}),
       });
 
       this.setupEventHandlers();
@@ -141,29 +135,26 @@ export class WebSocketService {
       this.reconnectAttempts++;
 
       const msg = err?.message ?? "";
-      if (
+      const isAuthError =
         msg.includes("Authentication required") ||
-        msg.includes("UNAUTHORIZED")
-      ) {
-        this.shouldStopReconnecting = true;
-        this.authErrorCount = this.maxAuthErrors;
+        msg.includes("UNAUTHORIZED");
+
+      if (isAuthError) {
         this.cleanupSocket();
-        // Do NOT remove auth tokens here — they may be HttpOnly cookies that
-        // the browser sends automatically; clearing them via document.cookie
-        // would break other requests.
+        // Signal auth failure so the app can fetch a fresh token and reconnect.
         this.emit("error", { message: msg, code: "UNAUTHORIZED" });
         return;
       }
 
-      if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      if (this.reconnectAttempts < this.maxReconnectAttempts) {
+        // Retry with backoff
+        const delay = Math.min(1000 * this.reconnectAttempts, 5000);
+        setTimeout(() => this.connect(), delay);
+      } else {
+        this.cleanupSocket();
         this.emit("error", {
           message: `Не удалось подключиться после ${this.maxReconnectAttempts} попыток`,
           code: "INTERNAL_ERROR",
-        });
-      } else {
-        this.emit("error", {
-          message: msg || "Ошибка подключения",
-          code: "BAD_REQUEST",
         });
       }
     });
@@ -182,8 +173,6 @@ export class WebSocketService {
 
     this.socket.on(SERVER_EVENTS.ERROR, (error: ErrorMessage) => {
       if (error.code === "UNAUTHORIZED") {
-        this.shouldStopReconnecting = true;
-        this.authErrorCount = this.maxAuthErrors;
         this.cleanupSocket();
       }
       this.emit("error", error);

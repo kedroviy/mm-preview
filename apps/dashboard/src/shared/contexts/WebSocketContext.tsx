@@ -41,6 +41,18 @@ export function WebSocketProvider({
   const isInitialized = useRef(false);
   const [isConnected, setIsConnected] = useState(false);
 
+  // Fetches the HttpOnly access_token via a server-side route and connects.
+  // Needed because the WS server is on a different domain (onrender.com)
+  // and the browser won't send moviematch.space cookies cross-domain.
+  const connectWithToken = useCallback(() => {
+    fetch("/api/auth/token", { credentials: "include" })
+      .then((res) => res.json())
+      .then(({ accessToken }: { accessToken: string | null }) => {
+        webSocketService.connect(accessToken ?? undefined);
+      })
+      .catch(() => webSocketService.connect());
+  }, []);
+
   useEffect(() => {
     const handleConnect = () => setIsConnected(true);
     const handleDisconnect = () => setIsConnected(false);
@@ -55,9 +67,7 @@ export function WebSocketProvider({
 
     if (autoConnect && !isInitialized.current) {
       isInitialized.current = true;
-      // Auth via cookie access_token is automatic (withCredentials: true).
-      // Server also auto-refreshes token via refresh_token cookie.
-      webSocketService.connect();
+      connectWithToken();
     }
 
     return () => {
@@ -69,11 +79,20 @@ export function WebSocketProvider({
   useEffect(() => {
     const handleError = (error: { code: string; message?: string }) => {
       if (error.code === "UNAUTHORIZED") {
-        // Both tokens are truly expired — redirect to login (user-creation app).
-        const userCreationUrl = getAppUrls().USER_CREATION;
-        if (typeof window !== "undefined") {
-          window.location.href = userCreationUrl;
-        }
+        // Access token expired or missing — try refreshing via HTTP then reconnect.
+        fetch("/api/v1/auth/refresh", { method: "POST", credentials: "include" })
+          .then((res) => {
+            if (!res.ok) throw new Error("refresh failed");
+            return res.json();
+          })
+          .then(() => connectWithToken())
+          .catch(() => {
+            // Both tokens expired — redirect to login.
+            const userCreationUrl = getAppUrls().USER_CREATION;
+            if (typeof window !== "undefined") {
+              window.location.href = userCreationUrl;
+            }
+          });
       }
     };
 
