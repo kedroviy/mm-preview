@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  getAccessToken,
-  type WebSocketServiceEvents,
-  webSocketService,
-} from "@mm-preview/sdk";
+import { type WebSocketServiceEvents, webSocketService } from "@mm-preview/sdk";
 import {
   createContext,
   type PropsWithChildren,
@@ -45,6 +41,15 @@ export function WebSocketProvider({
   const isInitialized = useRef(false);
   const [isConnected, setIsConnected] = useState(false);
 
+  const connectWithToken = useCallback(() => {
+    fetch("/api/auth/token", { credentials: "include" })
+      .then((res) => res.json())
+      .then(({ accessToken }: { accessToken: string | null }) => {
+        webSocketService.connect(accessToken ?? undefined);
+      })
+      .catch(() => webSocketService.connect());
+  }, []);
+
   useEffect(() => {
     const handleConnect = () => setIsConnected(true);
     const handleDisconnect = () => setIsConnected(false);
@@ -57,64 +62,43 @@ export function WebSocketProvider({
 
     setIsConnected(webSocketService.isConnected());
 
-    if (!autoConnect || isInitialized.current) {
-      return () => {
-        unsubscribeConnect();
-        unsubscribeDisconnect();
-      };
+    if (autoConnect && !isInitialized.current) {
+      isInitialized.current = true;
+      connectWithToken();
     }
-
-    const tryConnect = () => {
-      if (isInitialized.current) {
-        return true;
-      }
-      const token = getAccessToken();
-      if (token) {
-        webSocketService.connect();
-        isInitialized.current = true;
-        return true;
-      }
-      return false;
-    };
-
-    if (tryConnect()) {
-      return () => {
-        unsubscribeConnect();
-        unsubscribeDisconnect();
-      };
-    }
-
-    const pollId = setInterval(() => {
-      if (tryConnect()) {
-        clearInterval(pollId);
-      }
-    }, 1000);
-
-    const stopId = setTimeout(() => clearInterval(pollId), 30_000);
 
     return () => {
       unsubscribeConnect();
       unsubscribeDisconnect();
-      clearInterval(pollId);
-      clearTimeout(stopId);
     };
-  }, [autoConnect]);
+  }, [autoConnect, connectWithToken]);
 
   useEffect(() => {
-    const handleError = (error: { code: string; message: string }) => {
-      if (error.code === "UNAUTHORIZED" && typeof window !== "undefined") {
-        console.warn(
-          "[WebSocket] Auth failed after token refresh attempt:",
-          error.message,
-        );
-        const userCreationUrl = getAppUrls().USER_CREATION;
-        window.location.href = userCreationUrl;
+    const handleError = (error: { code: string; message?: string }) => {
+      if (error.code === "UNAUTHORIZED") {
+        fetch("/api/v1/auth/refresh", {
+          method: "POST",
+          credentials: "include",
+        })
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error("refresh failed");
+            }
+            return res.json();
+          })
+          .then(() => connectWithToken())
+          .catch(() => {
+            const userCreationUrl = getAppUrls().USER_CREATION;
+            if (typeof window !== "undefined") {
+              window.location.href = userCreationUrl;
+            }
+          });
       }
     };
 
     const unsubscribe = webSocketService.on("error", handleError);
     return () => unsubscribe();
-  }, []);
+  }, [connectWithToken]);
 
   const getMyRooms = useCallback(() => webSocketService.getMyRooms(), []);
   const joinRoom = useCallback(

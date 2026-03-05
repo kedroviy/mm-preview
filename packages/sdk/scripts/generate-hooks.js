@@ -35,8 +35,7 @@ function generateHook(operation, path, method, tag) {
   const returnType = getReturnType(operation.responses);
 
   if (isMutation) {
-    // Generate mutation hook
-    const bodyType = hasBody ? getBodyType(operation.requestBody) : "void";
+    // Use `any` for data type to avoid importing generated DTO types
 
     return `
 /**
@@ -46,9 +45,9 @@ export function ${hookName}() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (${hasBody ? `data: ${bodyType}` : ""}) => {
+    mutationFn: async (${hasBody || pathParams.length > 0 ? "data: any" : ""}) => {
       ${pathParams.length > 0 ? `const { ${pathParams.join(", ")}, ...rest } = data as any;` : ""}
-      const response: ApiResponse<${returnType}> = await ${functionName}(${[
+      const response: ApiResponse<any> = await ${functionName}(${[
         pathParams.length > 0 ? `{ ${pathParams.join(", ")} }` : "",
         queryParams.length > 0 ? "rest" : "",
         hasBody && pathParams.length === 0 ? "data" : hasBody ? "rest" : "",
@@ -72,11 +71,11 @@ export function ${hookName}() {
 /**
  * ${operation.summary || operation.description || `${method.toUpperCase()} ${path}`}
  */
-export function ${hookName}(${pathParams.length > 0 ? `path: { ${pathParams.map((p) => `${p}: string`).join(", ")} }, ` : ""}${queryParams.length > 0 ? `params?: { ${queryParams.map((p) => `${p.name}?: ${getTypeFromSchema(p.schema)}`).join(", ")} }, ` : ""}options?: UseQueryOptions<${returnType}>) {
+export function ${hookName}(${pathParams.length > 0 ? `path: { ${pathParams.map((p) => `${p}: string`).join(", ")} }, ` : ""}${queryParams.length > 0 ? `params?: { ${queryParams.map((p) => `${p.name}?: any`).join(", ")} }, ` : ""}options?: UseQueryOptions<any>) {
   return useQuery({
     queryKey: ${queryKeyName}.${functionName}(${pathParams.length > 0 ? "path" : ""}${queryParams.length > 0 ? ", params" : ""}),
     queryFn: async () => {
-      const response: ApiResponse<${returnType}> = await ${functionName}(${[
+      const response: ApiResponse<any> = await ${functionName}(${[
         pathParams.length > 0 ? "path" : "",
         queryParams.length > 0 ? "params" : "",
       ]
@@ -109,8 +108,7 @@ function getTypeFromSchema(schema) {
     return `${itemsType}[]`;
   }
   if (schema.$ref) {
-    const refName = schema.$ref.split("/").pop();
-    return refName;
+    return "any";
   }
   return "any";
 }
@@ -155,13 +153,18 @@ export {};
 `;
         // Add specific stub exports for useUsers
         if (fileName === "useUsers") {
-          stubContent = `// This file is a stub. Run "npm run generate:swagger" and "npm run generate:hooks" to generate actual hooks.
-import type { UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
+          stubContent = `// This file is a stub. Run "npm run generate:all" to generate actual hooks.
+import { useQuery, type UseQueryOptions, type UseQueryResult } from '@tanstack/react-query';
 
 export function useUsersController_getProfile(
-  _options?: UseQueryOptions<unknown, Error, unknown, readonly unknown[]>
+  options?: UseQueryOptions<unknown, Error, unknown, readonly unknown[]>
 ): UseQueryResult<unknown, Error> {
-  throw new Error('This is a stub. Run "npm run generate:all" to generate actual hooks.');
+  return useQuery({
+    queryKey: ['users', 'UsersController_getProfile', '__stub__'],
+    queryFn: () => Promise.resolve(null),
+    enabled: false,
+    ...options,
+  }) as UseQueryResult<unknown, Error>;
 }
 
 export const usersKeys = {
@@ -194,18 +197,23 @@ export const usersKeys = {
       // Create stub files for each expected hook file
       const stubFiles = ["useHealth", "useAuth", "useUsers", "useRooms"];
       stubFiles.forEach((fileName) => {
-        let stubContent = `// This file is a stub. Run "npm run generate:swagger" and "npm run generate:hooks" to generate actual hooks.
+        let stubContent = `// This file is a stub. Run "npm run generate:all" to generate actual hooks.
 export {};
 `;
         // Add specific stub exports for useUsers
         if (fileName === "useUsers") {
-          stubContent = `// This file is a stub. Run "npm run generate:swagger" and "npm run generate:hooks" to generate actual hooks.
-import type { UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
+          stubContent = `// This file is a stub. Run "npm run generate:all" to generate actual hooks.
+import { useQuery, type UseQueryOptions, type UseQueryResult } from '@tanstack/react-query';
 
 export function useUsersController_getProfile(
-  _options?: UseQueryOptions<unknown, Error, unknown, readonly unknown[]>
+  options?: UseQueryOptions<unknown, Error, unknown, readonly unknown[]>
 ): UseQueryResult<unknown, Error> {
-  throw new Error('This is a stub. Run "npm run generate:all" to generate actual hooks.');
+  return useQuery({
+    queryKey: ['users', 'UsersController_getProfile', '__stub__'],
+    queryFn: () => Promise.resolve(null),
+    enabled: false,
+    ...options,
+  }) as UseQueryResult<unknown, Error>;
 }
 
 export const usersKeys = {
@@ -276,7 +284,7 @@ export const usersKeys = {
       const fileName = `use${toPascalCase(tag)}.ts`;
       const filePath = path.join(OUTPUT_DIR, fileName);
 
-      const imports = `import { useMutation, useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query';\nimport { ${hooks.map((h) => h.functionName).join(", ")} } from '../requests/${toCamelCase(tag)}';\nimport type { ApiResponse } from '../types';\n`;
+      const imports = `import { useMutation, useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query';\nimport { ${hooks.map((h) => h.functionName).join(", ")} } from '../requests/${toCamelCase(tag)}';\nimport type { ApiResponse } from '../../types';\n`;
 
       // Generate query keys
       const queryKeys = queryKeysByTag[tag] || [];
@@ -284,13 +292,7 @@ export const usersKeys = {
       if (queryKeys.length > 0) {
         queryKeysCode = `\nexport const ${toCamelCase(tag)}Keys = {\n`;
         queryKeys.forEach(({ functionName, pathParams, queryParams }) => {
-          const keyParams = [
-            ...pathParams.map((p) => `${p}: string`),
-            ...queryParams.map(
-              (p) => `${p.name}?: ${getTypeFromSchema(p.schema)}`,
-            ),
-          ];
-          queryKeysCode += `  ${functionName}: (${keyParams.length > 0 ? keyParams.join(", ") : ""}) => ['${tag}', '${functionName}'${pathParams.length > 0 ? `, ...Object.values({ ${pathParams.join(", ")} })` : ""}${queryParams.length > 0 ? ", params" : ""}],\n`;
+              queryKeysCode += `  ${functionName}: (...args: any[]) => ['${tag}', '${functionName}', ...args] as const,\n`;
         });
         queryKeysCode += "} as const;\n";
       }
@@ -328,12 +330,17 @@ export {};
       // Add specific stub exports for useUsers
       if (fileName === "useUsers") {
         stubContent = `// This file is a stub. Generation failed: ${error.message}
-import type { UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
+import { useQuery, type UseQueryOptions, type UseQueryResult } from '@tanstack/react-query';
 
 export function useUsersController_getProfile(
-  _options?: UseQueryOptions<unknown, Error, unknown, readonly unknown[]>
+  options?: UseQueryOptions<unknown, Error, unknown, readonly unknown[]>
 ): UseQueryResult<unknown, Error> {
-  throw new Error('This is a stub. Run "npm run generate:all" to generate actual hooks.');
+  return useQuery({
+    queryKey: ['users', 'UsersController_getProfile', '__stub__'],
+    queryFn: () => Promise.resolve(null),
+    enabled: false,
+    ...options,
+  }) as UseQueryResult<unknown, Error>;
 }
 
 export const usersKeys = {

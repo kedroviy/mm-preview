@@ -43,7 +43,7 @@ function generateRequestFunction(operation, path, method, tag) {
   const returnType = getReturnType(operation.responses);
 
   const pathWithParams = pathParams.reduce((acc, param) => {
-    return acc.replace(`{${param}}`, `\${${param}}`);
+    return acc.replace(`{${param}}`, `\${path.${param}}`);
   }, path);
 
   const functionCode = `
@@ -100,8 +100,7 @@ function getTypeFromSchema(schema) {
     return `${itemsType}[]`;
   }
   if (schema.$ref) {
-    const refName = schema.$ref.split("/").pop();
-    return refName;
+    return "any";
   }
   return "any";
 }
@@ -210,7 +209,7 @@ export {};
       const fileName = `${toCamelCase(tag)}.ts`;
       const filePath = path.join(OUTPUT_DIR, fileName);
 
-      const imports = `import { api } from '../../client';\nimport type { ApiResponse } from '../../types';\n`;
+      const imports = `import { api } from '../../client';\n`;
       const functions = requests.map((r) => r.functionCode).join("\n");
 
       const content = `${imports}${functions}`;

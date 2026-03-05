@@ -3,7 +3,7 @@
 import type { Room } from "@mm-preview/sdk";
 import {
   getAccessToken,
-  getWebSocketUrl,
+  getWebSocketRoomsUrl,
   setAccessToken,
 } from "@mm-preview/sdk";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -39,7 +39,7 @@ export function useMyRooms(userId: string, enabled = true) {
     try {
       const token = getAccessToken();
       // WebSocket всегда использует прямой URL (не может быть проксирован)
-      const socketUrl = getWebSocketUrl();
+      const socketUrl = getWebSocketRoomsUrl();
 
       console.log("Connecting to Socket.IO for my rooms:", socketUrl);
 

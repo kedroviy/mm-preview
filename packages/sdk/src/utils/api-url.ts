@@ -64,81 +64,26 @@ export function getServerApiUrl(): string {
 }
 
 /**
- * Получить WebSocket URL для Socket.IO
+ * Получить URL для подключения к WebSocket namespace /rooms.
  *
- * Socket.IO автоматически добавляет /socket.io/ к базовому URL, поэтому
- * нужно передавать только базовый URL без пути.
- *
- * В продакшене (Vercel): использует прямой URL к бэкенду (wss://mm-admin-1.onrender.com)
- * Протокол определяется автоматически на основе window.location.protocol (wss:// для HTTPS)
- *
- * ВАЖНО: Vercel не поддерживает WebSocket через rewrites, поэтому в продакшене
- * всегда используется прямой URL к бэкенду с правильным протоколом.
- *
- * В локальной разработке:
- * - Если используется прокси (NEXT_PUBLIC_USE_API_PROXY=true), использует относительный URL ""
- *   Socket.IO автоматически определит протокол (ws:// для localhost) и добавит /socket.io/
- * - Иначе использует прямой URL к бэкенду (ws://localhost:4000)
- */
-export function getWebSocketUrl(): string {
-  // Проверяем, нужно ли использовать прокси (только для локальной разработки)
-  const useProxy =
-    process.env.NEXT_PUBLIC_USE_API_PROXY === "true" &&
-    process.env.NODE_ENV !== "production";
-
-  // В продакшене на Vercel всегда используем прямой URL к бэкенду
-  // так как Vercel не поддерживает WebSocket через rewrites
-  const isProduction = process.env.NODE_ENV === "production";
-
-  if (isProduction || !useProxy) {
-    // Используем прямой URL к бэкенду
-    // BACKEND_URL имеет приоритет
-    let apiUrl = process.env.BACKEND_URL;
-
-    if (!apiUrl) {
-      // Если NEXT_PUBLIC_API_URL - это полный URL, используем его
-      const publicApiUrl = process.env.NEXT_PUBLIC_API_URL;
-      if (publicApiUrl && !publicApiUrl.startsWith("/")) {
-        apiUrl = publicApiUrl.replace(/\/api\/v1\/?$/, "");
-      } else if (isProduction) {
-        // В продакшене, если переменные не установлены, используем дефолтный URL бэкенда
-        // Это fallback для случая, когда BACKEND_URL не установлен в Vercel
-        apiUrl = "https://mm-admin-1.onrender.com";
-      } else {
-        // В разработке используем localhost
-        apiUrl = "http://localhost:4000";
-      }
-    }
-
-    // Определяем протокол автоматически на основе текущего протокола страницы
-    // Это важно для правильного определения wss:// вместо ws://
-    if (typeof window !== "undefined") {
-      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-      const wsUrl = apiUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
-      // Socket.IO использует свой путь /socket.io/, поэтому возвращаем базовый URL
-      // Socket.IO сам добавит /socket.io/ к URL
-      return `${protocol}//${wsUrl}`;
-    }
-
-    // На сервере определяем протокол на основе URL
-    const wsUrl = apiUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
-    const wsProtocol = apiUrl.startsWith("https") ? "wss:" : "ws:";
-    // Socket.IO использует свой путь /socket.io/, поэтому возвращаем базовый URL
-    return `${wsProtocol}//${wsUrl}`;
-  }
-
-  // В локальной разработке с прокси используем относительный URL
-  // Socket.IO автоматически определит протокол (ws:// для localhost)
-  // Socket.IO сам добавит /socket.io/ к URL
-  return "";
-}
-
-/**
- * Получить URL для подключения к WebSocket namespace /rooms
- * Бэкенд использует Socket.IO с namespace `/rooms` — клиент должен подключаться к этому пути.
- * Возвращает полный URL (например wss://host/rooms) или относительный '/rooms' при прокси.
+ * Production: wss://mm-admin-1.onrender.com/rooms (или BACKEND_URL/rooms)
+ * Development: ws://localhost:4000/rooms (или NEXT_PUBLIC_API_URL/rooms)
  */
 export function getWebSocketRoomsUrl(): string {
-  const base = getWebSocketUrl();
-  return base ? `${base}/rooms` : "/rooms";
+  const isProduction = process.env.NODE_ENV === "production";
+
+  let baseUrl: string;
+  if (isProduction) {
+    baseUrl = process.env.BACKEND_URL || "https://mm-admin-1.onrender.com";
+  } else {
+    const publicApiUrl = process.env.NEXT_PUBLIC_API_URL;
+    baseUrl =
+      publicApiUrl && !publicApiUrl.startsWith("/")
+        ? publicApiUrl.replace(/\/api\/v1\/?$/, "")
+        : "http://localhost:4000";
+  }
+
+  const host = baseUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  const protocol = baseUrl.startsWith("https") ? "wss:" : "ws:";
+  return `${protocol}//${host}/rooms`;
 }

@@ -8,6 +8,16 @@ export interface User {
   recentRooms?: string[];
 }
 
+export interface UserProfile extends User {
+  rooms: Array<{
+    roomId: string;
+    publicCode: string;
+    users: string[];
+    isMember?: boolean;
+    isCreator?: boolean;
+  }>;
+}
+
 export interface CreateUserRequest {
   name: string;
   userId?: string;
@@ -19,6 +29,14 @@ export interface UpdateUserRequest {
 
 export const usersApi = {
   /**
+   * Получить профиль текущего аутентифицированного пользователя (из JWT).
+   * GET /api/v1/users/profile
+   */
+  getProfile: async () => {
+    return api.get<UserProfile>("/api/v1/users/profile");
+  },
+
+  /**
    * Получить список пользователей
    */
   getUsers: async (params?: { page?: number; limit?: number }) => {
@@ -26,7 +44,7 @@ export const usersApi = {
   },
 
   /**
-   * Получить пользователя по ID
+   * Получить пользователя по ID (только для admins)
    */
   getUserById: async (userId: string) => {
     return api.get<User>(`/api/v1/users/${userId}`);
@@ -34,7 +52,6 @@ export const usersApi = {
 
   /**
    * Создать нового пользователя
-   * Токен автоматически устанавливается в куки через Set-Cookie заголовок
    */
   createUser: async (data: CreateUserRequest) => {
     return api.post<User>("/api/v1/users", data);

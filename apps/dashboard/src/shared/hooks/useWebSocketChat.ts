@@ -179,13 +179,18 @@ export function useWebSocketChat({
 
     const handleRoomUpdate = (data: {
       roomId: string;
-      room: Room;
+      room?: Room;
       event: string;
       userId?: string;
     }) => {
       if (roomId && data.roomId === roomId) {
-        setIsMuted(data.room.isMuted || false);
-        onRoomUpdateRef.current?.(data);
+        setIsMuted(data.room?.isMuted || false);
+        if (data.room) {
+          onRoomUpdateRef.current?.({
+            ...data,
+            room: data.room,
+          });
+        }
       }
     };
 

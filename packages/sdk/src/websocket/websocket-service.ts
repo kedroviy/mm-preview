@@ -2,11 +2,7 @@
 
 import { io, type Socket } from "socket.io-client";
 import { getWebSocketRoomsUrl } from "../utils/api-url";
-import {
-  getAccessToken,
-  removeAllAuthTokens,
-  setAccessToken,
-} from "../utils/cookies";
+import { removeAllAuthTokens, setAccessToken } from "../utils/cookies";
 import { CLIENT_EVENTS, SERVER_EVENTS } from "./constants/events";
 import type {
   ChatHistoryMessage,
@@ -60,46 +56,33 @@ export class WebSocketService {
   private currentRoomId: string | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
-  private authErrorCount = 0;
-  private maxAuthErrors = 3;
   private isConnecting = false;
   private shouldStopReconnecting = false;
 
   /**
    * Подключение к WebSocket namespace /rooms.
    * Resets all blocking flags — each explicit call is treated as a fresh attempt.
-   * Will silently return (without error) if no access token is available yet;
-   * the caller is expected to retry when a token becomes available.
+   * @param token - JWT access token. Required for cross-domain (onrender.com != moviematch.space).
+   *   If omitted the connection is attempted without auth (will likely fail on deployed envs).
    */
-  connect(): void {
+  connect(token?: string): void {
     if (this.socket?.connected || this.isConnecting) {
       return;
     }
 
     this.shouldStopReconnecting = false;
-    this.authErrorCount = 0;
     this.reconnectAttempts = 0;
     this.isConnecting = true;
-
-    const token = getAccessToken();
-
-    if (!token) {
-      this.isConnecting = false;
-      return;
-    }
 
     const roomsUrl = getWebSocketRoomsUrl();
 
     try {
       this.socket = io(roomsUrl, {
-        transports: ["websocket", "polling"],
-        reconnection: true,
-        reconnectionDelay: 1000,
-        reconnectionAttempts: this.maxReconnectAttempts,
-        reconnectionDelayMax: 5000,
+        transports: ["websocket"],
+        reconnection: false,
         timeout: 20000,
         withCredentials: true,
-        auth: { token },
+        ...(token ? { auth: { token } } : {}),
       });
 
       this.setupEventHandlers();
@@ -131,9 +114,6 @@ export class WebSocketService {
 
     this.socket.on("connect", () => {
       this.reconnectAttempts = 0;
-      if (!this.shouldStopReconnecting) {
-        this.authErrorCount = 0;
-      }
       this.isConnecting = false;
       this.emit("connect");
     });
@@ -157,27 +137,16 @@ export class WebSocketService {
         msg.includes("Authentication required") || msg.includes("UNAUTHORIZED");
 
       if (isAuthError) {
-        this.authErrorCount++;
-
-        // Stop Socket.IO auto-reconnection while we try to refresh
-        this.socket?.disconnect();
-
-        if (this.authErrorCount >= this.maxAuthErrors) {
-          this.shouldStopReconnecting = true;
-          this.cleanupSocket();
-          this.emit("error", { message: msg, code: "UNAUTHORIZED" });
-          return;
-        }
-
-        this.refreshTokenAndReconnect().catch(() => {
-          this.shouldStopReconnecting = true;
-          this.cleanupSocket();
-          this.emit("error", { message: msg, code: "UNAUTHORIZED" });
-        });
+        this.cleanupSocket();
+        this.emit("error", { message: msg, code: "UNAUTHORIZED" });
         return;
       }
 
-      if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      if (this.reconnectAttempts < this.maxReconnectAttempts) {
+        const delay = Math.min(1000 * this.reconnectAttempts, 5000);
+        setTimeout(() => this.connect(), delay);
+      } else {
+        this.cleanupSocket();
         this.emit("error", {
           message: `Не удалось подключиться после ${this.maxReconnectAttempts} попыток`,
           code: "INTERNAL_ERROR",
@@ -190,7 +159,6 @@ export class WebSocketService {
       (data: TokenRefreshedMessage) => {
         if (data.accessToken) {
           setAccessToken(data.accessToken);
-          this.authErrorCount = 0;
           this.shouldStopReconnecting = false;
         }
         this.emit("tokenRefreshed", data);
@@ -199,11 +167,7 @@ export class WebSocketService {
 
     this.socket.on(SERVER_EVENTS.ERROR, (error: ErrorMessage) => {
       if (error.code === "UNAUTHORIZED") {
-        this.authErrorCount++;
-        if (this.authErrorCount >= this.maxAuthErrors) {
-          this.shouldStopReconnecting = true;
-          this.cleanupSocket();
-        }
+        this.cleanupSocket();
       }
       this.emit("error", error);
     });
@@ -452,10 +416,6 @@ export class WebSocketService {
       return;
     }
 
-    const _isUUID =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-        roomId,
-      );
     const isPublicCode = /^\d{6}$/.test(roomId);
 
     if (isPublicCode) {
@@ -488,9 +448,8 @@ export class WebSocketService {
         setAccessToken(response.data.accessToken);
         this.cleanupSocket();
         this.shouldStopReconnecting = false;
-        this.authErrorCount = 0;
         this.reconnectAttempts = 0;
-        this.connect();
+        this.connect(response.data.accessToken);
         return;
       }
 

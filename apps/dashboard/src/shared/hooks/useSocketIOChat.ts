@@ -3,7 +3,7 @@
 import type { ChatMessage } from "@mm-preview/sdk";
 import {
   getAccessToken,
-  getWebSocketUrl,
+  getWebSocketRoomsUrl,
   setAccessToken,
 } from "@mm-preview/sdk";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -61,7 +61,7 @@ export function useSocketIOChat({
 
       // Формируем URL для Socket.IO
       // WebSocket всегда использует прямой URL (не может быть проксирован)
-      const socketUrl = getWebSocketUrl();
+      const socketUrl = getWebSocketRoomsUrl();
 
       console.log("Connecting to Socket.IO:", socketUrl);
 

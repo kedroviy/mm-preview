@@ -25,7 +25,7 @@
     "test": "turbo run test",
     "storybook": "turbo run storybook",
     "sdk:generate": "npm run generate:all -w @mm-preview/sdk",
-    "sdk:generate:swagger": "npm -C packages/sdk run generate:swagger"
+    "sdk:update-swagger": "node packages/sdk/scripts/fetch-live-swagger.js && npm run sdk:generate"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",
