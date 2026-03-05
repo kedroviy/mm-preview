@@ -66,21 +66,29 @@ export class WebSocketService {
   private shouldStopReconnecting = false;
 
   /**
-   * Подключение к WebSocket namespace /rooms
+   * Подключение к WebSocket namespace /rooms.
+   * Resets all blocking flags — each explicit call is treated as a fresh attempt.
+   * Will silently return (without error) if no access token is available yet;
+   * the caller is expected to retry when a token becomes available.
    */
   connect(): void {
     if (this.socket?.connected || this.isConnecting) {
       return;
     }
 
+    this.shouldStopReconnecting = false;
+    this.authErrorCount = 0;
+    this.reconnectAttempts = 0;
     this.isConnecting = true;
-    const token = getAccessToken();
-    const roomsUrl = getWebSocketRoomsUrl();
 
-    if (this.shouldStopReconnecting) {
+    const token = getAccessToken();
+
+    if (!token) {
       this.isConnecting = false;
       return;
     }
+
+    const roomsUrl = getWebSocketRoomsUrl();
 
     try {
       this.socket = io(roomsUrl, {
@@ -91,7 +99,7 @@ export class WebSocketService {
         reconnectionDelayMax: 5000,
         timeout: 20000,
         withCredentials: true,
-        ...(token ? { auth: { token } } : {}),
+        auth: { token },
       });
 
       this.setupEventHandlers();
@@ -145,15 +153,27 @@ export class WebSocketService {
       this.reconnectAttempts++;
 
       const msg = err?.message ?? "";
-      if (
-        msg.includes("Authentication required") ||
-        msg.includes("UNAUTHORIZED")
-      ) {
-        this.shouldStopReconnecting = true;
-        this.authErrorCount = this.maxAuthErrors;
-        this.cleanupSocket();
-        removeAllAuthTokens();
-        this.emit("error", { message: msg, code: "UNAUTHORIZED" });
+      const isAuthError =
+        msg.includes("Authentication required") || msg.includes("UNAUTHORIZED");
+
+      if (isAuthError) {
+        this.authErrorCount++;
+
+        // Stop Socket.IO auto-reconnection while we try to refresh
+        this.socket?.disconnect();
+
+        if (this.authErrorCount >= this.maxAuthErrors) {
+          this.shouldStopReconnecting = true;
+          this.cleanupSocket();
+          this.emit("error", { message: msg, code: "UNAUTHORIZED" });
+          return;
+        }
+
+        this.refreshTokenAndReconnect().catch(() => {
+          this.shouldStopReconnecting = true;
+          this.cleanupSocket();
+          this.emit("error", { message: msg, code: "UNAUTHORIZED" });
+        });
         return;
       }
 
@@ -161,11 +181,6 @@ export class WebSocketService {
         this.emit("error", {
           message: `Не удалось подключиться после ${this.maxReconnectAttempts} попыток`,
           code: "INTERNAL_ERROR",
-        });
-      } else {
-        this.emit("error", {
-          message: msg || "Ошибка подключения",
-          code: "BAD_REQUEST",
         });
       }
     });
@@ -184,10 +199,11 @@ export class WebSocketService {
 
     this.socket.on(SERVER_EVENTS.ERROR, (error: ErrorMessage) => {
       if (error.code === "UNAUTHORIZED") {
-        this.shouldStopReconnecting = true;
-        this.authErrorCount = this.maxAuthErrors;
-        this.cleanupSocket();
-        removeAllAuthTokens();
+        this.authErrorCount++;
+        if (this.authErrorCount >= this.maxAuthErrors) {
+          this.shouldStopReconnecting = true;
+          this.cleanupSocket();
+        }
       }
       this.emit("error", error);
     });
@@ -460,38 +476,31 @@ export class WebSocketService {
   }
 
   /**
-   * Обновить токен и переподключиться (для использования из приложения)
+   * Обновить токен и переподключиться (для использования из приложения).
+   * Rejects if the refresh fails — caller decides what to do next.
    */
   async refreshTokenAndReconnect(): Promise<void> {
-    const { getRefreshToken } = await import("../utils/cookies");
-    const { authApi } = await import("../services/auth");
     try {
-      const refreshToken = getRefreshToken();
-      if (!refreshToken) {
-        const response = await authApi.refreshToken();
-        if (response.data?.accessToken) {
-          setAccessToken(response.data.accessToken);
-          this.disconnect();
-          this.connect();
-        }
-      } else {
-        this.disconnect();
+      const { authApi } = await import("../services/auth");
+      const response = await authApi.refreshToken();
+
+      if (response.data?.accessToken) {
+        setAccessToken(response.data.accessToken);
+        this.cleanupSocket();
+        this.shouldStopReconnecting = false;
+        this.authErrorCount = 0;
+        this.reconnectAttempts = 0;
         this.connect();
+        return;
       }
+
+      throw new Error("No access token in refresh response");
     } catch (err: unknown) {
       const status = (err as { status?: number })?.status;
       if (status === 401 || status === 403) {
         removeAllAuthTokens();
-        this.emit("error", {
-          message: "Требуется повторный вход",
-          code: "UNAUTHORIZED",
-        });
-      } else {
-        this.emit("error", {
-          message: "Не удалось обновить токен",
-          code: "INTERNAL_ERROR",
-        });
       }
+      throw err;
     }
   }
 }

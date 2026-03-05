@@ -1,6 +1,10 @@
 "use client";
 
-import { type WebSocketServiceEvents, webSocketService } from "@mm-preview/sdk";
+import {
+  getAccessToken,
+  type WebSocketServiceEvents,
+  webSocketService,
+} from "@mm-preview/sdk";
 import {
   createContext,
   type PropsWithChildren,
@@ -42,11 +46,6 @@ export function WebSocketProvider({
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    if (autoConnect && !isInitialized.current) {
-      webSocketService.connect();
-      isInitialized.current = true;
-    }
-
     const handleConnect = () => setIsConnected(true);
     const handleDisconnect = () => setIsConnected(false);
 
@@ -58,15 +57,56 @@ export function WebSocketProvider({
 
     setIsConnected(webSocketService.isConnected());
 
+    if (!autoConnect || isInitialized.current) {
+      return () => {
+        unsubscribeConnect();
+        unsubscribeDisconnect();
+      };
+    }
+
+    const tryConnect = () => {
+      if (isInitialized.current) {
+        return true;
+      }
+      const token = getAccessToken();
+      if (token) {
+        webSocketService.connect();
+        isInitialized.current = true;
+        return true;
+      }
+      return false;
+    };
+
+    if (tryConnect()) {
+      return () => {
+        unsubscribeConnect();
+        unsubscribeDisconnect();
+      };
+    }
+
+    const pollId = setInterval(() => {
+      if (tryConnect()) {
+        clearInterval(pollId);
+      }
+    }, 1000);
+
+    const stopId = setTimeout(() => clearInterval(pollId), 30_000);
+
     return () => {
       unsubscribeConnect();
       unsubscribeDisconnect();
+      clearInterval(pollId);
+      clearTimeout(stopId);
     };
   }, [autoConnect]);
 
   useEffect(() => {
-    const handleError = (error: { code: string }) => {
+    const handleError = (error: { code: string; message: string }) => {
       if (error.code === "UNAUTHORIZED" && typeof window !== "undefined") {
+        console.warn(
+          "[WebSocket] Auth failed after token refresh attempt:",
+          error.message,
+        );
         const userCreationUrl = getAppUrls().USER_CREATION;
         window.location.href = userCreationUrl;
       }
