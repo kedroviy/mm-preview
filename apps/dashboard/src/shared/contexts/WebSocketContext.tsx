@@ -1,6 +1,10 @@
 "use client";
 
-import { type WebSocketServiceEvents, webSocketService } from "@mm-preview/sdk";
+import {
+  setAccessToken,
+  type WebSocketServiceEvents,
+  webSocketService,
+} from "@mm-preview/sdk";
 import {
   createContext,
   type PropsWithChildren,
@@ -12,6 +16,8 @@ import {
   useState,
 } from "react";
 import { getAppUrls } from "../config/constants";
+
+const MAX_AUTH_RETRIES = 2;
 
 interface WebSocketContextValue {
   isConnected: boolean;
@@ -40,6 +46,7 @@ export function WebSocketProvider({
 }: PropsWithChildren<{ autoConnect?: boolean }>) {
   const isInitialized = useRef(false);
   const [isConnected, setIsConnected] = useState(false);
+  const authRetryCount = useRef(0);
 
   const connectWithToken = useCallback(() => {
     fetch("/api/auth/token", { credentials: "include" })
@@ -50,8 +57,17 @@ export function WebSocketProvider({
       .catch(() => webSocketService.connect());
   }, []);
 
+  const redirectToLogin = useCallback(() => {
+    if (typeof window !== "undefined") {
+      window.location.href = getAppUrls().USER_CREATION;
+    }
+  }, []);
+
   useEffect(() => {
-    const handleConnect = () => setIsConnected(true);
+    const handleConnect = () => {
+      setIsConnected(true);
+      authRetryCount.current = 0;
+    };
     const handleDisconnect = () => setIsConnected(false);
 
     const unsubscribeConnect = webSocketService.on("connect", handleConnect);
@@ -75,30 +91,41 @@ export function WebSocketProvider({
 
   useEffect(() => {
     const handleError = (error: { code: string; message?: string }) => {
-      if (error.code === "UNAUTHORIZED") {
-        fetch("/api/v1/auth/refresh", {
-          method: "POST",
-          credentials: "include",
-        })
-          .then((res) => {
-            if (!res.ok) {
-              throw new Error("refresh failed");
-            }
-            return res.json();
-          })
-          .then(() => connectWithToken())
-          .catch(() => {
-            const userCreationUrl = getAppUrls().USER_CREATION;
-            if (typeof window !== "undefined") {
-              window.location.href = userCreationUrl;
-            }
-          });
+      if (error.code !== "UNAUTHORIZED") {
+        return;
       }
+
+      authRetryCount.current++;
+
+      if (authRetryCount.current > MAX_AUTH_RETRIES) {
+        redirectToLogin();
+        return;
+      }
+
+      fetch("/api/v1/auth/refresh", {
+        method: "POST",
+        credentials: "include",
+      })
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("refresh failed");
+          }
+          return res.json();
+        })
+        .then((data: { accessToken?: string } | undefined) => {
+          if (data?.accessToken) {
+            setAccessToken(data.accessToken);
+            webSocketService.connect(data.accessToken);
+          } else {
+            connectWithToken();
+          }
+        })
+        .catch(() => redirectToLogin());
     };
 
     const unsubscribe = webSocketService.on("error", handleError);
     return () => unsubscribe();
-  }, [connectWithToken]);
+  }, [connectWithToken, redirectToLogin]);
 
   const getMyRooms = useCallback(() => webSocketService.getMyRooms(), []);
   const joinRoom = useCallback(
