@@ -25,7 +25,11 @@ interface WebSocketContextValue {
   joinRoom: (publicCode: string, userId: string) => void;
   leaveRoom: (roomId: string, userId: string) => void;
   sendMessage: (roomId: string, message: string) => void;
-  reconnectToRoom: (roomId: string, publicCode: string, userId: string) => void;
+  reconnectToRoom: (
+    roomId: string,
+    publicCode: string,
+    userId: string,
+  ) => void;
   getCurrentRoomId: () => string | null;
   refreshTokenAndReconnect: () => Promise<void>;
   on: <T extends keyof WebSocketServiceEvents>(
@@ -47,6 +51,7 @@ export function WebSocketProvider({
   const isInitialized = useRef(false);
   const [isConnected, setIsConnected] = useState(false);
   const authRetryCount = useRef(0);
+  const isRetrying = useRef(false);
 
   const connectWithToken = useCallback(() => {
     fetch("/api/auth/token", { credentials: "include" })
@@ -64,16 +69,24 @@ export function WebSocketProvider({
   }, []);
 
   useEffect(() => {
-    const handleConnect = () => {
-      setIsConnected(true);
-      authRetryCount.current = 0;
-    };
+    const handleConnect = () => setIsConnected(true);
     const handleDisconnect = () => setIsConnected(false);
+
+    const resetAuthRetries = () => {
+      authRetryCount.current = 0;
+      isRetrying.current = false;
+    };
 
     const unsubscribeConnect = webSocketService.on("connect", handleConnect);
     const unsubscribeDisconnect = webSocketService.on(
       "disconnect",
       handleDisconnect,
+    );
+    const unsubJoinedRoom = webSocketService.on("joinedRoom", resetAuthRetries);
+    const unsubMyRooms = webSocketService.on("myRooms", resetAuthRetries);
+    const unsubTokenRefreshed = webSocketService.on(
+      "tokenRefreshed",
+      resetAuthRetries,
     );
 
     setIsConnected(webSocketService.isConnected());
@@ -86,12 +99,19 @@ export function WebSocketProvider({
     return () => {
       unsubscribeConnect();
       unsubscribeDisconnect();
+      unsubJoinedRoom();
+      unsubMyRooms();
+      unsubTokenRefreshed();
     };
   }, [autoConnect, connectWithToken]);
 
   useEffect(() => {
     const handleError = (error: { code: string; message?: string }) => {
       if (error.code !== "UNAUTHORIZED") {
+        return;
+      }
+
+      if (isRetrying.current) {
         return;
       }
 
@@ -102,7 +122,9 @@ export function WebSocketProvider({
         return;
       }
 
-      fetch("/api/v1/auth/refresh", {
+      isRetrying.current = true;
+
+      fetch("/api/auth/refresh", {
         method: "POST",
         credentials: "include",
       })
@@ -113,14 +135,18 @@ export function WebSocketProvider({
           return res.json();
         })
         .then((data: { accessToken?: string } | undefined) => {
+          isRetrying.current = false;
           if (data?.accessToken) {
             setAccessToken(data.accessToken);
             webSocketService.connect(data.accessToken);
           } else {
-            connectWithToken();
+            redirectToLogin();
           }
         })
-        .catch(() => redirectToLogin());
+        .catch(() => {
+          isRetrying.current = false;
+          redirectToLogin();
+        });
     };
 
     const unsubscribe = webSocketService.on("error", handleError);
