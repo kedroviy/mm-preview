@@ -1,8 +1,7 @@
-import { cookies } from "next/headers";
-import type { ApiError, ApiResponse, RequestConfig } from "./types";
+import type { ApiError, ApiResponse, Client, RequestConfig } from "./types";
 import { getServerApiUrl } from "./utils/api-url";
 
-class ServerApiClient {
+class ServerApiClient implements Client {
   private baseURL: string;
   private defaultHeaders: HeadersInit;
   private timeout: number;
@@ -12,8 +11,6 @@ class ServerApiClient {
     timeout?: number;
     headers?: HeadersInit;
   }) {
-    // Server-side клиент всегда использует прямой URL (не прокси)
-    // так как серверные запросы идут напрямую, минуя Vercel rewrites
     this.baseURL = config?.baseURL || getServerApiUrl();
     this.timeout = config?.timeout || 30000;
     this.defaultHeaders = {
@@ -23,18 +20,23 @@ class ServerApiClient {
   }
 
   private buildURL(url: string, params?: RequestConfig["params"]): string {
-    const fullURL = url.startsWith("http") ? url : `${this.baseURL}${url}`;
+    let base = this.baseURL;
+    if (base.endsWith("/api/v1") && url.startsWith("/api/v1")) {
+      base = base.replace(/\/api\/v1\/?$/, "");
+    }
+
+    const fullURL = url.startsWith("http") ? url : `${base}${url}`;
 
     if (!params || Object.keys(params).length === 0) {
       return fullURL;
     }
 
     const searchParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(params)) {
       if (value !== null && value !== undefined) {
         searchParams.append(key, String(value));
       }
-    });
+    }
 
     const separator = fullURL.includes("?") ? "&" : "?";
     return `${fullURL}${separator}${searchParams.toString()}`;
@@ -47,28 +49,23 @@ class ServerApiClient {
     const { params, timeout = this.timeout, ...fetchConfig } = config;
 
     const fullURL = this.buildURL(url, params);
-    const cookieStore = await cookies();
-    const token = cookieStore.get("access_token")?.value;
-
     const headers: Record<string, string> = {
       ...(this.defaultHeaders as Record<string, string>),
       ...(fetchConfig.headers as Record<string, string>),
     };
 
-    // Добавляем токен в заголовок Authorization, если он есть
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
+      const { credentials: _, ...restFetchConfig } = fetchConfig;
+
       const response = await fetch(fullURL, {
-        ...fetchConfig,
+        ...restFetchConfig,
         headers,
         signal: controller.signal,
-        credentials: "include",
+        credentials: fetchConfig.credentials ?? "include",
+        cache: "no-store",
       });
 
       clearTimeout(timeoutId);
@@ -79,7 +76,7 @@ class ServerApiClient {
           const errorData = await response.json();
           errorMessage = errorData.message || errorData.error || errorMessage;
         } catch {
-          // If response is not JSON, use default error message
+          // not JSON
         }
 
         const error: ApiError = {
@@ -102,17 +99,10 @@ class ServerApiClient {
 
       if (error instanceof Error) {
         if (error.name === "AbortError") {
-          throw {
-            message: "Request timeout",
-            code: "TIMEOUT",
-          } as ApiError;
+          throw { message: "Request timeout", code: "TIMEOUT" } as ApiError;
         }
-
-        throw {
-          message: error.message,
-        } as ApiError;
+        throw { message: error.message } as ApiError;
       }
-
       throw error;
     }
   }
@@ -163,6 +153,29 @@ class ServerApiClient {
   ): Promise<ApiResponse<T>> {
     return this.request<T>(url, { ...config, method: "DELETE" });
   }
+}
+
+/**
+ * Create a server-side API client.
+ * Pass cookies and auth headers via options factory `headers` param.
+ *
+ * @example
+ * ```ts
+ * const client = createServerClient();
+ * await queryClient.prefetchQuery({
+ *   ...getUserProfileOptions({
+ *     client,
+ *     headers: { Cookie: cookieStore.toString(), Authorization: `Bearer ${token}` },
+ *   }),
+ * });
+ * ```
+ */
+export function createServerClient(config?: {
+  baseURL?: string;
+  timeout?: number;
+  headers?: HeadersInit;
+}): Client {
+  return new ServerApiClient(config);
 }
 
 export const serverApi = new ServerApiClient();

@@ -43,7 +43,7 @@ export { roomsApi } from "./services/rooms";
 export type { CreateUserRequest, User } from "./services/users";
 export { usersApi } from "./services/users";
 // Types
-export type { ApiError, ApiResponse, RequestConfig } from "./types";
+export type { ApiError, ApiResponse, Client, RequestConfig } from "./types";
 export {
   getClientApiUrl,
   getServerApiUrl,
@@ -96,7 +96,12 @@ export {
 // Server-side exports are not included in main index to avoid importing next/headers in client code
 // Use direct fetch in server components instead
 
+// Server client (use in server components / RSC)
+export { createServerClient } from "./client-server";
+
 export * from "./generated/hooks";
+export * from "./generated/options";
 export * from "./generated/requests";
+export * from "./generated/schemas";
 // Generated exports (will be available after running generate:all)
 export * from "./generated/types";

@@ -5,7 +5,9 @@ const { execSync } = require("node:child_process");
 const scripts = [
   "generate:swagger",
   "generate:types",
+  "generate:schemas",
   "generate:requests",
+  "generate:options",
   "generate:hooks",
 ];
 

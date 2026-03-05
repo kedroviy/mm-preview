@@ -5,6 +5,7 @@ const SDK_ROOT = path.join(__dirname, "..");
 const GENERATED_DIR = path.join(SDK_ROOT, "src", "generated");
 const REQUESTS_DIR = path.join(GENERATED_DIR, "requests");
 const HOOKS_DIR = path.join(GENERATED_DIR, "hooks");
+const OPTIONS_DIR = path.join(GENERATED_DIR, "options");
 
 // Ensure directories exist
 function ensureDir(dir) {
@@ -111,11 +112,45 @@ ${indexExports.join("\n")}
   }
 }
 
+// Create stub schemas
+function createSchemasStub() {
+  const schemasPath = path.join(GENERATED_DIR, "schemas.ts");
+  if (!fs.existsSync(schemasPath)) {
+    fs.writeFileSync(schemasPath, "export {};\n");
+    console.log("✓ Created stub: schemas.ts");
+  }
+}
+
+// Create stub options
+function createOptionsStub() {
+  ensureDir(OPTIONS_DIR);
+
+  const optionFiles = ["health", "auth", "users", "rooms"];
+  const indexExports = [];
+
+  optionFiles.forEach((fileName) => {
+    const filePath = path.join(OPTIONS_DIR, `${fileName}.ts`);
+    if (!fs.existsSync(filePath)) {
+      fs.writeFileSync(filePath, "export {};\n");
+      console.log(`✓ Created stub: options/${fileName}.ts`);
+    }
+    indexExports.push(`export * from './${fileName}';`);
+  });
+
+  const indexPath = path.join(OPTIONS_DIR, "index.ts");
+  if (!fs.existsSync(indexPath)) {
+    fs.writeFileSync(indexPath, `${indexExports.join("\n")}\n`);
+    console.log("✓ Created stub: options/index.ts");
+  }
+}
+
 // Main function
 function main() {
   console.log("Creating stub files for generated SDK modules...");
   createTypesStub();
+  createSchemasStub();
   createRequestsStub();
+  createOptionsStub();
   createHooksStub();
   console.log("✓ All stub files created/verified");
 }
