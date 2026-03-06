@@ -35,125 +35,81 @@ function getDashboardUrl(request: NextRequest): string {
 }
 
 export async function middleware(request: NextRequest) {
-  // Проверяем, что мы на странице user-creation (корневой путь)
   const pathname = request.nextUrl.pathname;
-  const isUserCreationPage = pathname === "/";
 
-  // Если не на странице создания пользователя, пропускаем
-  if (!isUserCreationPage) {
+  // 1. Ограничиваем работу только главной страницей (создание юзера)
+  if (pathname !== "/") return NextResponse.next();
+
+  const accessToken = request.cookies.get("access_token")?.value;
+  const refreshToken = request.cookies.get("refresh_token")?.value;
+
+  // 2. Сценарий: Токенов нет вообще — ничего не делаем, показываем форму
+  if (!accessToken && !refreshToken) {
     return NextResponse.next();
   }
 
-  // Проверяем access_token в куках
-  const accessToken = request.cookies.get("access_token");
-  const refreshToken = request.cookies.get("refresh_token");
-  // Middleware работает на сервере, используем прямой URL (не прокси)
-  const { getServerApiUrl } = await import("@mm-preview/sdk");
+  const { decodeJWT, getServerApiUrl } = await import("@mm-preview/sdk");
   const apiUrl = getServerApiUrl();
 
-  if (!accessToken?.value) {
-    if (!refreshToken?.value) {
-      // Нет ни access_token, ни refresh_token - показываем форму
-      return NextResponse.next();
-    } else {
-      // Есть refresh_token, но нет access_token - пытаемся обновить
-      try {
-        const refreshCookieString = `refresh_token=${refreshToken.value}`;
+  // 3. Сценарий: Есть валидный Access Token — сразу редирект
+  if (accessToken) {
+    const decoded = decodeJWT(accessToken);
+    const userId = decoded?.sub || decoded?.userId;
 
-        const refreshResponse = await fetch(`${apiUrl}/auth/refresh`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Cookie: refreshCookieString,
-            Origin:
-              request.headers.get("origin") ||
-              request.url.split("/").slice(0, 3).join("/"),
-          },
-          credentials: "include",
-          cache: "no-store",
-        });
-
-        if (refreshResponse.ok) {
-          // Получаем новый access_token из Set-Cookie
-          const setCookieHeaders = refreshResponse.headers.getSetCookie();
-          let newAccessToken: string | null = null;
-
-          for (const cookie of setCookieHeaders) {
-            const accessMatch = cookie.match(/access_token=([^;]+)/);
-            if (accessMatch) {
-              newAccessToken = accessMatch[1];
-              break;
-            }
-          }
-
-          if (newAccessToken) {
-            // Декодируем новый access_token и извлекаем userId
-            const { decodeJWT } = await import("@mm-preview/sdk");
-            const decoded = decodeJWT(newAccessToken);
-            const userId = decoded?.sub || decoded?.userId;
-
-            if (userId && typeof userId === "string") {
-              const dashboardUrl = getDashboardUrl(request);
-              console.log(
-                "[user-creation middleware] Token refreshed, redirecting to dashboard with userId:",
-                userId,
-              );
-              return NextResponse.redirect(
-                new URL(`${dashboardUrl}/${userId}`),
-              );
-            }
-          }
-        } else {
-          // Refresh не удался (refresh_token невалидный) - очищаем refresh_token и показываем форму
-          console.log(
-            "[user-creation middleware] Refresh failed, clearing refresh_token and showing form",
-          );
-          const response = NextResponse.next();
-          response.cookies.delete("refresh_token");
-          return response;
-        }
-      } catch (error) {
-        // Ошибка при refresh - очищаем refresh_token и показываем форму
-        console.error(
-          "[user-creation middleware] Error refreshing token:",
-          error,
-        );
-        const response = NextResponse.next();
-        response.cookies.delete("refresh_token");
-        return response;
-      }
-
-      // Если refresh не удался или не получили userId, очищаем refresh_token и показываем форму
-      const nextResponse = NextResponse.next();
-      nextResponse.cookies.delete("refresh_token");
-      return nextResponse;
+    if (userId) {
+      const dashboardUrl = getDashboardUrl(request);
+      return NextResponse.redirect(new URL(`${dashboardUrl}/${userId}`, request.url));
     }
   }
-  if (accessToken?.value) {
+
+  // 4. Сценарий: Access нет, но есть Refresh — пробуем обновить
+  if (refreshToken) {
     try {
-      const { decodeJWT } = await import("@mm-preview/sdk");
-      const decoded = decodeJWT(accessToken.value);
+      const refreshResponse = await fetch(`${apiUrl}/auth/refresh`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: `refresh_token=${refreshToken}`,
+        },
+        // Важно: в Middleware fetch не пробрасывает куки автоматически
+      });
 
-      // Извлекаем userId из поля sub (стандартное поле JWT для subject/userId)
-      const userId = decoded?.sub || decoded?.userId;
+      if (refreshResponse.ok) {
+        // Извлекаем Set-Cookie от бэкенда
+        const setCookies = refreshResponse.headers.getSetCookie();
+        const newAccess = setCookies.find(c => c.includes("access_token="))
+          ?.match(/access_token=([^;]+)/)?.[1];
 
-      if (userId && typeof userId === "string") {
-        const dashboardUrl = getDashboardUrl(request);
-        console.log(
-          "[user-creation middleware] Access token found, redirecting to dashboard with userId:",
-          userId,
-        );
-        return NextResponse.redirect(new URL(`${dashboardUrl}/${userId}`));
+        if (newAccess) {
+          const decoded = decodeJWT(newAccess);
+          const userId = decoded?.sub || decoded?.userId;
+
+          if (userId) {
+            const dashboardUrl = getDashboardUrl(request);
+            const response = NextResponse.redirect(new URL(`${dashboardUrl}/${userId}`, request.url));
+
+            // ПЕРЕНОСИМ КУКИ: Чтобы браузер получил новые токены, 
+            // нужно скопировать Set-Cookie из ответа бэкенда в ответ Middleware
+            setCookies.forEach(cookie => {
+              response.headers.append("Set-Cookie", cookie);
+            });
+
+            return response;
+          }
+        }
       }
-    } catch (error) {
-      // Если токен невалидный, просто показываем форму
-      console.error("[user-creation middleware] Invalid access token:", error);
+    } catch (e) {
+      console.error("[Middleware] Refresh error:", e);
     }
   }
 
-  // Если нет access_token, показываем форму создания
-  return NextResponse.next();
+  // 5. Если мы здесь — токены были, но они битые. Чистим и показываем форму.
+  const response = NextResponse.next();
+  response.cookies.delete("access_token");
+  response.cookies.delete("refresh_token");
+  return response;
 }
+
 
 export const config = {
   matcher: [
