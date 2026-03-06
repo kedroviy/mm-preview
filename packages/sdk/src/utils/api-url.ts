@@ -71,19 +71,26 @@ export function getServerApiUrl(): string {
  */
 export function getWebSocketRoomsUrl(): string {
   const isProduction = process.env.NODE_ENV === "production";
-
+  
   let baseUrl: string;
+  
   if (isProduction) {
-    baseUrl = process.env.BACKEND_URL || "wss://mm-admin-1.onrender.com";
+    // В продакшене отдаем приоритет BACKEND_URL, но если его нет — фиксированному адресу
+    baseUrl = process.env.BACKEND_URL || "https://mm-admin-1.onrender.com";
   } else {
     const publicApiUrl = process.env.NEXT_PUBLIC_API_URL;
-    baseUrl =
-      publicApiUrl && !publicApiUrl.startsWith("/")
+    baseUrl = publicApiUrl && !publicApiUrl.startsWith("/")
         ? publicApiUrl.replace(/\/api\/v1\/?$/, "")
         : "http://localhost:4000";
   }
 
+  // Очищаем хост от протоколов и лишних слешей
   const host = baseUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
-  const protocol = baseUrl.startsWith("https") ? "wss:" : "ws:";
+  
+  // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: 
+  // Если мы на HTTPS (Production), всегда форсим WSS, иначе браузер заблокирует соединение.
+  const protocol = baseUrl.startsWith("https") || isProduction ? "wss:" : "ws:";
+  
   return `${protocol}//${host}/rooms`;
 }
+

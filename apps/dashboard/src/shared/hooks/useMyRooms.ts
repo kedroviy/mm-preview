@@ -60,7 +60,7 @@ export function useMyRooms(userId: string, enabled = true) {
       socket.on("connect", () => {
         setIsConnected(true);
         console.log("✅ Socket.IO connected for my rooms");
-
+console.log('interesting socket start')
         // Запрашиваем комнаты после подключения
         socket.emit("getMyRooms", {});
         setIsLoading(true);
