@@ -57,17 +57,6 @@ export {
   shouldUseSameSiteNone,
 } from "./utils/cookie-config";
 // Utils
-export {
-  deleteCookie,
-  getAccessToken,
-  getCookie,
-  getRefreshToken,
-  removeAccessToken,
-  removeAllAuthTokens,
-  removeRefreshToken,
-  setAccessToken,
-  setCookie,
-} from "./utils/cookies";
 export { getEnvMode, isDevelopment, isProduction } from "./utils/env-mode";
 export { decodeJWT, getUserIdFromToken } from "./utils/jwt";
 export {
