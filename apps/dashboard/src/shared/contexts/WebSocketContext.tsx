@@ -131,11 +131,8 @@ export function WebSocketProvider({
           isRetrying.current = false;
 
           if (data?.accessToken) {
-            // ✅ УДАЛЯЕМ setAccessToken(data.accessToken); 
-            // Браузер уже обновил куку из заголовков ответа fetch автоматически.
-
-            // ✅ ПЕРЕДАЕМ ТОКЕН НАПРЯМУЮ В CONNECT
-            // Это нужно, если SDK использует этот аргумент для socket.auth.token
+            // Закрываем текущее (анонимное) соединение и подключаемся с токеном
+            webSocketService.disconnect();
             webSocketService.connect(data.accessToken);
           } else {
             redirectToLogin();

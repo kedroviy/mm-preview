@@ -139,7 +139,8 @@ export class WebSocketService {
     });
 
     this.socket.on(SERVER_EVENTS.ERROR, (error: ErrorMessage) => {
-      if (error.code === "UNAUTHORIZED") this.cleanupSocket();
+      // Не отключаем сокет здесь — контекст сделает refresh и при успехе вызовет
+      // disconnect() + connect(token). Так избегаем цикла: disconnect → connect(undefined) → UNAUTHORIZED → disconnect.
       this.emit("error", error);
     });
 

@@ -13,7 +13,8 @@
     "API_URL",
     "ALLOWED_COOKIE_DOMAINS",
     "ALLOWED_COOKIE_URLS",
-    "ALLOW_CROSS_ORIGIN_COOKIES"
+    "ALLOW_CROSS_ORIGIN_COOKIES",
+    "SWAGGER_URL"
   ],
   "tasks": {
     "build": {
