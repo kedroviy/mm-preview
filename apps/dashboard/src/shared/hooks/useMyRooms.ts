@@ -19,18 +19,6 @@ export function useMyRooms(userId: string, enabled = true) {
   const [isConnected, setIsConnected] = useState(false);
   const socketRef = useRef<Socket | null>(null);
 
-  const _getCookie = useCallback((name: string) => {
-    if (typeof document === "undefined") {
-      return null;
-    }
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-      return parts.pop()?.split(";").shift();
-    }
-    return null;
-  }, []);
-
   const connect = useCallback(() => {
     if (!enabled || !userId) {
       return;
@@ -44,23 +32,19 @@ export function useMyRooms(userId: string, enabled = true) {
       console.log("Connecting to Socket.IO for my rooms:", socketUrl);
 
       const socketConfig: any = {
-        transports: ["websocket"],
+        transports: ["websocket", 'pooling'],
         reconnection: true,
         reconnectionDelay: 1000,
         reconnectionAttempts: 5,
         withCredentials: true,
       };
 
-      if (token) {
-        socketConfig.auth = { token };
-      }
-
       const socket = io(socketUrl, socketConfig);
 
       socket.on("connect", () => {
         setIsConnected(true);
         console.log("✅ Socket.IO connected for my rooms");
-console.log('interesting socket start')
+        console.log('interesting socket start')
         // Запрашиваем комнаты после подключения
         socket.emit("getMyRooms", {});
         setIsLoading(true);
@@ -107,17 +91,10 @@ console.log('interesting socket start')
   }, [enabled, userId]);
 
   useEffect(() => {
-    if (enabled && userId) {
+    if (enabled && userId && !socketRef.current) { // Добавьте проверку, чтобы не переподключаться зря
       connect();
     }
-
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
-      }
-    };
-  }, [enabled, userId, connect]);
+  }, [enabled, userId]);
 
   const refreshRooms = useCallback(() => {
     if (socketRef.current?.connected) {

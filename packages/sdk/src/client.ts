@@ -1,6 +1,5 @@
 import type { ApiError, ApiResponse, RequestConfig } from "./types";
 import { getClientApiUrl } from "./utils/api-url";
-import { getAccessToken } from "./utils/cookies";
 
 class ApiClient {
   private baseURL: string;
@@ -53,17 +52,11 @@ class ApiClient {
     const { params, timeout = this.timeout, ...fetchConfig } = config;
 
     const fullURL = this.buildURL(url, params);
-    const token = getAccessToken();
     const headers: Record<string, string> = {
       ...(this.defaultHeaders as Record<string, string>),
       ...(fetchConfig.headers as Record<string, string>),
     };
 
-    // Добавляем токен в заголовок Authorization, если он доступен через document.cookie
-    // Если токен HttpOnly, он недоступен через document.cookie, но браузер отправит его автоматически в куках
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
