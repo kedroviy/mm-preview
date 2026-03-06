@@ -48,7 +48,7 @@ export type RedisUserResponseDto = v.InferOutput<typeof redisUserResponseDtoSche
 export const roomResponseDtoSchema = v.object({
   roomId: v.string(),
   publicCode: v.string(),
-  createdBy: v.optional(v.nullable(v.object({}))),
+  createdBy: v.optional(v.nullable(v.string())),
   users: v.array(v.string()),
   userRoles: v.record(v.string(), v.picklist(["room_creator", "room_member"])),
   choices: v.record(v.string(), v.string()),

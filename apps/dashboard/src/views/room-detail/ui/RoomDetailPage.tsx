@@ -17,6 +17,7 @@ import { RoomChoices } from "@/src/widgets/room-choices";
 import { RoomHeader } from "@/src/widgets/room-header";
 import { RoomMembers } from "@/src/widgets/room-members";
 import { RoomNotMember } from "@/src/widgets/room-not-member";
+import Loading from "@/app/loading";
 
 type ViewConfig = {
   view: "loading" | "error" | "not-member" | "member";
@@ -184,9 +185,9 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
                 />
                 <RoomChoices room={room} currentUserId={userId} />
               </div>
-              {profile && (
+              {profileData && (
                 <ChatWindow
-                  userId={profile.userId}
+                  userId={profileData.userId}
                   messages={chatMessages}
                   onSendMessage={sendChatMessage}
                   isLoading={!isChatConnected || !isReadyToSend}
@@ -220,7 +221,7 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
 
 export function RoomDetailPage({ userId, roomId }: RoomDetailPageProps) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<Loading />}>
       <RoomContent userId={userId} roomId={roomId} />
     </Suspense>
   );

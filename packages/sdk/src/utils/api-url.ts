@@ -74,7 +74,7 @@ export function getWebSocketRoomsUrl(): string {
 
   let baseUrl: string;
   if (isProduction) {
-    baseUrl = process.env.BACKEND_URL || "https://mm-admin-1.onrender.com";
+    baseUrl = process.env.BACKEND_URL || "wss://mm-admin-1.onrender.com";
   } else {
     const publicApiUrl = process.env.NEXT_PUBLIC_API_URL;
     baseUrl =

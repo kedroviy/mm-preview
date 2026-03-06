@@ -507,7 +507,7 @@ export interface components {
              * @description User ID of the room creator (UUID)
              * @example 123e4567-e89b-12d3-a456-426614174000
              */
-            createdBy?: Record<string, never> | null;
+            createdBy?: string | null;
             /**
              * @description List of user IDs in the room
              * @example [

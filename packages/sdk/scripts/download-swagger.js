@@ -4,23 +4,33 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const OUTPUT_PATH = path.join(__dirname, "../swagger.json");
-const SOURCE_PATH = path.join(__dirname, "../../../apps/dashboard/swagger.json");
 
-/**
- * Copies apps/dashboard/swagger.json → packages/sdk/swagger.json.
- *
- * apps/dashboard/swagger.json is the committed source of truth.
- * Run "npm run sdk:generate:swagger" manually when the backend API changes,
- * commit the updated file, and re-deploy.
- */
-function main() {
-  if (!fs.existsSync(SOURCE_PATH)) {
-    console.error(`✗ Source swagger not found: ${SOURCE_PATH}`);
+// Выбираем URL в зависимости от окружения
+const SWAGGER_URL = process.env.NODE_ENV === 'production'
+  ? "https://mm-admin-1.onrender.com/api/docs-json"
+  : "http://localhost:4000/api/docs-json";
+
+async function main() {
+  console.log(`📡 Fetching swagger from: ${SWAGGER_URL}...`);
+
+  try {
+    const response = await fetch(SWAGGER_URL);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Сохраняем полученный JSON в файл
+    fs.writeFileSync(OUTPUT_PATH, JSON.stringify(data, null, 2));
+
+    console.log(`✓ Swagger downloaded and saved to ${OUTPUT_PATH}`);
+  } catch (error) {
+    console.error(`✗ Failed to fetch swagger: ${error.message}`);
+    console.error(`Make sure your backend is running at ${SWAGGER_URL}`);
     process.exit(1);
   }
-
-  fs.copyFileSync(SOURCE_PATH, OUTPUT_PATH);
-  console.log(`✓ Swagger copied from apps/dashboard/swagger.json to packages/sdk/swagger.json`);
 }
 
 main();
