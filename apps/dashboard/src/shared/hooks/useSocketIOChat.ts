@@ -4,7 +4,6 @@ import type { ChatMessage } from "@mm-preview/sdk";
 import {
   getAccessToken,
   getWebSocketRoomsUrl,
-  setAccessToken,
 } from "@mm-preview/sdk";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { io, type Socket } from "socket.io-client";
@@ -179,10 +178,6 @@ export function useSocketIOChat({
             "🔄 Token refreshed via WebSocket:",
             data.message || "New access token received",
           );
-          // Сохраняем новый токен в cookie
-          if (data.accessToken) {
-            setAccessToken(data.accessToken);
-          }
           onTokenRefreshed?.(data.accessToken);
         },
       );

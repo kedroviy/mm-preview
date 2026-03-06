@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  setAccessToken,
   type WebSocketServiceEvents,
   webSocketService,
 } from "@mm-preview/sdk";
@@ -57,6 +56,8 @@ export function WebSocketProvider({
     fetch("/api/auth/token", { credentials: "include" })
       .then((res) => res.json())
       .then(({ accessToken }: { accessToken: string | null }) => {
+        // Если accessToken пришел в JSON - передаем его, 
+        // но если нет - просто коннектимся, полагаясь на куки
         webSocketService.connect(accessToken ?? undefined);
       })
       .catch(() => webSocketService.connect());
@@ -107,46 +108,45 @@ export function WebSocketProvider({
 
   useEffect(() => {
     const handleError = (error: { code: string; message?: string }) => {
-      if (error.code !== "UNAUTHORIZED") {
-        return;
-      }
-
-      if (isRetrying.current) {
-        return;
-      }
+      if (error.code !== "UNAUTHORIZED") return;
+      if (isRetrying.current) return;
 
       authRetryCount.current++;
-
+      
       if (authRetryCount.current > MAX_AUTH_RETRIES) {
         redirectToLogin();
         return;
       }
 
       isRetrying.current = true;
-
       fetch("/api/auth/refresh", {
         method: "POST",
-        credentials: "include",
+        credentials: "include", // Обязательно: отправляет старый refresh_token и получает новый Set-Cookie
       })
         .then((res) => {
-          if (!res.ok) {
-            throw new Error("refresh failed");
-          }
+          if (!res.ok) throw new Error("refresh failed");
           return res.json();
         })
         .then((data: { accessToken?: string } | undefined) => {
           isRetrying.current = false;
+
           if (data?.accessToken) {
-            setAccessToken(data.accessToken);
+            // ✅ УДАЛЯЕМ setAccessToken(data.accessToken); 
+            // Браузер уже обновил куку из заголовков ответа fetch автоматически.
+
+            // ✅ ПЕРЕДАЕМ ТОКЕН НАПРЯМУЮ В CONNECT
+            // Это нужно, если SDK использует этот аргумент для socket.auth.token
             webSocketService.connect(data.accessToken);
           } else {
             redirectToLogin();
           }
         })
         .catch(() => {
+          console.error(error)
           isRetrying.current = false;
           redirectToLogin();
         });
+
     };
 
     const unsubscribe = webSocketService.on("error", handleError);
