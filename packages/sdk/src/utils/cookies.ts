@@ -37,26 +37,26 @@ export function getCookie(name: string): string | null {
   return null;
 }
 
-export function setCookie(name: string, value: string, days = 30): void {
-  if (typeof document === "undefined") {
-    return;
-  }
+// export function setCookie(name: string, value: string, days = 30): void {
+//   if (typeof document === "undefined") {
+//     return;
+//   }
 
-  const expires = new Date();
-  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+//   const expires = new Date();
+//   expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
 
-  // Определяем настройки SameSite на основе разрешенных доменов
-  const hostname = window.location.hostname;
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+//   // Определяем настройки SameSite на основе разрешенных доменов
+//   const hostname = window.location.hostname;
+//   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-  const cookieConfig = getSameSiteConfig(hostname, apiUrl);
+//   const cookieConfig = getSameSiteConfig(hostname, apiUrl);
 
-  const sameSite = cookieConfig.sameSite === "none" ? "None" : "Lax";
-  const secure = cookieConfig.secure ? "Secure;" : "";
+//   const sameSite = cookieConfig.sameSite === "none" ? "None" : "Lax";
+//   const secure = cookieConfig.secure ? "Secure;" : "";
 
-  // biome-ignore lint/suspicious/noDocumentCookie: Standard way to set cookies in browser
-  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=${sameSite};${secure}`;
-}
+//   // biome-ignore lint/suspicious/noDocumentCookie: Standard way to set cookies in browser
+//   document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=${sameSite};${secure}`;
+// }
 
 export function deleteCookie(name: string): void {
   if (typeof document === "undefined") {
@@ -72,9 +72,9 @@ export function getAccessToken(): string | null {
   return token;
 }
 
-export function setAccessToken(token: string): void {
-  setCookie(COOKIE_NAME, token);
-}
+// export function setAccessToken(token: string): void {
+//   setCookie(COOKIE_NAME, token);
+// }
 
 export function removeAccessToken(): void {
   deleteCookie(COOKIE_NAME);

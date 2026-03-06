@@ -4,7 +4,6 @@ import type { Room } from "@mm-preview/sdk";
 import {
   getAccessToken,
   getWebSocketRoomsUrl,
-  setAccessToken,
 } from "@mm-preview/sdk";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { io, type Socket } from "socket.io-client";
@@ -54,20 +53,6 @@ export function useMyRooms(userId: string, enabled = true) {
         setIsConnected(false);
         console.log("❌ Socket.IO disconnected for my rooms");
       });
-
-      // socket.on(
-      //   "tokenRefreshed",
-      //   (data: { accessToken: string; message?: string }) => {
-      //     console.log(
-      //       "🔄 Token refreshed via WebSocket in useMyRooms:",
-      //       data.message || "New access token received",
-      //     );
-      //     // Сохраняем новый токен в cookie
-      //     if (data.accessToken) {
-      //       setAccessToken(data.accessToken);
-      //     }
-      //   },
-      // );
 
       socket.on("myRooms", (data: MyRoomsResponse) => {
         console.log("📋 My rooms received:", data.rooms.length, "rooms");
