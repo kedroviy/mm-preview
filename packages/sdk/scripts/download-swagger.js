@@ -7,7 +7,7 @@ const OUTPUT_PATH = path.join(__dirname, "../swagger.json");
 
 // Выбираем URL в зависимости от окружения
 const SWAGGER_URL = process.env.NODE_ENV === 'production'
-  ? "https://mm-admin-1.onrender.com/api/docs-json"
+  ? "https://api.moviematch.space/api/docs-json"
   : "http://localhost:4000/api/docs-json";
 
 async function main() {

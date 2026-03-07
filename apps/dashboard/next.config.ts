@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@mm-preview/ui", "@mm-preview/sdk"],
   async rewrites() {
     const backendUrl =
-      process.env.BACKEND_URL || "https://mm-admin.onrender.com";
+      process.env.BACKEND_URL || "https://api.moviematch.space";
     return [
       {
         source: "/api/v1/:path*",

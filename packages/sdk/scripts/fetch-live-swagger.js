@@ -18,7 +18,7 @@ const OUTPUT_PATH = path.join(__dirname, "../../../apps/dashboard/swagger.json")
 
 const SWAGGER_URL =
   process.env.SWAGGER_URL ||
-  "https://mm-admin-1.onrender.com/api/docs-json";
+  "https://api.moviematch.space/api/docs-json";
 
 function fetchSwagger(url) {
   return new Promise((resolve, reject) => {

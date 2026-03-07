@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 /**
  * Returns the access_token from HttpOnly cookie so the client can pass it
- * to the WebSocket handshake (cross-domain: onrender.com ≠ moviematch.space,
+ * to the WebSocket handshake (cross-domain: api.moviematch.space ≠ dashboard.moviematch.space,
  * so cookies are not sent automatically by the browser).
  */
 export async function GET() {

@@ -66,7 +66,7 @@ export function getServerApiUrl(): string {
 /**
  * Получить URL для подключения к WebSocket namespace /rooms.
  *
- * Production: wss://mm-admin-1.onrender.com/rooms (или BACKEND_URL/rooms)
+ * Production: wss://api.moviematch.space/rooms (или BACKEND_URL/rooms)
  * Development: ws://localhost:4000/rooms (или NEXT_PUBLIC_API_URL/rooms)
  */
 export function getWebSocketRoomsUrl(): string {
@@ -76,7 +76,7 @@ export function getWebSocketRoomsUrl(): string {
   
   if (isProduction) {
     // В продакшене отдаем приоритет BACKEND_URL, но если его нет — фиксированному адресу
-    baseUrl = process.env.BACKEND_URL || "https://mm-admin-1.onrender.com";
+    baseUrl = process.env.BACKEND_URL || "https://api.moviematch.space";
   } else {
     const publicApiUrl = process.env.NEXT_PUBLIC_API_URL;
     baseUrl = publicApiUrl && !publicApiUrl.startsWith("/")
