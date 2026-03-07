@@ -1,6 +1,6 @@
 "use client";
 
-import type { Room, RoomMember } from "@mm-preview/sdk";
+import type { RoomMember } from "@mm-preview/sdk";
 import { roomKeys } from "@mm-preview/sdk";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -8,14 +8,15 @@ import { useWebSocket } from "../contexts/WebSocketContext";
 
 type RoomUpdatePayload = {
   roomId: string;
-  room?: Room;
   /** Если бэкенд присылает участников в roomUpdate — обновляем кэш без HTTP-запроса */
   members?: RoomMember[];
 };
 
 /**
- * Подписывается на roomUpdate по WebSocket. Если в событии есть room и/или members —
- * обновляет кэш React Query без HTTP-запросов. Иначе инвалидирует запросы (будет refetch).
+ * Подписывается на roomUpdate по WebSocket.
+ * Комнату всегда инвалидируем (refetch), чтобы не перезаписать кэш частичным room из события
+ * и не сломать чат (useChat зависит от room.isMember из useRoom).
+ * Участников обновляем из события без запроса, если пришли data.members; иначе инвалидируем.
  */
 export function useInvalidateRoomOnUpdate() {
   const queryClient = useQueryClient();
@@ -28,11 +29,7 @@ export function useInvalidateRoomOnUpdate() {
       const detailKey = roomKeys.detail(data.roomId);
       const membersKey = [...detailKey, "members"] as const;
 
-      if (data.room != null) {
-        queryClient.setQueryData(detailKey, data.room);
-      } else {
-        queryClient.invalidateQueries({ queryKey: detailKey });
-      }
+      queryClient.invalidateQueries({ queryKey: detailKey });
 
       if (data.members != null) {
         queryClient.setQueryData(membersKey, data.members);
