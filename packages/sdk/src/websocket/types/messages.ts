@@ -2,6 +2,7 @@ import type {
   Room,
   ChatMessage as RoomChatMessage,
 } from "../../services/rooms";
+import type { RoomUpdateEventName } from "../constants/events";
 import type { WsError } from "../constants/errors";
 
 /**
@@ -48,7 +49,7 @@ export interface LeftRoomMessage {
 export interface RoomUpdateMessage {
   roomId: string;
   room?: Room;
-  event: "userJoined" | "userLeft" | "movieChosen" | "userConnected" | "userDisconnected";
+  event: RoomUpdateEventName;
   userId?: string;
   movieId?: string;
 }
