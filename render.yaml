@@ -1,0 +1,43 @@
+# Render Blueprint: mm-preview monorepo
+# Деплой каждого приложения как отдельный Web Service.
+# Build выполняется из корня репозитория (нужны workspace-зависимости).
+
+services:
+  # --- Landing (главная/лендинг) ---
+  - type: web
+    name: mm-preview-landing
+    runtime: node
+    buildCommand: npm ci && npx turbo run build --filter=@mm-preview/landing
+    startCommand: cd apps/landing && npx next start
+    buildFilter:
+      paths:
+        - apps/landing/**
+        - packages/**
+        - package.json
+        - turbo.json
+
+  # --- User creation (создание пользователя) ---
+  - type: web
+    name: mm-preview-user-creation
+    runtime: node
+    buildCommand: npm ci && npx turbo run build --filter=@mm-preview/user-creation
+    startCommand: cd apps/user-creation && npx next start
+    buildFilter:
+      paths:
+        - apps/user-creation/**
+        - packages/**
+        - package.json
+        - turbo.json
+
+  # --- Dashboard ---
+  - type: web
+    name: mm-preview-dashboard
+    runtime: node
+    buildCommand: npm ci && npx turbo run build --filter=@mm-preview/dashboard
+    startCommand: cd apps/dashboard && npx next start
+    buildFilter:
+      paths:
+        - apps/dashboard/**
+        - packages/**
+        - package.json
+        - turbo.json
