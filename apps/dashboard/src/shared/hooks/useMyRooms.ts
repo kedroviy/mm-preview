@@ -65,6 +65,14 @@ export function useMyRooms(userId: string, enabled = true) {
         setIsLoading(false);
       });
 
+      socket.on("roomUpdate", (data: any) => {
+
+        if (data.event === "userJoined" || data.event === "userDisconnected") {
+          socket.emit("getMyRooms", {});
+          setIsLoading(true);
+        }
+      });
+
       socketRef.current = socket;
     } catch (error) {
       console.error(

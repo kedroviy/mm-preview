@@ -50,7 +50,6 @@ export function RoomsPageClient({
   };
 
   const handleDelete = (_roomId: string) => {
-    // TODO: Implement room deletion
     notificationService.showInfo("Удаление комнаты будет реализовано позже");
   };
 
