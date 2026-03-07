@@ -29,15 +29,24 @@ export function useWebSocketMyRooms(userId: string, enabled = true) {
       }
     };
 
+    // При обновлении комнаты (новый участник, выход, выбор фильма и т.д.) обновляем список комнат у всех в комнате
+    const handleRoomUpdate = () => {
+      if (isConnected) {
+        getMyRooms();
+      }
+    };
+
     // Подписываемся на события
     const unsubscribeMyRooms = on("myRooms", handleMyRooms);
+    const unsubscribeRoomUpdate = on("roomUpdate", handleRoomUpdate);
     const unsubscribeError = on("error", handleError);
 
     return () => {
       unsubscribeMyRooms();
+      unsubscribeRoomUpdate();
       unsubscribeError();
     };
-  }, [enabled, userId, on]);
+  }, [enabled, userId, on, isConnected, getMyRooms]);
 
   // Запрашиваем комнаты при подключении
   useEffect(() => {
