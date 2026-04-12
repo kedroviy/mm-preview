@@ -24,12 +24,16 @@ export function Header() {
           <a
             href="#top"
             className="font-[family-name:var(--font-syne)] text-lg font-bold tracking-tight sm:text-xl"
+            aria-label="Movie Match — перейти к началу страницы"
           >
             <span className="landing-headline-gradient bg-clip-text text-transparent">
               Movie Match
             </span>
           </a>
-          <nav className="hidden items-center gap-8 md:flex">
+          <nav
+            className="hidden items-center gap-8 md:flex"
+            aria-label="Разделы страницы"
+          >
             {nav.map((item) => (
               <a
                 key={item.href}
@@ -44,6 +48,7 @@ export function Header() {
             <Button
               onClick={handleStart}
               className="rounded-full border-0 bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-110 sm:px-5"
+              aria-label="Начать: создать аккаунт и открыть приложение в браузере"
             >
               Начать
             </Button>

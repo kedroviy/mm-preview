@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@mm-preview/ui";
 import { useState } from "react";
 
 type Scenario = "friends" | "couple" | "solo";
@@ -35,30 +34,51 @@ export function ScenarioPicker() {
       className="scroll-mt-28 py-16 sm:scroll-mt-32 sm:py-20"
     >
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-        <h2 className="text-center font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
+        <h2
+          id="scenario-heading"
+          className="text-center font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl"
+        >
           Ваш сценарий
         </h2>
-        <p className="mx-auto mt-3 max-w-lg text-center text-[var(--landing-muted)]">
+        <p
+          id="scenario-description"
+          className="mx-auto mt-3 max-w-lg text-center text-[var(--landing-muted)]"
+        >
           Нажмите вариант — вечер с друзьями, вдвоём или соло-подбор фильма на
           вечер одному.
         </p>
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
+        <fieldset
+          className="mt-8 flex flex-wrap justify-center gap-3 border-0 p-0"
+          aria-labelledby="scenario-heading"
+          aria-describedby="scenario-description"
+        >
+          <legend className="sr-only">Выберите сценарий использования</legend>
           {(Object.keys(copy) as Scenario[]).map((key) => (
-            <Button
+            <label
               key={key}
-              type="button"
-              onClick={() => setScenario(key)}
               className={
                 key === scenario
-                  ? "rounded-full border-0 bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-400/30"
-                  : "rounded-full border border-violet-200 bg-white px-6 py-2.5 text-sm font-semibold text-violet-900 shadow-sm hover:bg-violet-50/90"
+                  ? "cursor-pointer rounded-full border-0 bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-400/30"
+                  : "cursor-pointer rounded-full border border-violet-200 bg-white px-6 py-2.5 text-sm font-semibold text-violet-900 shadow-sm hover:bg-violet-50/90"
               }
             >
+              <input
+                type="radio"
+                name="landing-scenario"
+                value={key}
+                checked={key === scenario}
+                onChange={() => setScenario(key)}
+                className="sr-only"
+              />
               {copy[key].label}
-            </Button>
+            </label>
           ))}
-        </div>
-        <div className="landing-glass mt-8 rounded-3xl border border-violet-100/90 p-8 shadow-md shadow-violet-100/40">
+        </fieldset>
+        <div
+          className="landing-glass mt-8 rounded-3xl border border-violet-100/90 p-8 shadow-md shadow-violet-100/40"
+          aria-live="polite"
+          aria-atomic="true"
+        >
           <p className="text-lg leading-relaxed text-slate-700">
             {active.body}
           </p>

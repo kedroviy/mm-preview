@@ -5,7 +5,27 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  /** Lighthouse «Missing source maps» для крупных first-party чанков. */
+  productionBrowserSourceMaps: true,
   transpilePackages: ["@mm-preview/ui"],
+  async headers() {
+    const base: { key: string; value: string }[] = [
+      { key: "X-Frame-Options", value: "DENY" },
+      { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+      { key: "X-Content-Type-Options", value: "nosniff" },
+      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+    ];
+    if (
+      process.env.VERCEL === "1" ||
+      process.env.LANDING_FORCE_HSTS === "true"
+    ) {
+      base.push({
+        key: "Strict-Transport-Security",
+        value: "max-age=31536000; includeSubDomains; preload",
+      });
+    }
+    return [{ source: "/:path*", headers: base }];
+  },
   async rewrites() {
     const backendUrl =
       process.env.BACKEND_URL || "https://api.moviematch.space";

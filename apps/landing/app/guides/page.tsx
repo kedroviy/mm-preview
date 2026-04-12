@@ -31,11 +31,11 @@ export default function GuidesIndexPage() {
   const jsonLd = getGuidesIndexJsonLdString();
 
   return (
-    <div className="min-h-svh" id="top">
+    <div className="min-h-svh">
       <Script
         id="guides-index-json-ld"
         type="application/ld+json"
-        strategy="beforeInteractive"
+        strategy="afterInteractive"
         // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD без пользовательского ввода
         dangerouslySetInnerHTML={{
           // biome-ignore lint/style/useNamingConvention: имя поля задаёт React
@@ -43,7 +43,11 @@ export default function GuidesIndexPage() {
         }}
       />
       <Header />
-      <main className="mx-auto max-w-3xl px-4 pb-24 pt-28 sm:px-6 sm:pt-32 lg:px-8">
+      <main
+        id="top"
+        tabIndex={-1}
+        className="mx-auto max-w-3xl px-4 pb-24 pt-28 sm:px-6 sm:pt-32 lg:px-8"
+      >
         <nav
           aria-label="Хлебные крошки"
           className="text-sm text-[var(--landing-muted)]"

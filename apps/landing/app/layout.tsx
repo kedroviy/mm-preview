@@ -43,6 +43,12 @@ export default function RootLayout({
   return (
     <html lang="ru" className={`${fontDisplay.variable} ${fontSans.variable}`}>
       <body className="landing-body font-[family-name:var(--font-outfit)] antialiased">
+        <a
+          href="#top"
+          className="fixed left-4 top-0 z-[9999] -translate-y-full rounded-b-lg bg-violet-900 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-transform focus:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-violet-900"
+        >
+          К основному содержимому
+        </a>
         <Provider>{children}</Provider>
       </body>
     </html>

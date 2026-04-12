@@ -62,7 +62,7 @@ export default async function GuideArticlePage({
       <Script
         id={`guide-json-ld-${slug}`}
         type="application/ld+json"
-        strategy="beforeInteractive"
+        strategy="afterInteractive"
         // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD без пользовательского ввода
         dangerouslySetInnerHTML={{
           // biome-ignore lint/style/useNamingConvention: имя поля задаёт React
@@ -70,53 +70,62 @@ export default async function GuideArticlePage({
         }}
       />
       <Header />
-      <article className="mx-auto max-w-3xl px-4 pb-24 pt-28 sm:px-6 sm:pt-32 lg:px-8">
-        <nav className="text-sm text-[var(--landing-muted)]">
-          <Link href="/" className="text-violet-600 hover:underline">
-            Главная
-          </Link>
-          <span className="mx-2">/</span>
-          <Link href="/guides" className="text-violet-600 hover:underline">
-            Гайды
-          </Link>
-          <span className="mx-2">/</span>
-          <span className="line-clamp-1 text-[var(--landing-ink)]">
+      <main id="top" tabIndex={-1}>
+        <article className="mx-auto max-w-3xl px-4 pb-24 pt-28 sm:px-6 sm:pt-32 lg:px-8">
+          <nav
+            className="text-sm text-[var(--landing-muted)]"
+            aria-label="Хлебные крошки"
+          >
+            <Link href="/" className="text-violet-600 hover:underline">
+              Главная
+            </Link>
+            <span className="mx-2" aria-hidden>
+              /
+            </span>
+            <Link href="/guides" className="text-violet-600 hover:underline">
+              Гайды
+            </Link>
+            <span className="mx-2" aria-hidden>
+              /
+            </span>
+            <span className="line-clamp-1 text-[var(--landing-ink)]">
+              {guide.h1}
+            </span>
+          </nav>
+          <h1 className="mt-6 font-[family-name:var(--font-syne)] text-3xl font-bold tracking-tight text-[var(--landing-ink)] sm:text-4xl">
             {guide.h1}
-          </span>
-        </nav>
-        <h1 className="mt-6 font-[family-name:var(--font-syne)] text-3xl font-bold tracking-tight text-[var(--landing-ink)] sm:text-4xl">
-          {guide.h1}
-        </h1>
-        <p className="mt-5 text-lg leading-relaxed text-[var(--landing-muted)]">
-          {guide.intro}
-        </p>
-        {guide.sections.map((section) => (
-          <section key={section.title} className="mt-10">
-            <h2 className="font-[family-name:var(--font-syne)] text-xl font-bold text-[var(--landing-ink)] sm:text-2xl">
-              {section.title}
-            </h2>
-            <div className="mt-4 space-y-4 text-[var(--landing-muted)] leading-relaxed">
-              {section.paragraphs.map((p, i) => (
-                <p key={`${section.title}-${i}`}>{p}</p>
-              ))}
-            </div>
-          </section>
-        ))}
-        <div className="mt-12 flex flex-wrap gap-4 border-t border-violet-100 pt-10">
-          <Link
-            href="/guides"
-            className="text-sm font-semibold text-violet-600 hover:underline"
-          >
-            ← Все гайды
-          </Link>
-          <Link
-            href="/#download"
-            className="text-sm font-semibold text-violet-600 hover:underline"
-          >
-            Google Play и веб-старт
-          </Link>
-        </div>
-      </article>
+          </h1>
+          <p className="mt-5 text-lg leading-relaxed text-[var(--landing-muted)]">
+            {guide.intro}
+          </p>
+          {guide.sections.map((section) => (
+            <section key={section.title} className="mt-10">
+              <h2 className="font-[family-name:var(--font-syne)] text-xl font-bold text-[var(--landing-ink)] sm:text-2xl">
+                {section.title}
+              </h2>
+              <div className="mt-4 space-y-4 text-[var(--landing-muted)] leading-relaxed">
+                {section.paragraphs.map((p, i) => (
+                  <p key={`${section.title}-${i}`}>{p}</p>
+                ))}
+              </div>
+            </section>
+          ))}
+          <div className="mt-12 flex flex-wrap gap-4 border-t border-violet-100 pt-10">
+            <Link
+              href="/guides"
+              className="text-sm font-semibold text-violet-600 hover:underline"
+            >
+              ← Все гайды
+            </Link>
+            <Link
+              href="/#download"
+              className="text-sm font-semibold text-violet-600 hover:underline"
+            >
+              Google Play и веб-старт
+            </Link>
+          </div>
+        </article>
+      </main>
     </div>
   );
 }

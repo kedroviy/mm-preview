@@ -8,14 +8,17 @@ export function LandingFaq() {
       className="scroll-mt-28 border-t border-violet-100/90 py-16 sm:scroll-mt-32 sm:py-24"
     >
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-        <h2 className="text-center font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
+        <h2
+          id="faq-heading"
+          className="text-center font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl"
+        >
           Вопросы и ответы
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-center text-[var(--landing-muted)]">
           Лобби, приглашение, совместный и соло-подбор — и как это связано с
           Google Play.
         </p>
-        <ul className="mt-10 space-y-3">
+        <ul className="mt-10 space-y-3" aria-labelledby="faq-heading">
           {LANDING_FAQ_ITEMS.map((item) => (
             <li key={item.question}>
               <details className="landing-glass group rounded-2xl border border-violet-100/90 px-5 py-1 shadow-sm open:shadow-md">

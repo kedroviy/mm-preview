@@ -13,7 +13,7 @@ export default function Home() {
       <Script
         id="movie-match-json-ld"
         type="application/ld+json"
-        strategy="beforeInteractive"
+        strategy="afterInteractive"
         // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD без пользовательского ввода
         dangerouslySetInnerHTML={{
           // biome-ignore lint/style/useNamingConvention: имя поля задаёт React
