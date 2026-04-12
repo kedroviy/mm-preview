@@ -293,17 +293,7 @@ export function MainBlock() {
                         есть соло-подбор: один человек может подобрать себе кино
                         на вечер. Лобби и приглашение — когда смотрите вместе.
                       </p>
-                      <p className="mt-4 text-sm text-[var(--landing-muted)]">
-                        Пакет{" "}
-                        <code className="rounded-md bg-violet-50 px-1.5 py-0.5 text-violet-900 ring-1 ring-violet-100">
-                          com.moviematcher
-                        </code>
-                        . В Vercel ссылку задаёт{" "}
-                        <code className="rounded-md bg-violet-50 px-1.5 py-0.5 text-violet-900 ring-1 ring-violet-100">
-                          NEXT_PUBLIC_GOOGLE_PLAY_URL
-                        </code>
-                        .
-                      </p>
+                  
                     </div>
 
                     <div className="flex flex-col items-center justify-center gap-6">
