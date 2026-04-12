@@ -1,0 +1,15 @@
+/**
+ * В primeicons 7 @font-face с font-display: block — текст/иконки скрыты до загрузки.
+ * Повторное объявление с тем же family/weight/style перекрывает для рантайма.
+ */
+@font-face {
+  font-family: "primeicons";
+  font-style: normal;
+  font-weight: normal;
+  font-display: swap;
+  src:
+    url("../../../node_modules/primeicons/fonts/primeicons.woff2")
+      format("woff2"),
+    url("../../../node_modules/primeicons/fonts/primeicons.woff")
+      format("woff");
+}

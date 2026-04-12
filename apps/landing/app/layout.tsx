@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit, Syne } from "next/font/google";
 import "primeicons/primeicons.css";
+import "./primeicons-font-display.css";
 import "./globals.css";
 import { rootLandingMetadata } from "@/src/shared/config/metadata";
 import { Provider } from "@/src/shared/config/providers/Provider";
