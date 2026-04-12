@@ -1,7 +1,7 @@
 "use client";
 
 import { ButtonShadcn } from "@mm-preview/ui/light";
-import { getAppUrls } from "@/src/shared/config/constants";
+import { getGooglePlayUrl } from "@/src/shared/config/constants";
 
 const nav = [
   { href: "#features", label: "Возможности" },
@@ -12,9 +12,8 @@ const nav = [
 ];
 
 export function Header() {
-  const handleStart = () => {
-    const urls = getAppUrls();
-    window.location.href = urls.USER_CREATION;
+  const handleStartGooglePlay = () => {
+    window.location.href = getGooglePlayUrl();
   };
 
   return (
@@ -47,9 +46,9 @@ export function Header() {
           <div className="flex shrink-0 items-center gap-2">
             <ButtonShadcn
               type="button"
-              onClick={handleStart}
+              onClick={handleStartGooglePlay}
               className="rounded-full border-0 bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-110 sm:px-5"
-              aria-label="Начать: создать аккаунт и открыть приложение в браузере"
+              aria-label="Начать: открыть приложение в Google Play"
             >
               Начать
             </ButtonShadcn>
