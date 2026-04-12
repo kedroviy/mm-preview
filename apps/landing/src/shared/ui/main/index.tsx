@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@mm-preview/ui";
+import { ButtonShadcn } from "@mm-preview/ui";
 import Link from "next/link";
 import { getAppUrls, getGooglePlayUrl } from "@/src/shared/config/constants";
 import { LONG_TAIL_GUIDES } from "@/src/shared/seo/long-tail-guides";
@@ -141,13 +141,14 @@ export function MainBlock() {
                 участника.
               </p>
               <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-5">
-                <Button
+                <ButtonShadcn
+                  type="button"
                   onClick={handleCreateUser}
                   className="group relative overflow-hidden rounded-full border-0 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-violet-600 bg-[length:200%_100%] px-8 py-3 text-base font-semibold text-white shadow-xl shadow-violet-500/30 transition hover:bg-[position:100%_0]"
                   aria-label="Создать аккаунт Movie Match в браузере"
                 >
                   Создать аккаунт (веб)
-                </Button>
+                </ButtonShadcn>
                 <a
                   href={playUrl}
                   target="_blank"
@@ -488,13 +489,14 @@ export function MainBlock() {
                   фильма на вечер одному.
                 </p>
                 <div className="relative mt-8 flex flex-wrap justify-center gap-4">
-                  <Button
+                  <ButtonShadcn
+                    type="button"
                     onClick={handleCreateUser}
                     className="rounded-full border-0 bg-gradient-to-r from-violet-600 to-fuchsia-600 px-8 py-3 text-base font-semibold text-white shadow-lg shadow-violet-300/50 transition hover:brightness-105"
                     aria-label="Начать в браузере: создать аккаунт Movie Match"
                   >
                     Начать в браузере
-                  </Button>
+                  </ButtonShadcn>
                   <a
                     href={playUrl}
                     target="_blank"

@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@mm-preview/ui";
+import { ButtonShadcn } from "@mm-preview/ui";
 import { getAppUrls } from "@/src/shared/config/constants";
 
 const nav = [
@@ -45,13 +45,14 @@ export function Header() {
             ))}
           </nav>
           <div className="flex shrink-0 items-center gap-2">
-            <Button
+            <ButtonShadcn
+              type="button"
               onClick={handleStart}
               className="rounded-full border-0 bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-110 sm:px-5"
               aria-label="Начать: создать аккаунт и открыть приложение в браузере"
             >
               Начать
-            </Button>
+            </ButtonShadcn>
           </div>
         </div>
       </div>

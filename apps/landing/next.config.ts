@@ -1,8 +1,10 @@
-import fs from "node:fs";
 import path from "node:path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    optimizePackageImports: ["@mm-preview/ui"],
+  },
   reactStrictMode: true,
   poweredByHeader: false,
   /** Lighthouse «Missing source maps» для крупных first-party чанков. */
@@ -11,7 +13,7 @@ const nextConfig: NextConfig = {
   async headers() {
     const base: { key: string; value: string }[] = [
       { key: "X-Frame-Options", value: "DENY" },
-      { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+      /** Без COOP: `same-origin` мешает back/forward cache в Chrome на мобильных навигациях. */
       { key: "X-Content-Type-Options", value: "nosniff" },
       { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
     ];
@@ -52,19 +54,6 @@ const nextConfig: NextConfig = {
     // pnpm uses symlinks and a different node_modules structure
     const appNodeModules = path.resolve(__dirname, "node_modules");
     const rootNodeModules = path.resolve(__dirname, "../../node_modules");
-    // Helper to find legacy module (for backward compatibility)
-    const findLegacyModule = (packageName: string, moduleName: string) => {
-      const appPath = path.resolve(appNodeModules, packageName, moduleName);
-      const rootPath = path.resolve(rootNodeModules, packageName, moduleName);
-
-      if (fs.existsSync(appPath)) {
-        return appPath;
-      }
-      if (fs.existsSync(rootPath)) {
-        return rootPath;
-      }
-      return appPath;
-    };
 
     // Add node_modules to resolve.modules
     config.resolve.modules = [
@@ -76,19 +65,6 @@ const nextConfig: NextConfig = {
 
     // For pnpm, we need to ensure symlinks are followed
     config.resolve.symlinks = true;
-
-    // Legacy module resolution (for backward compatibility with old components)
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      // Legacy components still use these modules
-      "primereact/animateonscroll": findLegacyModule(
-        "primereact",
-        "animateonscroll",
-      ),
-      "primereact/avatar": findLegacyModule("primereact", "avatar"),
-      "primereact/button": findLegacyModule("primereact", "button"),
-      "primereact/badge": findLegacyModule("primereact", "badge"),
-    };
 
     return config;
   },

@@ -1,7 +1,23 @@
+import type { Metadata } from "next";
+import nextDynamic from "next/dynamic";
 import Script from "next/script";
 import { getLandingJsonLdString } from "@/src/shared/config/landing-json-ld";
+import { metadataByLang } from "@/src/shared/config/metadata";
 import { Header } from "@/src/shared/ui/header";
-import { MainBlock } from "@/src/shared/ui/main";
+
+const MainBlock = nextDynamic(
+  () =>
+    import("@/src/shared/ui/main").then((mod) => ({ default: mod.MainBlock })),
+  { ssr: true },
+);
+
+/** Явно на маршруте `/` — часть чекеров (в т.ч. моб. Lighthouse) ожидает meta description в HTML страницы. */
+export const metadata: Metadata = {
+  description: metadataByLang.ru.description,
+  openGraph: {
+    description: metadataByLang.ru.openGraph.description,
+  },
+};
 
 export const dynamic = "force-static";
 

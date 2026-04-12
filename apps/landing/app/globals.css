@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tailwindcss-primeui";
 @import "@mm-preview/ui/styles";
 
 /* Tailwind v4: без этого сканируется только `packages/ui` — утилиты лендинга не генерировались */
