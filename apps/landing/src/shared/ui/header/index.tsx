@@ -1,6 +1,6 @@
 "use client";
 
-import { ButtonShadcn } from "@mm-preview/ui";
+import { ButtonShadcn } from "@mm-preview/ui/light";
 import { getAppUrls } from "@/src/shared/config/constants";
 
 const nav = [

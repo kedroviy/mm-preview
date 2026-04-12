@@ -21,7 +21,7 @@ const cssLoadPlugin = {
 };
 
 export default defineConfig({
-  entry: ["src/index.ts"],
+  entry: ["src/index.ts", "src/export-light.ts"],
   format: ["esm", "cjs"],
   dts: { tsconfig: path.join(root, "tsconfig.json") },
   outDir: "dist",

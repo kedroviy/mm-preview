@@ -11,6 +11,11 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
+    "./light": {
+      "types": "./dist/export-light.d.ts",
+      "import": "./dist/export-light.mjs",
+      "require": "./dist/export-light.js"
+    },
     "./styles": "./dist/styles.css"
   },
   "scripts": {

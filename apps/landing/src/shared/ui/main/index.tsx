@@ -1,6 +1,6 @@
 "use client";
 
-import { ButtonShadcn } from "@mm-preview/ui";
+import { ButtonShadcn } from "@mm-preview/ui/light";
 import Link from "next/link";
 import { getAppUrls, getGooglePlayUrl } from "@/src/shared/config/constants";
 import { LONG_TAIL_GUIDES } from "@/src/shared/seo/long-tail-guides";
