@@ -3,7 +3,9 @@ import path from "node:path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@mm-preview/ui", "@mm-preview/sdk"],
+  reactStrictMode: true,
+  poweredByHeader: false,
+  transpilePackages: ["@mm-preview/ui"],
   async rewrites() {
     const backendUrl =
       process.env.BACKEND_URL || "https://api.moviematch.space";
@@ -25,12 +27,11 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer: _isServer }) => {
     // For pnpm, we need to ensure modules are resolved correctly
     // pnpm uses symlinks and a different node_modules structure
     const appNodeModules = path.resolve(__dirname, "node_modules");
     const rootNodeModules = path.resolve(__dirname, "../../node_modules");
-
     // Helper to find legacy module (for backward compatibility)
     const findLegacyModule = (packageName: string, moduleName: string) => {
       const appPath = path.resolve(appNodeModules, packageName, moduleName);

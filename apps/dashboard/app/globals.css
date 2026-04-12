@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "@mm-preview/ui/styles";
 
+@source "./**/*.{tsx,ts,jsx,js}";
+@source "../src/**/*.{tsx,ts,jsx,js}";
+
 /* InputOtp styles - ensure component is visible and styled */
 .p-inputotp {
   display: flex;

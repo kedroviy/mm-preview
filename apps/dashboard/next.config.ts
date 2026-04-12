@@ -30,6 +30,10 @@ const nextConfig: NextConfig = {
     // pnpm uses symlinks and a different node_modules structure
     const appNodeModules = path.resolve(__dirname, "node_modules");
     const rootNodeModules = path.resolve(__dirname, "../../node_modules");
+    const reactQueryRoot = path.resolve(
+      rootNodeModules,
+      "@tanstack/react-query",
+    );
 
     // Helper to find legacy module (for backward compatibility).
     // Only returns a path when it exists; otherwise undefined so we don't alias to missing paths (avoids MODULE_NOT_FOUND on Vercel).
@@ -72,7 +76,14 @@ const nextConfig: NextConfig = {
       const target = findLegacyModule("primereact", name);
       if (target) legacyAliases[`primereact/${name}`] = target;
     }
-    config.resolve.alias = { ...config.resolve.alias, ...legacyAliases };
+    const alias: Record<string, string> = {
+      ...config.resolve.alias,
+      ...legacyAliases,
+    };
+    if (fs.existsSync(reactQueryRoot)) {
+      alias["@tanstack/react-query"] = reactQueryRoot;
+    }
+    config.resolve.alias = alias;
 
     return config;
   },

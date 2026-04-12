@@ -1,15 +1,9 @@
 "use client";
 
 import { PrimeReactProviderWrapper } from "@mm-preview/ui";
-import type { PropsWithChildren, ReactNode } from "react";
-import QueryProvider from "./QueryProvider";
+import type { PropsWithChildren } from "react";
 
-type Props = {
-  children: ReactNode;
-};
-
-export const Provider = ({ children }: PropsWithChildren<Props>) => (
-  <QueryProvider>
-    <PrimeReactProviderWrapper>{children}</PrimeReactProviderWrapper>
-  </QueryProvider>
+/** Только UI-провайдер: на лендинге нет запросов к API через React Query. */
+export const Provider = ({ children }: PropsWithChildren) => (
+  <PrimeReactProviderWrapper>{children}</PrimeReactProviderWrapper>
 );

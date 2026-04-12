@@ -129,6 +129,18 @@ export function getAppUrls() {
   } as const;
 }
 
+const DEFAULT_GOOGLE_PLAY_LISTING =
+  "https://play.google.com/store/apps/details?id=com.moviematcher";
+
+/** Ссылка на карточку приложения в Google Play; env переопределяет дефолт */
+export function getGooglePlayUrl(): string {
+  const v = process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL;
+  if (typeof v === "string" && v.trim().length > 0) {
+    return v.trim();
+  }
+  return DEFAULT_GOOGLE_PLAY_LISTING;
+}
+
 // For backward compatibility, export as object (will be evaluated at module load time)
 // Note: This will use fallback values if env vars are not set during build
 export const APP_URLS = getAppUrls();

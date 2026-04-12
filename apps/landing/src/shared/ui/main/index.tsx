@@ -1,260 +1,477 @@
 "use client";
 
 import { Button } from "@mm-preview/ui";
-import { Avatar } from "primereact/avatar";
-import { Ripple } from "primereact/ripple";
-import type { ReactNode } from "react";
+import Link from "next/link";
+import { getAppUrls, getGooglePlayUrl } from "@/src/shared/config/constants";
+import { LONG_TAIL_GUIDES } from "@/src/shared/seo/long-tail-guides";
+import { LandingFaq } from "@/src/shared/ui/landing-faq/LandingFaq";
+import { Reveal } from "@/src/shared/ui/reveal";
+import { ScenarioPicker } from "@/src/shared/ui/scenario-picker/ScenarioPicker";
+import { features, reviews } from "./lib/constants";
 
-// AnimateOnScroll wrapper - primereact/animateonscroll may not exist in PrimeReact 10
-// Using a simple div wrapper for now
-interface AnimateOnScrollProps {
-  children?: ReactNode;
-  className?: string;
-  enterClassName?: string;
-  leaveClassName?: string;
-}
-
-function AnimateOnScroll({
-  children,
-  className,
-  enterClassName,
-}: AnimateOnScrollProps) {
+function GooglePlayBadge({ className = "" }: { className?: string }) {
   return (
-    <div className={className} data-animate-on-scroll>
-      {children}
-    </div>
+    <svg
+      className={className}
+      viewBox="0 0 180 53"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <title>Google Play</title>
+      <rect
+        width="180"
+        height="53"
+        rx="8"
+        fill="#000"
+        stroke="rgba(255,255,255,0.22)"
+        strokeWidth="1"
+      />
+      <path d="M12 15.5L28 26.5L12 37.5V15.5Z" fill="url(#gp-a)" />
+      <path d="M12 15.5L28 26.5L36 21L12 10V15.5Z" fill="url(#gp-b)" />
+      <path d="M12 37.5L28 26.5L36 32L12 43V37.5Z" fill="url(#gp-c)" />
+      <path d="M28 26.5L36 21V32L28 26.5Z" fill="url(#gp-d)" />
+      <text
+        x="48"
+        y="22"
+        fill="#fff"
+        fontSize="9"
+        fontFamily="system-ui,sans-serif"
+        letterSpacing="0.06em"
+      >
+        GET IT ON
+      </text>
+      <text
+        x="48"
+        y="38"
+        fill="#fff"
+        fontSize="14"
+        fontFamily="system-ui,sans-serif"
+        fontWeight="500"
+      >
+        Google Play
+      </text>
+      <defs>
+        <linearGradient
+          id="gp-a"
+          x1="8"
+          y1="40"
+          x2="26"
+          y2="22"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#00D4FF" />
+          <stop offset="1" stopColor="#00F076" />
+        </linearGradient>
+        <linearGradient
+          id="gp-b"
+          x1="8"
+          y1="10"
+          x2="34"
+          y2="24"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#FFD800" />
+          <stop offset="1" stopColor="#FF4E00" />
+        </linearGradient>
+        <linearGradient
+          id="gp-c"
+          x1="10"
+          y1="42"
+          x2="34"
+          y2="28"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#FF4E00" />
+          <stop offset="1" stopColor="#FC1964" />
+        </linearGradient>
+        <linearGradient
+          id="gp-d"
+          x1="26"
+          y1="20"
+          x2="38"
+          y2="32"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#00F076" />
+          <stop offset="1" stopColor="#00D4FF" />
+        </linearGradient>
+      </defs>
+    </svg>
   );
 }
 
-import { getAppUrls } from "@/src/shared/config/constants";
-
-export default function MainBlock() {
+export function MainBlock() {
   const handleCreateUser = () => {
     const urls = getAppUrls();
     window.location.href = urls.USER_CREATION;
   };
 
-  return (
-    <div className="card flex flex-col items-center overflow-hidden pt-16">
-      <div className="h-[30rem]" />
-      <div className="flex flex-wrap justify-center gap-8">
-        <AnimateOnScroll
-          className="flex flex-col bg-primary text-primary-contrast border-primary shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
-          enterClassName="animate-enter fade-in-10 spin-in-45 slide-in-from-t-12 animate-duration-1000"
-          leaveClassName="animate-leave fade-out-0 animate-duration-100"
-        >
-          <div className="rounded-full bg-primary text-primary-contrast w-12 h-12 flex items-center justify-center">
-            <i className="pi pi-user !text-2xl" />
-          </div>
-          <span className="text-2xl font-bold">Индивидуальный подбор</span>
-          <span className="text-muted-color text-center">
-            Мы подбираем фильмы по твоему вкусу — жанры, актёры и настроение,
-            всё учитывается.
-          </span>
-          <Ripple />
-        </AnimateOnScroll>
-        <AnimateOnScroll
-          className="flex flex-col bg-primary text-primary-contrast border-primary shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
-          enterClassName="animate-enter fade-in-10 spin-in-45 slide-in-from-t-12 animate-duration-1000"
-          leaveClassName="animate-leave fade-out-0 animate-duration-100"
-        >
-          <div className="rounded-full bg-primary text-primary-contrast w-12 h-12 flex items-center justify-center">
-            <i className="pi pi-users !text-2xl" />
-          </div>
-          <span className="text-2xl font-bold">С друзьями — интереснее</span>
-          <span className="text-muted-color text-center">
-            Создавай подборки, голосуй вместе с друзьями и находи идеальный
-            фильм для вечера.
-          </span>
-          <Ripple />
-        </AnimateOnScroll>
-        <AnimateOnScroll
-          className="flex flex-col bg-primary text-primary-contrast border-primary shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
-          enterClassName="animate-enter fade-in-10 spin-in-45 slide-in-from-t-12 animate-duration-1000"
-          leaveClassName="animate-leave fade-out-0 animate-duration-100"
-        >
-          <div className="rounded-full bg-primary text-primary-contrast w-12 h-12 flex items-center justify-center">
-            <i className="pi pi-building !text-2xl" />
-          </div>
-          <span className="text-2xl font-bold">Продвинутые рекомендации</span>
-          <span className="text-muted-color text-center">
-            Умный алгоритм учитывает твои оценки и привычки, предлагая всё
-            точнее с каждым просмотром.
-          </span>
-          <Ripple />
-        </AnimateOnScroll>
-      </div>
-      <div className="h-[30rem]" />
-      <div className="flex flex-wrap justify-center gap-8">
-        <AnimateOnScroll
-          className="flex flex-col shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
-          enterClassName="animate-enter fade-in-10 slide-in-from-t-20 animate-duration-1000"
-          leaveClassName="animate-leave fade-out-0 animate-duration-100"
-        >
-          <Avatar shape="circle" size="xlarge" />
-          <span className="text-2xl font-medium">Jenna Thompson</span>
-          <span className="text-muted-color text-center">
-            Не знаю как я жила без этого раньше!
-          </span>
-          <Ripple />
-        </AnimateOnScroll>
-        <AnimateOnScroll
-          className="flex flex-col shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
-          enterClassName="animate-enter fade-in-10 slide-in-from-b-20 animate-duration-1000"
-          leaveClassName="animate-leave fade-out-0 animate-duration-100"
-        >
-          <Avatar shape="circle" size="xlarge" />
-          <span className="text-2xl font-medium">Isabel Garcia</span>
-          <span className="text-muted-color text-center">
-            Никогда бы не узнал про генеральские котлы без этого приложения
-          </span>
-          <Ripple />
-        </AnimateOnScroll>
-        <AnimateOnScroll
-          className="flex flex-col shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
-          enterClassName="animate-enter fade-in-10 slide-in-from-t-20 animate-duration-1000"
-          leaveClassName="animate-leave fade-out-0 animate-duration-100"
-        >
-          <Avatar shape="circle" size="xlarge" />
-          <span className="text-2xl font-medium">Xavier Mason</span>
-          <span className="text-muted-color text-center">Паааааа</span>
-          <Ripple />
-        </AnimateOnScroll>
-      </div>
-      <div className="h-[30rem]" />
-      <div className="flex flex-wrap justify-center gap-8">
-        <AnimateOnScroll
-          className="flex flex-col bg-primary text-primary-contrast border-primary shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
-          enterClassName="animate-enter fade-in-10 spin-in-45 slide-in-from-t-12 animate-duration-1000"
-          leaveClassName="animate-leave fade-out-0 animate-duration-100"
-        >
-          <span className="bg-white/20 text-xl font-medium rounded-xl px-4 py-2">
-            850K
-          </span>
-          <span className="text-2xl font-bold">Customers</span>
-          <span className="text-center">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          </span>
-          <Ripple />
-        </AnimateOnScroll>
-        <AnimateOnScroll
-          className="flex flex-col bg-primary text-primary-contrast border-primary shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
-          enterClassName="animate-enter fade-in-10 zoom-in-50 slide-in-from-t-20 animate-duration-1000"
-          leaveClassName="animate-leave fade-out-0 animate-duration-100"
-        >
-          <span className="bg-white/20 text-xl font-medium rounded-xl px-4 py-2">
-            $1.5M
-          </span>
-          <span className="text-2xl font-bold">Revenue</span>
-          <span className="text-center">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          </span>
-          <Ripple />
-        </AnimateOnScroll>
-        <AnimateOnScroll
-          className="flex flex-col bg-primary text-primary-contrast border-primary shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
-          enterClassName="animate-enter fade-in-10 spin-in-[-45deg] slide-in-from-t-16 animate-duration-1000"
-          leaveClassName="animate-leave fade-out-0 animate-duration-100"
-        >
-          <span className="bg-white/20 text-xl font-medium rounded-xl px-4 py-2">
-            140K
-          </span>
-          <span className="text-2xl font-bold">Sales</span>
-          <span className="text-center">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          </span>
-          <Ripple />
-        </AnimateOnScroll>
-      </div>
-      <div className="h-[30rem]" />
-      <div className="flex flex-wrap justify-center gap-8">
-        <AnimateOnScroll
-          className="flex flex-col bg-purple-500 text-white border-purple-500 shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
-          enterClassName="animate-enter fade-in-10 zoom-in-50 animate-duration-1000"
-          leaveClassName="animate-leave fade-out-0 animate-duration-100"
-        >
-          <div className="rounded-full border-2 border-white w-12 h-12 flex items-center justify-center">
-            <i className="pi pi-wifi !text-2xl" />
-          </div>
-          <span className="text-2xl font-bold">Bandwidth</span>
-          <span className="text-center">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          </span>
-          <Ripple />
-        </AnimateOnScroll>
-        <AnimateOnScroll
-          className="flex flex-col bg-teal-500 text-white border-teal-500 shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
-          enterClassName="animate-enter fade-in-10 zoom-in-75 animate-duration-1000"
-          leaveClassName="animate-leave fade-out-0 animate-duration-1000"
-        >
-          <div className="rounded-full border-2 border-white w-12 h-12 flex items-center justify-center">
-            <i className="pi pi-database !text-2xl" />
-          </div>
-          <span className="text-2xl font-bold">Storage</span>
-          <span className="text-center">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          </span>
-          <Ripple />
-        </AnimateOnScroll>
+  const playUrl = getGooglePlayUrl();
 
-        <AnimateOnScroll
-          className="flex flex-col bg-indigo-500 text-white border-indigo-500 shadow-lg justify-center items-center max-w-80 rounded-2xl p-8 gap-4 p-ripple cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105"
-          enterClassName="animate-enter fade-in-10 zoom-in-50 animate-duration-1000"
-          leaveClassName="animate-leave fade-out-0 animate-duration-100"
-        >
-          <div className="rounded-full border-2 border-white w-12 h-12 flex items-center justify-center">
-            <i className="pi pi-arrows-v !text-2xl" />
+  return (
+    <div id="top" className="relative">
+      <section className="relative min-h-[100svh] overflow-hidden pt-28 pb-16 sm:pt-32">
+        <div className="landing-mesh" aria-hidden>
+          <div className="landing-mesh-blob" />
+          <div className="landing-mesh-blob" />
+          <div className="landing-mesh-blob" />
+        </div>
+        <div className="landing-grid-bg" aria-hidden />
+
+        <div className="relative z-10 mx-auto flex max-w-6xl flex-col gap-12 px-4 sm:px-6 lg:px-8">
+          <Reveal className="mx-auto max-w-4xl text-center">
+            <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-200/80 bg-white/85 px-4 py-1.5 text-xs font-medium uppercase tracking-[0.2em] text-[var(--landing-muted)] shadow-sm shadow-violet-100/80 backdrop-blur-sm">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              </span>
+              Movie Match · развлечения · Google Play
+            </p>
+            <h1 className="font-[family-name:var(--font-syne)] text-4xl font-extrabold leading-[1.05] tracking-tight text-[var(--landing-ink)] sm:text-6xl lg:text-7xl">
+              Фильм для вечера —{" "}
+              <span className="landing-headline-gradient">без споров</span>
+              <br className="hidden sm:block" /> с друзьями или парой
+            </h1>
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-[var(--landing-muted)] sm:text-xl">
+              Как в приложении в Google Play: создаёшь лобби, приглашаешь друга
+              или супруга и начинаете совместный выбор — вместо часовых
+              дискуссий «что посмотрим».
+            </p>
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-5">
+              <Button
+                onClick={handleCreateUser}
+                className="group relative overflow-hidden rounded-full border-0 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-violet-600 bg-[length:200%_100%] px-8 py-3 text-base font-semibold text-white shadow-xl shadow-violet-500/30 transition hover:bg-[position:100%_0]"
+              >
+                Создать аккаунт (веб)
+              </Button>
+              <a
+                href={playUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-white px-8 py-3 text-base font-semibold text-violet-900 shadow-md shadow-violet-100 transition hover:border-violet-300 hover:bg-violet-50/90"
+              >
+                <i className="pi pi-google text-lg" />
+                Скачать в Google Play
+              </a>
+            </div>
+          </Reveal>
+
+          <Reveal delay={120} className="relative">
+            <div className="landing-glass relative overflow-hidden rounded-3xl border border-violet-100 p-1 shadow-md shadow-violet-100/40">
+              <div className="landing-shimmer-line absolute inset-x-0 top-0 h-px" />
+              <div className="flex overflow-hidden rounded-[1.35rem] bg-gradient-to-r from-white via-violet-50/40 to-emerald-50/30 py-3">
+                <div className="landing-marquee-track gap-12 pr-12 text-sm font-medium text-[var(--landing-muted)]">
+                  {(["marquee-a", "marquee-b"] as const).map((marqueeKey) => (
+                    <div
+                      key={marqueeKey}
+                      className="flex shrink-0 items-center gap-12"
+                    >
+                      {[
+                        "Лобби",
+                        "Приглашение друга",
+                        "Компания друзей",
+                        "Вдвоём с партнёром",
+                        "Драма",
+                        "Комедия",
+                        "Триллер",
+                        "Совместный выбор",
+                        "Без споров",
+                        "Как в Google Play",
+                      ].map((t) => (
+                        <span
+                          key={`${marqueeKey}-${t}`}
+                          className="flex items-center gap-2 whitespace-nowrap"
+                        >
+                          <i className="pi pi-film text-violet-500" />
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Reveal>
+
+          <Reveal delay={200} className="grid gap-6 lg:grid-cols-3 lg:gap-8">
+            <div className="landing-glass landing-card-hover relative overflow-hidden rounded-3xl p-8 lg:col-span-2">
+              <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-violet-300/35 blur-3xl" />
+              <div className="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-sm font-medium text-violet-600">
+                    Сценарий из приложения
+                  </p>
+                  <p className="mt-2 max-w-md text-2xl font-semibold text-[var(--landing-ink)] sm:text-3xl">
+                    Лобби → приглашение → совместный подбор фильма в одном
+                    потоке.
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <div className="h-24 w-20 rounded-2xl bg-gradient-to-br from-violet-100 to-violet-50 ring-1 ring-violet-200/80 transition hover:rotate-[-4deg]" />
+                  <div className="h-28 w-20 translate-y-2 rounded-2xl bg-gradient-to-br from-fuchsia-200/90 to-violet-200/80 ring-1 ring-fuchsia-200/80 transition hover:-translate-y-1" />
+                  <div className="h-24 w-20 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-50 ring-1 ring-emerald-200/80 transition hover:rotate-[4deg]" />
+                </div>
+              </div>
+            </div>
+            <div className="landing-glass landing-card-hover flex flex-col justify-between rounded-3xl p-8">
+              <div>
+                <p className="text-4xl font-[family-name:var(--font-syne)] font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">
+                  Play
+                </p>
+                <p className="mt-1 text-sm text-[var(--landing-muted)]">
+                  приложение уже в каталоге Google Play (Entertainment)
+                </p>
+              </div>
+              <div className="mt-8 space-y-3 border-t border-violet-100 pt-6">
+                <div className="flex items-center gap-3 text-sm text-slate-700">
+                  <i className="pi pi-check-circle text-emerald-500" />
+                  Лобби и приглашение друга
+                </div>
+                <div className="flex items-center gap-3 text-sm text-slate-700">
+                  <i className="pi pi-check-circle text-emerald-500" />
+                  Совместный выбор без споров
+                </div>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Google Play — выделенный блок */}
+      <section
+        id="download"
+        className="relative scroll-mt-28 py-12 sm:scroll-mt-32 sm:py-20"
+      >
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-violet-100/40 to-emerald-50/30" />
+        <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <Reveal>
+            <div className="landing-border-beam relative overflow-hidden rounded-[2rem] border border-violet-200/90 bg-gradient-to-br from-white via-violet-50/80 to-emerald-50/50 p-1 shadow-[0_24px_80px_-24px_rgba(124,92,255,0.2)]">
+              <div className="relative rounded-[1.85rem] bg-white/95 px-6 pb-14 pt-12 shadow-inner shadow-violet-50/50 sm:px-12 sm:pb-20 sm:pt-16">
+                <div className="absolute left-1/2 top-0 h-40 w-[min(90%,480px)] -translate-x-1/2 rounded-full bg-violet-200/50 blur-[100px]" />
+                <div className="relative grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16">
+                  <div className="min-w-0">
+                    <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-violet-800 ring-1 ring-violet-200/80">
+                      Google Play · Entertainment
+                    </span>
+                    <h2 className="mt-5 font-[family-name:var(--font-syne)] text-3xl font-bold leading-[1.2] tracking-tight text-[var(--landing-ink)] sm:text-4xl sm:leading-[1.18] lg:text-5xl lg:leading-[1.15]">
+                      Скачай{" "}
+                      <span className="landing-gradient-clip bg-gradient-to-r from-emerald-600 to-teal-600">
+                        Movie Match
+                      </span>{" "}
+                      в Google Play
+                    </h2>
+                    <p className="mt-4 max-w-xl text-lg text-[var(--landing-muted)]">
+                      Официальное описание в магазине: приложение помогает
+                      выбрать фильм в компании друзей или супругов — больше
+                      никаких споров при выборе. Создаёте лобби, приглашаете
+                      друга и начинаете подбор.
+                    </p>
+                    <p className="mt-4 text-sm text-[var(--landing-muted)]">
+                      Пакет{" "}
+                      <code className="rounded-md bg-violet-50 px-1.5 py-0.5 text-violet-900 ring-1 ring-violet-100">
+                        com.moviematcher
+                      </code>
+                      . В Vercel ссылку задаёт{" "}
+                      <code className="rounded-md bg-violet-50 px-1.5 py-0.5 text-violet-900 ring-1 ring-violet-100">
+                        NEXT_PUBLIC_GOOGLE_PLAY_URL
+                      </code>
+                      .
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col items-center justify-center gap-6">
+                    <div className="relative flex w-full max-w-sm flex-col items-center rounded-2xl border border-violet-100 bg-gradient-to-b from-white to-violet-50/40 p-8 shadow-md shadow-violet-100/60 transition hover:border-violet-200">
+                      <div className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br from-violet-100/60 via-transparent to-emerald-100/40" />
+                      <a
+                        href={playUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex flex-col items-center gap-5 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+                      >
+                        <GooglePlayBadge className="h-14 w-auto drop-shadow-[0_12px_32px_rgba(0,0,0,0.5)] transition group-hover:scale-[1.03]" />
+                        <span className="text-center text-sm text-[var(--landing-muted)]">
+                          Откроется карточка приложения в Google Play
+                        </span>
+                      </a>
+                    </div>
+                    <a
+                      href={playUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-medium text-violet-600 underline-offset-4 hover:text-violet-800 hover:underline"
+                    >
+                      Открыть Movie Match в Google Play →
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      <section
+        id="features"
+        className="scroll-mt-28 py-16 sm:scroll-mt-32 sm:py-24"
+      >
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <Reveal className="mx-auto max-w-2xl text-center">
+            <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
+              Сделано под совместные решения
+            </h2>
+            <p className="mt-3 text-[var(--landing-muted)]">
+              Тот же смысл, что и в карточке приложения: лобби, приглашение и
+              совместный выбор.
+            </p>
+          </Reveal>
+          <div className="mt-12 grid gap-5 md:grid-cols-3">
+            {features.map((f, i) => (
+              <Reveal
+                key={f.title}
+                delay={i * 70}
+                className={`landing-glass landing-card-hover rounded-3xl p-8 ${f.span}`}
+              >
+                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-fuchsia-100 ring-1 ring-violet-200/80">
+                  <i className={`pi ${f.icon} text-xl text-violet-600`} />
+                </div>
+                <h3 className="font-[family-name:var(--font-syne)] text-xl font-semibold text-[var(--landing-ink)]">
+                  {f.title}
+                </h3>
+                <p className="mt-2 text-[var(--landing-muted)]">{f.desc}</p>
+              </Reveal>
+            ))}
           </div>
-          <span className="text-2xl font-bold">Requests</span>
-          <span className="text-center">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          </span>
-          <Ripple />
-        </AnimateOnScroll>
-      </div>
-      <div className="h-[30rem]" />
-      <div className="flex flex-col items-center gap-8 w-full">
-        <AnimateOnScroll
-          enterClassName="animate-enter fade-in-10 slide-in-from-b-16 animate-duration-1000"
-          leaveClassName="animate-leave fade-out-0 animate-duration-100"
-        >
-          <div className="text-5xl lg:text-7xl text-center font-bold max-w-lg lg:max-w-3xl text-surface-900 dark:text-surface-50">
-            Choosing a movie in the company of friends or spouses.
-          </div>
-        </AnimateOnScroll>
-        <AnimateOnScroll
-          enterClassName="animate-enter fade-in-10 slide-in-from-b-16 animate-duration-1000"
-          leaveClassName="animate-leave fade-out-0 animate-duration-100"
-        >
-          <div className="max-w-md lg:max-w-2xl text-lg lg:text-xl text-center text-muted-color">
-            No more arguments when choosing a movie. You create a lobby, invite
-            a friend and start selecting a movie to watch.
-          </div>
-        </AnimateOnScroll>
-        <AnimateOnScroll
-          enterClassName="animate-enter fade-in-10 slide-in-from-b-16 animate-duration-1000"
-          leaveClassName="animate-leave fade-out-0 animate-duration-100"
-        >
-          <div className="flex items-center justify-center gap-4">
-            <Button
-              onClick={handleCreateUser}
-              className="text-lg px-6 py-3 p-ripple"
+        </div>
+      </section>
+
+      <ScenarioPicker />
+
+      <section
+        id="guides"
+        className="scroll-mt-28 border-t border-violet-100/90 py-16 sm:scroll-mt-32 sm:py-24"
+      >
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <Reveal className="mx-auto max-w-2xl text-center">
+            <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
+              Гайды: выбор фильма и Movie Match
+            </h2>
+            <p className="mt-3 text-[var(--landing-muted)]">
+              Отдельные страницы под узкие запросы — лобби, пара, компания,
+              Google Play. Всё в одном продукте.
+            </p>
+          </Reveal>
+          <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {LONG_TAIL_GUIDES.map((g, i) => (
+              <Reveal key={g.slug} delay={i * 40}>
+                <li>
+                  <Link
+                    href={`/guides/${g.slug}`}
+                    className="landing-glass landing-card-hover flex h-full flex-col rounded-2xl border border-violet-100/90 p-6 no-underline transition hover:border-violet-200"
+                  >
+                    <span className="font-[family-name:var(--font-syne)] text-lg font-semibold text-[var(--landing-ink)]">
+                      {g.h1}
+                    </span>
+                    <span className="mt-2 line-clamp-3 text-sm text-[var(--landing-muted)]">
+                      {g.metaDescription}
+                    </span>
+                    <span className="mt-4 text-sm font-medium text-violet-600">
+                      Читать →
+                    </span>
+                  </Link>
+                </li>
+              </Reveal>
+            ))}
+          </ul>
+          <p className="mt-8 text-center">
+            <Link
+              href="/guides"
+              className="text-sm font-semibold text-violet-600 underline-offset-4 hover:text-violet-800 hover:underline"
             >
-              Create Account
-              <Ripple />
-            </Button>
-            <Button
-              outlined
-              color="secondary"
-              className="text-lg px-6 py-3 p-ripple"
-            >
-              See our plans
-              <Ripple />
-            </Button>
+              Все материалы на одной странице →
+            </Link>
+          </p>
+        </div>
+      </section>
+
+      <LandingFaq />
+
+      <section
+        id="reviews"
+        className="scroll-mt-28 border-t border-violet-100/90 py-16 sm:scroll-mt-32 sm:py-24"
+      >
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <Reveal className="mx-auto max-w-2xl text-center">
+            <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
+              Отзывы
+            </h2>
+            <p className="mt-3 text-[var(--landing-muted)]">
+              Коротко — как это ощущается в жизни, а не в презентации.
+            </p>
+          </Reveal>
+          <div className="mt-12 grid auto-rows-fr gap-6 md:grid-cols-3">
+            {reviews.map((r, i) => (
+              <Reveal key={r.name} delay={i * 80} className="h-full min-h-0">
+                <blockquote className="landing-glass landing-card-hover flex h-full min-h-0 flex-col rounded-3xl p-8">
+                  <p className="text-lg leading-relaxed text-slate-700">
+                    «{r.quote}»
+                  </p>
+                  <footer className="mt-auto flex items-center gap-3 border-t border-violet-100 pt-6">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 text-sm font-bold text-white">
+                      {r.name[0]}
+                    </div>
+                    <div>
+                      <cite className="not-italic font-semibold text-[var(--landing-ink)]">
+                        {r.name}
+                      </cite>
+                      <p className="text-sm text-[var(--landing-muted)]">
+                        {r.role}
+                      </p>
+                    </div>
+                  </footer>
+                </blockquote>
+              </Reveal>
+            ))}
           </div>
-        </AnimateOnScroll>
-      </div>
-      <div className="h-[15rem]" />
+        </div>
+      </section>
+
+      <section className="relative pb-24 pt-8">
+        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
+          <Reveal>
+            <div className="landing-glass relative overflow-hidden rounded-[2rem] px-8 py-14 sm:px-16">
+              <div className="pointer-events-none absolute -left-24 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-violet-200/60 blur-[90px]" />
+              <div className="pointer-events-none absolute -right-24 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-amber-100/80 blur-[90px]" />
+              <h2 className="relative font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
+                Готов убрать хаос из выбора фильма?
+              </h2>
+              <p className="relative mx-auto mt-4 max-w-lg text-[var(--landing-muted)]">
+                В вебе — быстрый старт с аккаунтом; в Android — то же Movie
+                Match из Google Play, с фокусом на совместный выбор в лобби.
+              </p>
+              <div className="relative mt-8 flex flex-wrap justify-center gap-4">
+                <Button
+                  onClick={handleCreateUser}
+                  className="rounded-full border-0 bg-gradient-to-r from-violet-600 to-fuchsia-600 px-8 py-3 text-base font-semibold text-white shadow-lg shadow-violet-300/50 transition hover:brightness-105"
+                >
+                  Начать в браузере
+                </Button>
+                <a
+                  href={playUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center rounded-full border border-violet-200 bg-white px-8 py-3 text-base font-semibold text-violet-900 shadow-sm transition hover:border-violet-300 hover:bg-violet-50"
+                >
+                  Открыть в Google Play
+                </a>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+        <footer className="mx-auto mt-16 max-w-6xl px-4 text-center text-sm text-[var(--landing-muted)] sm:px-6">
+          <p>© {new Date().getFullYear()} Movie Match</p>
+        </footer>
+      </section>
     </div>
   );
 }

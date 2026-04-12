@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Tailwind v4 only auto-scans the app root; register this package so utilities
+   used in components (e.g. shadcn `className`s) are generated in consuming apps. */
+@source "../src/**/*.{tsx,ts,jsx,js}";
+
 @layer base {
   :root {
     --background: 0 0% 100%;

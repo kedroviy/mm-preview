@@ -3,18 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3000 -H 0.0.0.0",
+    "dev": "next dev --turbopack -p 3000 -H 0.0.0.0",
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "biome check",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@mm-preview/sdk": "*",
     "@mm-preview/ui": "*",
     "@primeuix/themes": "^1.2.5",
     "@tailwindcss/postcss": "^4.1.14",
-    "@tanstack/react-query": "^5.90.2",
     "@types/node": "^20",
     "@types/react": "^19.2.3",
     "@types/react-dom": "^19.2.3",

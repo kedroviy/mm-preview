@@ -2,6 +2,9 @@
 @import "tailwindcss-primeui";
 @import "@mm-preview/ui/styles";
 
+@source "./**/*.{tsx,ts,jsx,js}";
+@source "../src/**/*.{tsx,ts,jsx,js}";
+
 :root {
   height: 100vh;
 
