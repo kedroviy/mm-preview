@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Movie Match — совместный выбор фильма с друзьями или парой";
+export const alt =
+  "Movie Match — совместный и соло-подбор фильма (друзья, пара или один)";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -61,7 +62,7 @@ export default function OpenGraphImage() {
             maxWidth: 900,
           }}
         >
-          Совместный выбор с друзьями или парой · Google Play
+          Совместно или в соло · друзья, пара, один · Google Play
         </p>
       </div>
     </div>,

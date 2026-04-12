@@ -12,8 +12,8 @@ export function LandingFaq() {
           Вопросы и ответы
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-center text-[var(--landing-muted)]">
-          Коротко о сценарии Movie Match: лобби, приглашение, Google Play и
-          совместный выбор.
+          Лобби, приглашение, совместный и соло-подбор — и как это связано с
+          Google Play.
         </p>
         <ul className="mt-10 space-y-3">
           {LANDING_FAQ_ITEMS.map((item) => (

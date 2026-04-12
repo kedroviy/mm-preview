@@ -25,7 +25,7 @@ export function getLandingJsonLdString(): string {
       url: siteUrl,
       inLanguage: "ru-RU",
       description:
-        "Совместный выбор фильма: лобби, приглашение и подбор кино с друзьями или парой. Приложение в Google Play.",
+        "Совместный выбор фильма (лобби, приглашение) и соло-подбор для одного: подобрать себе кино на вечер. Приложение в Google Play.",
       publisher: { "@id": `${siteUrl}/#organization` },
     },
     {
@@ -39,6 +39,8 @@ export function getLandingJsonLdString(): string {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       name: "Movie Match",
+      description:
+        "Совместный выбор фильма (лобби, приглашение) и соло-подбор для одного на вечер.",
       applicationCategory: "EntertainmentApplication",
       operatingSystem: "ANDROID",
       offers: {

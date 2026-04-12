@@ -131,12 +131,13 @@ export function MainBlock() {
             <h1 className="font-[family-name:var(--font-syne)] text-4xl font-extrabold leading-[1.05] tracking-tight text-[var(--landing-ink)] sm:text-6xl lg:text-7xl">
               Фильм для вечера —{" "}
               <span className="landing-headline-gradient">без споров</span>
-              <br className="hidden sm:block" /> с друзьями или парой
+              <br className="hidden sm:block" /> с друзьями, парой или в соло
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-[var(--landing-muted)] sm:text-xl">
-              Как в приложении в Google Play: создаёшь лобби, приглашаешь друга
-              или супруга и начинаете совместный выбор — вместо часовых
-              дискуссий «что посмотрим».
+              Как в приложении в Google Play: лобби, приглашение и совместный
+              выбор с друзьями или партнёром — или соло-подбор, когда один
+              человек подбирает себе кино на вечер без лобби и без второго
+              участника.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-5">
               <Button
@@ -170,6 +171,7 @@ export function MainBlock() {
                       {[
                         "Лобби",
                         "Приглашение друга",
+                        "Соло-подбор",
                         "Компания друзей",
                         "Вдвоём с партнёром",
                         "Драма",
@@ -203,8 +205,8 @@ export function MainBlock() {
                     Сценарий из приложения
                   </p>
                   <p className="mt-2 max-w-md text-2xl font-semibold text-[var(--landing-ink)] sm:text-3xl">
-                    Лобби → приглашение → совместный подбор фильма в одном
-                    потоке.
+                    Лобби → приглашение → совместный подбор — и отдельно
+                    соло-подбор для вечера одному.
                   </p>
                 </div>
                 <div className="flex gap-3">
@@ -231,6 +233,10 @@ export function MainBlock() {
                 <div className="flex items-center gap-3 text-sm text-slate-700">
                   <i className="pi pi-check-circle text-emerald-500" />
                   Совместный выбор без споров
+                </div>
+                <div className="flex items-center gap-3 text-sm text-slate-700">
+                  <i className="pi pi-check-circle text-emerald-500" />
+                  Соло-подбор фильма на вечер
                 </div>
               </div>
             </div>
@@ -264,8 +270,9 @@ export function MainBlock() {
                     <p className="mt-4 max-w-xl text-lg text-[var(--landing-muted)]">
                       Официальное описание в магазине: приложение помогает
                       выбрать фильм в компании друзей или супругов — больше
-                      никаких споров при выборе. Создаёте лобби, приглашаете
-                      друга и начинаете подбор.
+                      никаких споров при совместном выборе. Плюс в приложении
+                      есть соло-подбор: один человек может подобрать себе кино
+                      на вечер. Лобби и приглашение — когда смотрите вместе.
                     </p>
                     <p className="mt-4 text-sm text-[var(--landing-muted)]">
                       Пакет{" "}
@@ -318,11 +325,11 @@ export function MainBlock() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <Reveal className="mx-auto max-w-2xl text-center">
             <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
-              Сделано под совместные решения
+              Совместно и в одиночку
             </h2>
             <p className="mt-3 text-[var(--landing-muted)]">
-              Тот же смысл, что и в карточке приложения: лобби, приглашение и
-              совместный выбор.
+              В карточке приложения: лобби, приглашение и совместный выбор — и
+              соло-подбор, когда фильм на вечер выбираете только вы.
             </p>
           </Reveal>
           <div className="mt-12 grid gap-5 md:grid-cols-3">
@@ -358,7 +365,7 @@ export function MainBlock() {
             </h2>
             <p className="mt-3 text-[var(--landing-muted)]">
               Отдельные страницы под узкие запросы — лобби, пара, компания,
-              Google Play. Всё в одном продукте.
+              соло-подбор, Google Play. Всё в одном приложении.
             </p>
           </Reveal>
           <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -447,7 +454,8 @@ export function MainBlock() {
               </h2>
               <p className="relative mx-auto mt-4 max-w-lg text-[var(--landing-muted)]">
                 В вебе — быстрый старт с аккаунтом; в Android — то же Movie
-                Match из Google Play, с фокусом на совместный выбор в лобби.
+                Match из Google Play: совместный выбор в лобби или соло-подбор
+                фильма на вечер одному.
               </p>
               <div className="relative mt-8 flex flex-wrap justify-center gap-4">
                 <Button

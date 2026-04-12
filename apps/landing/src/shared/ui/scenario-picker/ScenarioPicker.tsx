@@ -3,7 +3,7 @@
 import { Button } from "@mm-preview/ui";
 import { useState } from "react";
 
-type Scenario = "friends" | "couple";
+type Scenario = "friends" | "couple" | "solo";
 
 const copy: Record<Scenario, { label: string; body: string; hint: string }> = {
   friends: {
@@ -15,6 +15,11 @@ const copy: Record<Scenario, { label: string; body: string; hint: string }> = {
     label: "Вдвоём",
     body: "В паре больше эмоций вокруг «ты опять не угадал». Совместный подбор в Movie Match симметричен: не один тянет выбор, а оба участвуют в одном потоке — меньше ощущения, что ответственность лежит на одном человеке.",
     hint: "Если удобнее начать с телефона — карточка Movie Match в Google Play; если с браузера — кнопка создания аккаунта на этом сайте.",
+  },
+  solo: {
+    label: "В соло",
+    body: "Не всегда есть с кем согласовывать вечер: в приложении есть соло-подбор — один человек проходит подбор и выбирает себе фильм без лобби и без приглашения второго участника.",
+    hint: "Откройте Movie Match в Google Play и выберите сценарий для вечера в одиночку; при желании позже всегда можно перейти к лобби для совместного просмотра.",
   },
 };
 
@@ -34,8 +39,8 @@ export function ScenarioPicker() {
           Ваш сценарий
         </h2>
         <p className="mx-auto mt-3 max-w-lg text-center text-[var(--landing-muted)]">
-          Нажмите вариант — коротко о том, как Movie Match ложится на вечер с
-          друзьями или вдвоём.
+          Нажмите вариант — вечер с друзьями, вдвоём или соло-подбор фильма на
+          вечер одному.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           {(Object.keys(copy) as Scenario[]).map((key) => (

@@ -37,10 +37,10 @@ function dedupeKeywords(list: string[]): string[] {
 export const metadataByLang: Record<SupportedLocale, MetadataConfig> = {
   ru: {
     titleDefault:
-      "Movie Match — совместный выбор фильма с друзьями или парой | что посмотреть",
+      "Movie Match — совместный и соло-подбор фильма | что посмотреть",
     titleTemplate: "%s · Movie Match",
     description:
-      "Movie Match помогает договориться, что посмотреть: лобби, приглашение и совместный подбор фильма без бесконечных споров. Идеи для киновечера, просмотр с компанией или вдвоём — приложение в Google Play (развлечения). Подойдёт, если ищете способ выбрать кино, сериал на вечер или подобрать фильмы на настроение.",
+      "Movie Match помогает договориться, что посмотреть: лобби, приглашение и совместный подбор без бесконечных споров — и есть соло-подбор, когда один человек выбирает себе фильм на вечер. Идеи для киновечера, компания, пара или в одиночку — приложение в Google Play (развлечения).",
     keywords: dedupeKeywords([
       "что посмотреть",
       "что посмотреть вечером",
@@ -70,21 +70,23 @@ export const metadataByLang: Record<SupportedLocale, MetadataConfig> = {
       "movie match",
       "приложение для выбора фильма",
       "лобби для фильма",
+      "соло подбор фильма",
+      "выбрать фильм одному",
       "Google Play развлечения",
     ]),
     openGraph: {
-      title: "Movie Match — выберите фильм вместе, без споров",
+      title: "Movie Match — вместе или в соло, без хаоса в выборе",
       description:
-        "Лобби, приглашение и совместный подбор: договоритесь, что посмотреть, за минуты. Доступно в Google Play.",
+        "Лобби, приглашение и совместный подбор — плюс соло-подбор фильма на вечер одному. В Google Play.",
       siteName: "Movie Match",
     },
   },
   en: {
     titleDefault:
-      "Movie Match — pick a movie together with friends or your partner",
+      "Movie Match — pick a movie together or solo for movie night",
     titleTemplate: "%s · Movie Match",
     description:
-      "Movie Match helps you decide what to watch: create a lobby, invite your partner or friends, and match on movies without endless debate. Great for movie night, group watch, or date night — available on Google Play (Entertainment).",
+      "Movie Match helps you decide what to watch: lobby, invite, and match with friends or your partner—plus a solo picker when you want a film just for yourself. On Google Play (Entertainment).",
     keywords: dedupeKeywords([
       "what to watch",
       "movie night",
@@ -99,11 +101,13 @@ export const metadataByLang: Record<SupportedLocale, MetadataConfig> = {
       "entertainment app",
       "Google Play",
       "movie match",
+      "solo movie picker",
+      "pick a movie alone",
     ]),
     openGraph: {
-      title: "Movie Match — decide what to watch together",
+      title: "Movie Match — together or solo",
       description:
-        "Lobby, invite, and match—stop arguing, start watching. On Google Play.",
+        "Lobby, invite, and match together—or pick a movie solo for your night. On Google Play.",
       siteName: "Movie Match",
     },
   },
