@@ -31,7 +31,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://mm-admin.onrender.com/:path*"
+      "destination": "https://api.moviematch.space/:path*"
     }
   ]
 }
@@ -50,7 +50,7 @@
   - `NEXT_PUBLIC_USE_API_PROXY=false` или не устанавливайте
 
 - **Для серверных запросов:**
-  - `API_URL=https://mm-admin.onrender.com` (используется только на сервере)
+  - `API_URL=https://api.moviematch.space` (используется только на сервере)
 
 ## Как это работает
 
@@ -60,7 +60,7 @@
 import { api } from "@mm-preview/sdk";
 
 // В продакшене: запрос идет на /api/users/profile
-// Vercel проксирует его на https://mm-admin.onrender.com/users/profile
+// Vercel проксирует его на https://api.moviematch.space/users/profile
 // Браузер видит запрос как идущий с того же домена
 const response = await api.get("/users/profile");
 ```
@@ -71,7 +71,7 @@ const response = await api.get("/users/profile");
 import { getServerApiUrl } from "@mm-preview/sdk";
 
 // Всегда использует прямой URL
-const apiUrl = getServerApiUrl(); // https://mm-admin.onrender.com
+const apiUrl = getServerApiUrl(); // https://api.moviematch.space
 const response = await fetch(`${apiUrl}/users/profile`);
 ```
 
@@ -81,7 +81,7 @@ const response = await fetch(`${apiUrl}/users/profile`);
 import { getWebSocketUrl } from "@mm-preview/sdk";
 
 // Всегда использует прямой URL
-const wsUrl = getWebSocketUrl(); // wss://mm-admin.onrender.com/rooms
+const wsUrl = getWebSocketUrl(); // wss://api.moviematch.space/rooms
 const socket = io(wsUrl);
 ```
 

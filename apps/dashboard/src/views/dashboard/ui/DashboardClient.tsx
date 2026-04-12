@@ -100,10 +100,10 @@ export function DashboardClient({
                 {...(!isMyRoomsLoading &&
                   myRooms &&
                   myRooms.length > 0 && {
-                    badge: String(myRooms.length),
-                    badgeSeverity: "warning",
-                  })}
-                tooltip="Создайте комнату, присоединитесь к существующей или вернитесь в недавнюю комнату"
+                  badge: String(myRooms.length),
+                  badgeSeverity: "warning",
+                })}
+                tooltip={"Создайте комнату, присоединитесь к существующей или вернитесь в недавнюю комнату"}
                 tooltipOptions={{ position: "bottom" }}
                 onClick={() => {
                   navigate(`/${user.userId}/rooms`);
@@ -114,7 +114,6 @@ export function DashboardClient({
 
             <ViewTransition name="movies-button">
               <Button
-                type="button"
                 label="Movies"
                 icon="pi pi-video"
                 tooltip="Browse and discover new movies"
