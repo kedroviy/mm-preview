@@ -3,6 +3,7 @@
 import { ButtonShadcn } from "@mm-preview/ui/light";
 import Link from "next/link";
 import { getAppUrls, getGooglePlayUrl } from "@/src/shared/config/constants";
+import type { SupportedLocale } from "@/src/shared/config/metadata";
 import { LONG_TAIL_GUIDES } from "@/src/shared/seo/long-tail-guides";
 import { LandingFaq } from "@/src/shared/ui/landing-faq/LandingFaq";
 import { Reveal } from "@/src/shared/ui/reveal";
@@ -101,7 +102,7 @@ function GooglePlayBadge({ className = "" }: { className?: string }) {
   );
 }
 
-export function MainBlock() {
+export function MainBlock({ lang }: { lang: SupportedLocale }) {
   const handleCreateUser = () => {
     const urls = getAppUrls();
     window.location.href = urls.USER_CREATION;
@@ -390,7 +391,7 @@ export function MainBlock() {
                 <li key={g.slug} className="min-h-0">
                   <Reveal delay={i * 40} className="h-full">
                     <Link
-                      href={`/guides/${g.slug}`}
+                      href={`/${lang}/guides/${g.slug}`}
                       className="landing-glass landing-card-hover flex h-full min-h-0 flex-col rounded-2xl border border-violet-100/90 p-6 no-underline transition hover:border-violet-200"
                     >
                       <span className="font-[family-name:var(--font-syne)] text-lg font-semibold text-[var(--landing-ink)]">
@@ -409,7 +410,7 @@ export function MainBlock() {
             </ul>
             <p className="mt-8 text-center">
               <Link
-                href="/guides"
+                href={`/${lang}/guides`}
                 className="text-sm font-semibold text-violet-600 underline-offset-4 hover:text-violet-800 hover:underline"
                 aria-label="Все гайды на одной странице"
               >

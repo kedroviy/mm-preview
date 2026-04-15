@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
 import { getLandingSiteUrl } from "@/src/shared/config/site-url";
 
-export type SupportedLocale = "ru" | "en";
+export type SupportedLocale = "ru" | "en" | "es";
+
+export const SUPPORTED_LOCALES: readonly SupportedLocale[] = [
+  "ru",
+  "en",
+  "es",
+] as const;
+
+export const DEFAULT_LOCALE: SupportedLocale = "ru";
 
 export interface MetadataConfig {
   titleDefault: string;
@@ -111,6 +119,30 @@ export const metadataByLang: Record<SupportedLocale, MetadataConfig> = {
       siteName: "Movie Match",
     },
   },
+  es: {
+    titleDefault:
+      "Movie Match — elige una película en pareja o en solitario",
+    titleTemplate: "%s · Movie Match",
+    description:
+      "Movie Match te ayuda a decidir qué ver: sala, invitación y selección en grupo o en pareja, además de un modo en solitario cuando eliges para ti. En Google Play (Entretenimiento).",
+    keywords: dedupeKeywords([
+      "qué ver",
+      "noche de películas",
+      "elegir película",
+      "app para elegir películas",
+      "recomendaciones de películas",
+      "ver películas con amigos",
+      "Google Play",
+      "movie match",
+      "selector de películas",
+    ]),
+    openGraph: {
+      title: "Movie Match — juntos o en solitario",
+      description:
+        "Sala, invitación y match en grupo — o elige una película en solitario. En Google Play.",
+      siteName: "Movie Match",
+    },
+  },
 };
 
 /**
@@ -120,7 +152,7 @@ export function detectLanguage(
   pathname: string,
   acceptLanguage?: string | null,
 ): SupportedLocale {
-  const langMatch = pathname.match(/^\/(ru|en)(\/|$)/);
+  const langMatch = pathname.match(/^\/(ru|en|es)(\/|$)/);
   if (langMatch) {
     return langMatch[1] as SupportedLocale;
   }
@@ -133,9 +165,12 @@ export function detectLanguage(
     if (lowerLang.includes("en")) {
       return "en";
     }
+    if (lowerLang.includes("es")) {
+      return "es";
+    }
   }
 
-  return "ru";
+  return DEFAULT_LOCALE;
 }
 
 function googleSiteVerification(): Metadata["verification"] | undefined {
@@ -152,8 +187,9 @@ function googleSiteVerification(): Metadata["verification"] | undefined {
 export function createLandingMetadata(lang: SupportedLocale): Metadata {
   const siteUrl = getLandingSiteUrl();
   const base = new URL(`${siteUrl}/`);
-  const meta = metadataByLang[lang] ?? metadataByLang.ru;
+  const meta = metadataByLang[lang] ?? metadataByLang[DEFAULT_LOCALE];
   const verification = googleSiteVerification();
+  const canonical = `/${lang}`;
 
   return {
     metadataBase: base,
@@ -169,10 +205,12 @@ export function createLandingMetadata(lang: SupportedLocale): Metadata {
     publisher: "Movie Match",
     category: "entertainment",
     alternates: {
-      canonical: "/",
+      canonical,
       languages: {
-        "ru-RU": "/",
-        "x-default": "/",
+        "ru-RU": "/ru",
+        "en-US": "/en",
+        "es-ES": "/es",
+        "x-default": `/${DEFAULT_LOCALE}`,
       },
     },
     formatDetection: {
@@ -198,8 +236,8 @@ export function createLandingMetadata(lang: SupportedLocale): Metadata {
       description: meta.openGraph.description,
       siteName: meta.openGraph.siteName,
       type: "website",
-      locale: lang === "ru" ? "ru_RU" : "en_US",
-      url: "/",
+      locale: lang === "ru" ? "ru_RU" : lang === "es" ? "es_ES" : "en_US",
+      url: canonical,
     },
     twitter: {
       card: "summary_large_image",
@@ -218,4 +256,4 @@ export function createLandingMetadata(lang: SupportedLocale): Metadata {
 }
 
 /** Метаданные корневого лендинга (русский контент страницы). */
-export const rootLandingMetadata: Metadata = createLandingMetadata("ru");
+export const rootLandingMetadata: Metadata = createLandingMetadata(DEFAULT_LOCALE);
