@@ -304,10 +304,25 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                           href={playUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="group flex flex-col items-center gap-5 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+                          className="group flex w-full flex-col items-center gap-5 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
                           aria-label="Скачать Movie Match в Google Play. Откроется карточка приложения в новой вкладке."
                         >
                           <GooglePlayBadge className="h-14 w-auto drop-shadow-[0_12px_32px_rgba(0,0,0,0.5)] transition group-hover:scale-[1.03]" />
+                          <div className="hidden w-full grid-cols-[1fr_auto] items-center gap-4 rounded-2xl border border-violet-100/80 bg-white/70 p-4 md:grid">
+                            <span className="text-sm text-[var(--landing-muted)]">
+                              Сканируй QR с телефона — откроется Google Play
+                            </span>
+                            <span className="rounded-xl bg-white p-2 shadow-sm">
+                              <img
+                                src="/qr-google-play.svg"
+                                alt="QR-код: открыть Movie Match в Google Play"
+                                width={104}
+                                height={104}
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            </span>
+                          </div>
                           <span className="text-center text-sm text-[var(--landing-muted)]">
                             Откроется карточка приложения в Google Play
                           </span>

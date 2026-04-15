@@ -10,6 +10,7 @@
   ],
   "scripts": {
     "dev": "next dev --turbopack -p 3000 -H 0.0.0.0",
+    "prebuild": "node scripts/generate-qr.mjs",
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "biome check",
@@ -29,6 +30,7 @@
     "typescript": "^5"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.0"
+    "@biomejs/biome": "2.2.0",
+    "qrcode": "^1.5.4"
   }
 }
