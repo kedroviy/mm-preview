@@ -1,6 +1,8 @@
+import { cookies } from 'next/headers';
 import type { SupportedLocale } from '@/src/shared/config/metadata';
 
 export type LandingMessages = Record<string, string>;
+const LANDING_SEGMENT_LOCALE_COOKIE = 'mm_landing_segment_locale';
 
 export type HeaderCopy = Readonly<{
     features: string;
@@ -324,8 +326,9 @@ function getServerApiBaseUrl(): string {
 }
 
 function normalizeSwitcherLocales(locale: SupportedLocale, source?: string[]): SupportedLocale[] {
+    const fallback = locale === 'en' ? ['en'] : ['en', locale];
     if (!source || source.length === 0) {
-        return locale === 'en' ? ['en'] : ['en', locale];
+        return fallback;
     }
 
     const supported = source.filter(
@@ -334,11 +337,24 @@ function normalizeSwitcherLocales(locale: SupportedLocale, source?: string[]): S
     );
 
     if (supported.length === 0) {
-        return locale === 'en' ? ['en'] : ['en', locale];
+        return fallback;
     }
 
-    const deduped = [...new Set(supported)];
-    return deduped;
+    const preferred = locale === 'en' ? ['en'] : ['en', locale];
+    const merged = [...preferred, ...supported];
+    const deduped = [...new Set(merged)];
+    return deduped.filter(
+        (item) => item === 'en' || item === locale,
+    );
+}
+
+async function getSegmentLocale(currentLocale: SupportedLocale): Promise<SupportedLocale> {
+    const cookieStore = await cookies();
+    const cookieLocale = cookieStore.get(LANDING_SEGMENT_LOCALE_COOKIE)?.value;
+    if (cookieLocale === 'ru' || cookieLocale === 'en' || cookieLocale === 'es') {
+        return cookieLocale;
+    }
+    return currentLocale;
 }
 
 function mapHeaderFromMessages(locale: SupportedLocale, messages?: Record<string, string>): HeaderCopy {
@@ -361,6 +377,9 @@ function mapHeaderFromMessages(locale: SupportedLocale, messages?: Record<string
 export async function getLandingDictionary(locale: SupportedLocale): Promise<LandingDictionary> {
     const url = `${getServerApiBaseUrl()}/api/v1/i18n/landing?locale=${locale}`;
     const fallbackMessages = FALLBACK_MESSAGES[locale] ?? FALLBACK_MESSAGES.en;
+    const segmentLocale = await getSegmentLocale(locale);
+    const defaultSwitcherLocales =
+        segmentLocale === 'en' ? ['en'] : ['en', segmentLocale];
 
     try {
         const response = await fetch(url, {
@@ -372,7 +391,7 @@ export async function getLandingDictionary(locale: SupportedLocale): Promise<Lan
         if (!response.ok) {
             return {
                 header: FALLBACK_HEADER_COPY[locale] ?? FALLBACK_HEADER_COPY.en,
-                switcherLocales: locale === 'en' ? ['en'] : ['en', locale],
+                switcherLocales: defaultSwitcherLocales,
                 messages: fallbackMessages,
             };
         }
@@ -384,13 +403,13 @@ export async function getLandingDictionary(locale: SupportedLocale): Promise<Lan
         };
         return {
             header: mapHeaderFromMessages(locale, mergedMessages),
-            switcherLocales: normalizeSwitcherLocales(locale, payload.switcherLocales),
+            switcherLocales: normalizeSwitcherLocales(segmentLocale, payload.switcherLocales),
             messages: mergedMessages,
         };
     } catch {
         return {
             header: FALLBACK_HEADER_COPY[locale] ?? FALLBACK_HEADER_COPY.en,
-            switcherLocales: locale === 'en' ? ['en'] : ['en', locale],
+            switcherLocales: defaultSwitcherLocales,
             messages: fallbackMessages,
         };
     }
