@@ -4,13 +4,21 @@ import { ButtonShadcn } from "@mm-preview/ui/light";
 import Link from "next/link";
 import { getAppUrls, getGooglePlayUrl } from "@/src/shared/config/constants";
 import type { SupportedLocale } from "@/src/shared/config/metadata";
-import { LONG_TAIL_GUIDES } from "@/src/shared/seo/long-tail-guides";
+import { getLandingCopy } from "@/src/shared/i18n/landing-content";
+import { getGuidesForLocale } from "@/src/shared/seo/long-tail-guides";
 import { LandingFaq } from "@/src/shared/ui/landing-faq/LandingFaq";
 import { Reveal } from "@/src/shared/ui/reveal";
 import { ScenarioPicker } from "@/src/shared/ui/scenario-picker/ScenarioPicker";
-import { features, reviews } from "./lib/constants";
 
-function GooglePlayBadge({ className = "" }: { className?: string }) {
+function GooglePlayBadge({
+  className = "",
+  topLine,
+  bottomLine,
+}: {
+  className?: string;
+  topLine: string;
+  bottomLine: string;
+}) {
   return (
     <svg
       className={className}
@@ -40,7 +48,7 @@ function GooglePlayBadge({ className = "" }: { className?: string }) {
         fontFamily="system-ui,sans-serif"
         letterSpacing="0.06em"
       >
-        GET IT ON
+        {topLine}
       </text>
       <text
         x="48"
@@ -50,7 +58,7 @@ function GooglePlayBadge({ className = "" }: { className?: string }) {
         fontFamily="system-ui,sans-serif"
         fontWeight="500"
       >
-        Google Play
+        {bottomLine}
       </text>
       <defs>
         <linearGradient
@@ -103,6 +111,10 @@ function GooglePlayBadge({ className = "" }: { className?: string }) {
 }
 
 export function MainBlock({ lang }: { lang: SupportedLocale }) {
+  const t = getLandingCopy(lang);
+  const guides = getGuidesForLocale(lang);
+  const { features, reviews } = t;
+
   const handleCreateUser = () => {
     const urls = getAppUrls();
     window.location.href = urls.USER_CREATION;
@@ -128,37 +140,36 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
                 </span>
-                Movie Match · развлечения · Google Play
+                {t.heroEyebrow}
               </p>
               <h1 className="font-[family-name:var(--font-syne)] text-4xl font-extrabold leading-[1.05] tracking-tight text-[var(--landing-ink)] sm:text-6xl lg:text-7xl">
-                Фильм для вечера —{" "}
-                <span className="landing-headline-gradient">без споров</span>
-                <br className="hidden sm:block" /> с друзьями, парой или в соло
+                {t.heroTitleBefore}
+                <span className="landing-headline-gradient">
+                  {t.heroTitleHighlight}
+                </span>
+                <br className="hidden sm:block" /> {t.heroTitleLine2}
               </h1>
               <p className="mx-auto mt-6 max-w-2xl text-lg text-[var(--landing-muted)] sm:text-xl">
-                Как в приложении в Google Play: лобби, приглашение и совместный
-                выбор с друзьями или партнёром — или соло-подбор, когда один
-                человек подбирает себе кино на вечер без лобби и без второго
-                участника.
+                {t.heroSubtitle}
               </p>
               <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-5">
                 <ButtonShadcn
                   type="button"
                   onClick={handleCreateUser}
                   className="group relative overflow-hidden rounded-full border-0 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-violet-600 bg-[length:200%_100%] px-8 py-3 text-base font-semibold text-white shadow-xl shadow-violet-500/30 transition hover:bg-[position:100%_0]"
-                  aria-label="Создать аккаунт Movie Match в браузере"
+                  aria-label={t.ctaCreateAccountAria}
                 >
-                  Создать аккаунт (веб)
+                  {t.ctaCreateAccount}
                 </ButtonShadcn>
                 <a
                   href={playUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-white px-8 py-3 text-base font-semibold text-violet-900 shadow-md shadow-violet-100 transition hover:border-violet-300 hover:bg-violet-50/90"
-                  aria-label="Скачать Movie Match в Google Play (откроется в новой вкладке)"
+                  aria-label={t.ctaDownloadPlayAria}
                 >
                   <i className="pi pi-google text-lg" aria-hidden />
-                  Скачать в Google Play
+                  {t.ctaDownloadPlay}
                 </a>
               </div>
             </Reveal>
@@ -176,28 +187,16 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                         key={marqueeKey}
                         className="flex shrink-0 items-center gap-12"
                       >
-                        {[
-                          "Лобби",
-                          "Приглашение друга",
-                          "Соло-подбор",
-                          "Компания друзей",
-                          "Вдвоём с партнёром",
-                          "Драма",
-                          "Комедия",
-                          "Триллер",
-                          "Совместный выбор",
-                          "Без споров",
-                          "Как в Google Play",
-                        ].map((t) => (
+                        {t.marquee.map((label) => (
                           <span
-                            key={`${marqueeKey}-${t}`}
+                            key={`${marqueeKey}-${label}`}
                             className="flex items-center gap-2 whitespace-nowrap"
                           >
                             <i
                               className="pi pi-film text-violet-500"
                               aria-hidden
                             />
-                            {t}
+                            {label}
                           </span>
                         ))}
                       </div>
@@ -213,11 +212,10 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                 <div className="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <p className="text-sm font-medium text-violet-600">
-                      Сценарий из приложения
+                      {t.scenarioCardKicker}
                     </p>
                     <p className="mt-2 max-w-md text-2xl font-semibold text-[var(--landing-ink)] sm:text-3xl">
-                      Лобби → приглашение → совместный подбор — и отдельно
-                      соло-подбор для вечера одному.
+                      {t.scenarioCardTitle}
                     </p>
                   </div>
                   <div className="flex gap-3" aria-hidden>
@@ -230,10 +228,10 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
               <div className="landing-glass landing-card-hover flex flex-col justify-between rounded-3xl p-8">
                 <div>
                   <p className="text-4xl font-[family-name:var(--font-syne)] font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">
-                    Play
+                    {t.playBrand}
                   </p>
                   <p className="mt-1 text-sm text-[var(--landing-muted)]">
-                    приложение уже в каталоге Google Play (Entertainment)
+                    {t.playCardSub}
                   </p>
                 </div>
                 <div className="mt-8 space-y-3 border-t border-violet-100 pt-6">
@@ -242,21 +240,21 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                       className="pi pi-check-circle text-emerald-500"
                       aria-hidden
                     />
-                    Лобби и приглашение друга
+                    {t.playCheck1}
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-700">
                     <i
                       className="pi pi-check-circle text-emerald-500"
                       aria-hidden
                     />
-                    Совместный выбор без споров
+                    {t.playCheck2}
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-700">
                     <i
                       className="pi pi-check-circle text-emerald-500"
                       aria-hidden
                     />
-                    Соло-подбор фильма на вечер
+                    {t.playCheck3}
                   </div>
                 </div>
               </div>
@@ -264,7 +262,6 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
           </div>
         </section>
 
-        {/* Google Play — выделенный блок */}
         <section
           id="download"
           className="relative scroll-mt-28 py-12 sm:scroll-mt-32 sm:py-20"
@@ -278,23 +275,18 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                   <div className="relative grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16">
                     <div className="min-w-0">
                       <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-violet-800 ring-1 ring-violet-200/80">
-                        Google Play · Entertainment
+                        {t.downloadKicker}
                       </span>
                       <h2 className="mt-5 font-[family-name:var(--font-syne)] text-3xl font-bold leading-[1.2] tracking-tight text-[var(--landing-ink)] sm:text-4xl sm:leading-[1.18] lg:text-5xl lg:leading-[1.15]">
-                        Скачай{" "}
+                        {t.downloadTitleBefore}
                         <span className="landing-gradient-clip bg-gradient-to-r from-emerald-600 to-teal-600">
-                          Movie Match
-                        </span>{" "}
-                        в Google Play
+                          {t.downloadTitleBrand}
+                        </span>
+                        {t.downloadTitleAfter}
                       </h2>
                       <p className="mt-4 max-w-xl text-lg text-[var(--landing-muted)]">
-                        Официальное описание в магазине: приложение помогает
-                        выбрать фильм в компании друзей или супругов — больше
-                        никаких споров при совместном выборе. Плюс в приложении
-                        есть соло-подбор: один человек может подобрать себе кино
-                        на вечер. Лобби и приглашение — когда смотрите вместе.
+                        {t.downloadBody}
                       </p>
-                  
                     </div>
 
                     <div className="flex flex-col items-center justify-center gap-6">
@@ -305,17 +297,21 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="group flex w-full flex-col items-center gap-5 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
-                          aria-label="Скачать Movie Match в Google Play. Откроется карточка приложения в новой вкладке."
+                          aria-label={t.downloadCardAria}
                         >
-                          <GooglePlayBadge className="h-14 w-auto drop-shadow-[0_12px_32px_rgba(0,0,0,0.5)] transition group-hover:scale-[1.03]" />
+                          <GooglePlayBadge
+                            className="h-14 w-auto drop-shadow-[0_12px_32px_rgba(0,0,0,0.5)] transition group-hover:scale-[1.03]"
+                            topLine={t.googlePlayBadgeTop}
+                            bottomLine={t.googlePlayBadgeBottom}
+                          />
                           <div className="hidden w-full grid-cols-[1fr_auto] items-center gap-4 rounded-2xl border border-violet-100/80 bg-white/70 p-4 md:grid">
                             <span className="text-sm text-[var(--landing-muted)]">
-                              Сканируй QR с телефона — откроется Google Play
+                              {t.downloadQrCaption}
                             </span>
                             <span className="rounded-xl bg-white p-2 shadow-sm">
                               <img
                                 src="/qr-google-play.svg"
-                                alt="QR-код: открыть Movie Match в Google Play"
+                                alt={t.downloadQrAlt}
                                 width={104}
                                 height={104}
                                 loading="lazy"
@@ -324,7 +320,7 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                             </span>
                           </div>
                           <span className="text-center text-sm text-[var(--landing-muted)]">
-                            Откроется карточка приложения в Google Play
+                            {t.downloadCardHint}
                           </span>
                         </a>
                       </div>
@@ -333,9 +329,9 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm font-medium text-violet-600 underline-offset-4 hover:text-violet-800 hover:underline"
-                        aria-label="Открыть Movie Match в Google Play в новой вкладке"
+                        aria-label={t.downloadLinkAria}
                       >
-                        Открыть Movie Match в Google Play →
+                        {t.downloadLinkText}
                       </a>
                     </div>
                   </div>
@@ -352,11 +348,10 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <Reveal className="mx-auto max-w-2xl text-center">
               <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
-                Совместно и в одиночку
+                {t.featuresHeading}
               </h2>
               <p className="mt-3 text-[var(--landing-muted)]">
-                В карточке приложения: лобби, приглашение и совместный выбор — и
-                соло-подбор, когда фильм на вечер выбираете только вы.
+                {t.featuresSub}
               </p>
             </Reveal>
             <div className="mt-12 grid gap-5 md:grid-cols-3">
@@ -382,7 +377,7 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
           </div>
         </section>
 
-        <ScenarioPicker />
+        <ScenarioPicker lang={lang} />
 
         <section
           id="guides"
@@ -391,18 +386,15 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <Reveal className="mx-auto max-w-2xl text-center">
               <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
-                Гайды: выбор фильма и Movie Match
+                {t.guidesHeading}
               </h2>
-              <p className="mt-3 text-[var(--landing-muted)]">
-                Отдельные страницы под узкие запросы — лобби, пара, компания,
-                соло-подбор, Google Play. Всё в одном приложении.
-              </p>
+              <p className="mt-3 text-[var(--landing-muted)]">{t.guidesSub}</p>
             </Reveal>
             <ul
               className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-              aria-label="Тематические гайды по выбору фильма и приложению"
+              aria-label={t.guidesListAria}
             >
-              {LONG_TAIL_GUIDES.map((g, i) => (
+              {guides.map((g, i) => (
                 <li key={g.slug} className="min-h-0">
                   <Reveal delay={i * 40} className="h-full">
                     <Link
@@ -416,7 +408,7 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                         {g.metaDescription}
                       </span>
                       <span className="mt-4 text-sm font-medium text-violet-600">
-                        Читать →
+                        {t.guidesReadMore}
                       </span>
                     </Link>
                   </Reveal>
@@ -427,15 +419,14 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
               <Link
                 href={`/${lang}/guides`}
                 className="text-sm font-semibold text-violet-600 underline-offset-4 hover:text-violet-800 hover:underline"
-                aria-label="Все гайды на одной странице"
               >
-                Все материалы на одной странице →
+                {t.guidesAllLink}
               </Link>
             </p>
           </div>
         </section>
 
-        <LandingFaq />
+        <LandingFaq lang={lang} />
 
         <section
           id="reviews"
@@ -444,15 +435,17 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <Reveal className="mx-auto max-w-2xl text-center">
               <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
-                Отзывы
+                {t.reviewsHeading}
               </h2>
-              <p className="mt-3 text-[var(--landing-muted)]">
-                Коротко — как это ощущается в жизни, а не в презентации.
-              </p>
+              <p className="mt-3 text-[var(--landing-muted)]">{t.reviewsSub}</p>
             </Reveal>
             <div className="mt-12 grid auto-rows-fr gap-6 md:grid-cols-3">
               {reviews.map((r, i) => (
-                <Reveal key={r.name} delay={i * 80} className="h-full min-h-0">
+                <Reveal
+                  key={`${r.name}-${i}`}
+                  delay={i * 80}
+                  className="h-full min-h-0"
+                >
                   <blockquote className="landing-glass landing-card-hover flex h-full min-h-0 flex-col rounded-3xl p-8">
                     <p className="text-lg leading-relaxed text-slate-700">
                       «{r.quote}»
@@ -487,30 +480,28 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                 <div className="pointer-events-none absolute -left-24 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-violet-200/60 blur-[90px]" />
                 <div className="pointer-events-none absolute -right-24 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-amber-100/80 blur-[90px]" />
                 <h2 className="relative font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
-                  Готов убрать хаос из выбора фильма?
+                  {t.closingHeading}
                 </h2>
                 <p className="relative mx-auto mt-4 max-w-lg text-[var(--landing-muted)]">
-                  В вебе — быстрый старт с аккаунтом; в Android — то же Movie
-                  Match из Google Play: совместный выбор в лобби или соло-подбор
-                  фильма на вечер одному.
+                  {t.closingBody}
                 </p>
                 <div className="relative mt-8 flex flex-wrap justify-center gap-4">
                   <ButtonShadcn
                     type="button"
                     onClick={handleCreateUser}
                     className="rounded-full border-0 bg-gradient-to-r from-violet-600 to-fuchsia-600 px-8 py-3 text-base font-semibold text-white shadow-lg shadow-violet-300/50 transition hover:brightness-105"
-                    aria-label="Начать в браузере: создать аккаунт Movie Match"
+                    aria-label={t.closingWebAria}
                   >
-                    Начать в браузере
+                    {t.closingWeb}
                   </ButtonShadcn>
                   <a
                     href={playUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center rounded-full border border-violet-200 bg-white px-8 py-3 text-base font-semibold text-violet-900 shadow-sm transition hover:border-violet-300 hover:bg-violet-50"
-                    aria-label="Открыть Movie Match в Google Play в новой вкладке"
+                    aria-label={t.closingPlayAria}
                   >
-                    Открыть в Google Play
+                    {t.closingPlay}
                   </a>
                 </div>
               </div>

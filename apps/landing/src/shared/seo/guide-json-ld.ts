@@ -1,10 +1,33 @@
 import { getLandingSiteUrl } from "@/src/shared/config/site-url";
-import type { LongTailGuide } from "@/src/shared/seo/long-tail-guides";
+import {
+  DEFAULT_LOCALE,
+  type SupportedLocale,
+} from "@/src/shared/config/metadata";
+import type { LongTailGuide } from "@/src/shared/seo/long-tail-guides-types";
+
+const BREADCRUMB: Record<
+  SupportedLocale,
+  { home: string; guides: string }
+> = {
+  ru: { home: "Главная", guides: "Гайды" },
+  en: { home: "Home", guides: "Guides" },
+  es: { home: "Inicio", guides: "Guías" },
+};
+
+const JSON_LD_LANG: Record<SupportedLocale, string> = {
+  ru: "ru-RU",
+  en: "en-US",
+  es: "es-ES",
+};
 
 /** Article + хлебные крошки для страниц /guides/[slug] (SSG). */
-export function getGuideJsonLdString(guide: LongTailGuide): string {
+export function getGuideJsonLdString(
+  guide: LongTailGuide,
+  locale: SupportedLocale = DEFAULT_LOCALE,
+): string {
   const siteUrl = getLandingSiteUrl();
-  const pageUrl = `${siteUrl}/guides/${guide.slug}`;
+  const pageUrl = `${siteUrl}/${locale}/guides/${guide.slug}`;
+  const bc = BREADCRUMB[locale];
 
   const graph = [
     {
@@ -14,14 +37,14 @@ export function getGuideJsonLdString(guide: LongTailGuide): string {
         {
           "@type": "ListItem",
           position: 1,
-          name: "Главная",
-          item: siteUrl,
+          name: bc.home,
+          item: `${siteUrl}/${locale}`,
         },
         {
           "@type": "ListItem",
           position: 2,
-          name: "Гайды",
-          item: `${siteUrl}/guides`,
+          name: bc.guides,
+          item: `${siteUrl}/${locale}/guides`,
         },
         {
           "@type": "ListItem",
@@ -36,7 +59,7 @@ export function getGuideJsonLdString(guide: LongTailGuide): string {
       "@type": "Article",
       headline: guide.h1,
       description: guide.metaDescription,
-      inLanguage: "ru-RU",
+      inLanguage: JSON_LD_LANG[locale],
       mainEntityOfPage: {
         "@type": "WebPage",
         "@id": pageUrl,

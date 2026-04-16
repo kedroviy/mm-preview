@@ -6,8 +6,10 @@ import {
   SUPPORTED_LOCALES,
   type SupportedLocale,
 } from "@/src/shared/config/metadata";
+import { getGuidesPagesCopy } from "@/src/shared/i18n/guides-pages";
 import { getGuidesIndexJsonLdString } from "@/src/shared/seo/guides-index-json-ld";
-import { LONG_TAIL_GUIDES } from "@/src/shared/seo/long-tail-guides";
+import { getGuidesForLocale } from "@/src/shared/seo/long-tail-guides";
+import { getOpenGraphCopy } from "@/src/shared/seo/opengraph-copy";
 import { Header } from "@/src/shared/ui/header";
 
 export const dynamic = "force-static";
@@ -22,10 +24,11 @@ export async function generateMetadata({
     notFound();
   }
   const locale = lang as SupportedLocale;
+  const g = getGuidesPagesCopy(locale);
+  const og = getOpenGraphCopy(locale);
   return {
-    title: "Guides | Movie Match",
-    description:
-      "How to pick a movie together or solo: lobby, invite, and a quick movie night flow.",
+    title: g.metaTitle,
+    description: g.metaDescription,
     alternates: {
       canonical: `/${locale}/guides`,
       languages: {
@@ -36,11 +39,22 @@ export async function generateMetadata({
       },
     },
     openGraph: {
-      title: "Movie Match Guides",
-      description:
-        "Picking together or solo: lobby, invite, and an Android start from Google Play.",
+      title: g.ogTitle,
+      description: g.ogDescription,
       url: `/${locale}/guides`,
       type: "website",
+      images: [
+        {
+          url: `/${locale}/guides/opengraph-image`,
+          alt: og.guidesAlt,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: g.ogTitle,
+      description: g.ogDescription,
+      images: [`/${locale}/guides/opengraph-image`],
     },
   };
 }
@@ -55,7 +69,9 @@ export default async function GuidesIndexPage({
     notFound();
   }
   const locale = lang as SupportedLocale;
-  const jsonLd = getGuidesIndexJsonLdString();
+  const g = getGuidesPagesCopy(locale);
+  const guides = getGuidesForLocale(locale);
+  const jsonLd = getGuidesIndexJsonLdString(locale);
 
   return (
     <div className="min-h-svh">
@@ -80,41 +96,37 @@ export default async function GuidesIndexPage({
           className="text-sm text-[var(--landing-muted)]"
         >
           <Link href={`/${locale}`} className="text-violet-600 hover:underline">
-            Home
+            {g.home}
           </Link>
           <span className="mx-2" aria-hidden>
             /
           </span>
-          <span className="text-[var(--landing-ink)]">Guides</span>
+          <span className="text-[var(--landing-ink)]">{g.guides}</span>
         </nav>
         <h1 className="mt-6 font-[family-name:var(--font-syne)] text-3xl font-bold tracking-tight text-[var(--landing-ink)] sm:text-4xl">
-          Guides: pick together or solo
+          {g.indexH1}
         </h1>
-        <p className="mt-4 text-lg text-[var(--landing-muted)]">
-          Each page is a separate topic with static generation (SSG). Movie Match
-          on Google Play: a lobby and invite flow for picking together, plus a
-          solo picker when you choose a movie for yourself.
-        </p>
+        <p className="mt-4 text-lg text-[var(--landing-muted)]">{g.indexIntro}</p>
         <p className="mt-6">
           <Link
             href={`/${locale}#download`}
             className="text-sm font-semibold text-violet-600 underline-offset-4 hover:text-violet-800 hover:underline"
           >
-            ← Back to home: Google Play and web start
+            {g.backToHome}
           </Link>
         </p>
         <ul className="mt-10 space-y-4">
-          {LONG_TAIL_GUIDES.map((g) => (
-            <li key={g.slug}>
+          {guides.map((item) => (
+            <li key={item.slug}>
               <Link
-                href={`/${locale}/guides/${g.slug}`}
+                href={`/${locale}/guides/${item.slug}`}
                 className="landing-glass block rounded-2xl border border-violet-100/90 p-5 no-underline transition hover:border-violet-200"
               >
                 <span className="font-[family-name:var(--font-syne)] text-lg font-semibold text-[var(--landing-ink)]">
-                  {g.h1}
+                  {item.h1}
                 </span>
                 <p className="mt-2 text-sm text-[var(--landing-muted)]">
-                  {g.metaDescription}
+                  {item.metaDescription}
                 </p>
               </Link>
             </li>
@@ -123,13 +135,12 @@ export default async function GuidesIndexPage({
       </main>
       <footer className="border-t border-violet-100/80 py-10 text-center text-sm text-[var(--landing-muted)]">
         <p>
-          © {new Date().getFullYear()} Movie Match ·{" "}
+          {g.footerCopyright} {new Date().getFullYear()} Movie Match ·{" "}
           <Link href={`/${locale}`} className="text-violet-600 hover:underline">
-            Home
+            {g.home}
           </Link>
         </p>
       </footer>
     </div>
   );
 }
-

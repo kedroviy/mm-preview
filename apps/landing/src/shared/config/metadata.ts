@@ -20,6 +20,7 @@ export interface MetadataConfig {
     title: string;
     description: string;
     siteName: string;
+    imageAlt: string;
   };
 }
 
@@ -87,6 +88,8 @@ export const metadataByLang: Record<SupportedLocale, MetadataConfig> = {
       description:
         "Лобби, приглашение и совместный подбор — плюс соло-подбор фильма на вечер одному. В Google Play.",
       siteName: "Movie Match",
+      imageAlt:
+        "Movie Match — совместный и соло-подбор фильма (друзья, пара или один)",
     },
   },
   en: {
@@ -117,6 +120,8 @@ export const metadataByLang: Record<SupportedLocale, MetadataConfig> = {
       description:
         "Lobby, invite, and match together—or pick a movie solo for your night. On Google Play.",
       siteName: "Movie Match",
+      imageAlt:
+        "Movie Match — group and solo movie picking (friends, couple, solo)",
     },
   },
   es: {
@@ -141,6 +146,8 @@ export const metadataByLang: Record<SupportedLocale, MetadataConfig> = {
       description:
         "Sala, invitación y match en grupo — o elige una película en solitario. En Google Play.",
       siteName: "Movie Match",
+      imageAlt:
+        "Movie Match — elección de película en grupo y en solitario (amigos, pareja o solo)",
     },
   },
 };
@@ -238,11 +245,18 @@ export function createLandingMetadata(lang: SupportedLocale): Metadata {
       type: "website",
       locale: lang === "ru" ? "ru_RU" : lang === "es" ? "es_ES" : "en_US",
       url: canonical,
+      images: [
+        {
+          url: `/${lang}/opengraph-image`,
+          alt: meta.openGraph.imageAlt,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: meta.openGraph.title,
       description: meta.openGraph.description,
+      images: [`/${lang}/opengraph-image`],
     },
     appleWebApp: {
       capable: true,

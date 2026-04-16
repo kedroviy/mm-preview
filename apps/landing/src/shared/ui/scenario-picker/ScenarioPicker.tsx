@@ -1,32 +1,19 @@
 "use client";
 
 import { useState } from "react";
-
-type Scenario = "friends" | "couple" | "solo";
-
-const copy: Record<Scenario, { label: string; body: string; hint: string }> = {
-  friends: {
-    label: "С друзьями",
-    body: "В компании чаще всего страдает синхронизация: кто-то в личке, кто-то в общем чате. Movie Match завязан на одном лобби и приглашении — вы заранее собираете состав, а потом идёте в подбор, как в описании приложения в Google Play.",
-    hint: "Дальше: создайте комнату в приложении и разошлите приглашение до того, как начнётся «а у меня тут ещё пять вариантов».",
-  },
-  couple: {
-    label: "Вдвоём",
-    body: "В паре больше эмоций вокруг «ты опять не угадал». Совместный подбор в Movie Match симметричен: не один тянет выбор, а оба участвуют в одном потоке — меньше ощущения, что ответственность лежит на одном человеке.",
-    hint: "Если удобнее начать с телефона — карточка Movie Match в Google Play; если с браузера — кнопка создания аккаунта на этом сайте.",
-  },
-  solo: {
-    label: "В соло",
-    body: "Не всегда есть с кем согласовывать вечер: в приложении есть соло-подбор — один человек проходит подбор и выбирает себе фильм без лобби и без приглашения второго участника.",
-    hint: "Откройте Movie Match в Google Play и выберите сценарий для вечера в одиночку; при желании позже всегда можно перейти к лобби для совместного просмотра.",
-  },
-};
+import type { SupportedLocale } from "@/src/shared/config/metadata";
+import {
+  type ScenarioKey,
+  getLandingCopy,
+} from "@/src/shared/i18n/landing-content";
 
 /** Лёгкий интерактив без тяжёлых зависимостей — удержание на странице. */
-export function ScenarioPicker() {
-  const [scenario, setScenario] = useState<Scenario>("friends");
+export function ScenarioPicker({ lang }: { lang: SupportedLocale }) {
+  const [scenario, setScenario] = useState<ScenarioKey>("friends");
+  const copy = getLandingCopy(lang);
+  const scenarioCopy = copy.scenarioByKey;
 
-  const active = copy[scenario];
+  const active = scenarioCopy[scenario];
 
   return (
     <section
@@ -38,22 +25,21 @@ export function ScenarioPicker() {
           id="scenario-heading"
           className="text-center font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl"
         >
-          Ваш сценарий
+          {copy.scenarioHeading}
         </h2>
         <p
           id="scenario-description"
           className="mx-auto mt-3 max-w-lg text-center text-[var(--landing-muted)]"
         >
-          Нажмите вариант — вечер с друзьями, вдвоём или соло-подбор фильма на
-          вечер одному.
+          {copy.scenarioSub}
         </p>
         <fieldset
           className="mt-8 flex flex-wrap justify-center gap-3 border-0 p-0"
           aria-labelledby="scenario-heading"
           aria-describedby="scenario-description"
         >
-          <legend className="sr-only">Выберите сценарий использования</legend>
-          {(Object.keys(copy) as Scenario[]).map((key) => (
+          <legend className="sr-only">{copy.scenarioLegend}</legend>
+          {(["friends", "couple", "solo"] as const).map((key) => (
             <label
               key={key}
               className={
@@ -70,7 +56,7 @@ export function ScenarioPicker() {
                 onChange={() => setScenario(key)}
                 className="sr-only"
               />
-              {copy[key].label}
+              {scenarioCopy[key].label}
             </label>
           ))}
         </fieldset>

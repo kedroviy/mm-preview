@@ -1,13 +1,16 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import { Outfit, Syne } from "next/font/google";
 import "primeicons/primeicons.css";
 import "./primeicons-font-display.css";
 import "./globals.css";
-import { rootLandingMetadata } from "@/src/shared/config/metadata";
+import {
+  DEFAULT_LOCALE,
+  SUPPORTED_LOCALES,
+  type SupportedLocale,
+  rootLandingMetadata,
+} from "@/src/shared/config/metadata";
 import { Provider } from "@/src/shared/config/providers/Provider";
-
-/** Статическая генерация: без headers/cookies/searchParams на layout. */
-export const dynamic = "force-static";
 
 export const metadata: Metadata = rootLandingMetadata;
 
@@ -36,19 +39,31 @@ const fontSans = Outfit({
   adjustFontFallback: true,
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const rawLang = headersList.get("x-mm-lang");
+  const locale =
+    rawLang && SUPPORTED_LOCALES.includes(rawLang as SupportedLocale)
+      ? (rawLang as SupportedLocale)
+      : DEFAULT_LOCALE;
+  const skipLinkText: Record<SupportedLocale, string> = {
+    ru: "К основному содержимому",
+    en: "Skip to main content",
+    es: "Saltar al contenido principal",
+  };
+
   return (
-    <html lang="ru" className={`${fontDisplay.variable} ${fontSans.variable}`}>
+    <html lang={locale} className={`${fontDisplay.variable} ${fontSans.variable}`}>
       <body className="landing-body font-[family-name:var(--font-outfit)] antialiased">
         <a
           href="#top"
           className="fixed left-4 top-0 z-[9999] -translate-y-full rounded-b-lg bg-violet-900 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-transform focus:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-violet-900"
         >
-          К основному содержимому
+          {skipLinkText[locale]}
         </a>
         <Provider>{children}</Provider>
       </body>

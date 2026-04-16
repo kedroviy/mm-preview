@@ -6,6 +6,7 @@ import {
   SUPPORTED_LOCALES,
   type SupportedLocale,
 } from "@/src/shared/config/metadata";
+import { getGuidesPagesCopy } from "@/src/shared/i18n/guides-pages";
 import { getGuideJsonLdString } from "@/src/shared/seo/guide-json-ld";
 import {
   getAllGuideSlugs,
@@ -36,7 +37,7 @@ export async function generateMetadata({
     notFound();
   }
   const locale = lang as SupportedLocale;
-  const guide = getLongTailGuideBySlug(slug);
+  const guide = getLongTailGuideBySlug(slug, locale);
   if (!guide) {
     return {};
   }
@@ -58,11 +59,18 @@ export async function generateMetadata({
       description: guide.metaDescription,
       url: `/${locale}/guides/${slug}`,
       type: "article",
+      images: [
+        {
+          url: `/${locale}/guides/${slug}/opengraph-image`,
+          alt: guide.h1,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: guide.metaTitle,
       description: guide.metaDescription,
+      images: [`/${locale}/guides/${slug}/opengraph-image`],
     },
   };
 }
@@ -77,12 +85,13 @@ export default async function GuideArticlePage({
     notFound();
   }
   const locale = lang as SupportedLocale;
-  const guide = getLongTailGuideBySlug(slug);
+  const guide = getLongTailGuideBySlug(slug, locale);
   if (!guide) {
     notFound();
   }
 
-  const jsonLd = getGuideJsonLdString(guide);
+  const g = getGuidesPagesCopy(locale);
+  const jsonLd = getGuideJsonLdString(guide, locale);
 
   return (
     <div className="min-h-svh">
@@ -107,7 +116,7 @@ export default async function GuideArticlePage({
               href={`/${locale}`}
               className="text-violet-600 hover:underline"
             >
-              Home
+              {g.home}
             </Link>
             <span className="mx-2" aria-hidden>
               /
@@ -116,7 +125,7 @@ export default async function GuideArticlePage({
               href={`/${locale}/guides`}
               className="text-violet-600 hover:underline"
             >
-              Guides
+              {g.guides}
             </Link>
             <span className="mx-2" aria-hidden>
               /
@@ -148,13 +157,13 @@ export default async function GuideArticlePage({
               href={`/${locale}/guides`}
               className="text-sm font-semibold text-violet-600 hover:underline"
             >
-              ← All guides
+              {g.articleAllGuides}
             </Link>
             <Link
               href={`/${locale}#download`}
               className="text-sm font-semibold text-violet-600 hover:underline"
             >
-              Google Play and web start
+              {g.articlePlayWeb}
             </Link>
           </div>
         </article>
@@ -162,4 +171,3 @@ export default async function GuideArticlePage({
     </div>
   );
 }
-

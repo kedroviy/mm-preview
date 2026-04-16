@@ -1,13 +1,17 @@
 import { ImageResponse } from "next/og";
-import { getOpenGraphCopy } from "@/src/shared/seo/opengraph-copy";
+import { getOpenGraphCopy, parseOgLocale } from "@/src/shared/seo/opengraph-copy";
 
-export const alt =
-  "Movie Match — совместный и соло-подбор фильма (друзья, пара или один)";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OpenGraphImage() {
-  const copy = getOpenGraphCopy("ru");
+export default async function OpenGraphImage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  const copy = getOpenGraphCopy(parseOgLocale(lang));
+
   return new ImageResponse(
     <div
       style={{

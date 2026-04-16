@@ -32,7 +32,18 @@ export async function generateMetadata({
   const meta = metadataByLang[locale] ?? metadataByLang.ru;
   return {
     description: meta.description,
-    openGraph: { description: meta.openGraph.description },
+    openGraph: {
+      description: meta.openGraph.description,
+      images: [
+        {
+          url: `/${locale}/opengraph-image`,
+          alt: meta.openGraph.imageAlt,
+        },
+      ],
+    },
+    twitter: {
+      images: [`/${locale}/opengraph-image`],
+    },
   };
 }
 
@@ -46,7 +57,7 @@ export default async function Home({
     notFound();
   }
   const locale = lang as SupportedLocale;
-  const jsonLd = getLandingJsonLdString();
+  const jsonLd = getLandingJsonLdString(locale);
 
   return (
     <>

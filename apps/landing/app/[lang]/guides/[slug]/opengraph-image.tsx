@@ -1,12 +1,22 @@
 import { ImageResponse } from "next/og";
-import { getOpenGraphCopy } from "@/src/shared/seo/opengraph-copy";
+import { getLongTailGuideBySlug } from "@/src/shared/seo/long-tail-guides";
+import { getOpenGraphCopy, parseOgLocale } from "@/src/shared/seo/opengraph-copy";
 
-export const alt = "Movie Match — гайды: совместный и соло-подбор фильма";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function GuidesOpenGraphImage() {
-  const copy = getOpenGraphCopy("ru");
+export default async function GuideOpenGraphImage({
+  params,
+}: {
+  params: Promise<{ lang: string; slug: string }>;
+}) {
+  const { lang, slug } = await params;
+  const locale = parseOgLocale(lang);
+  const copy = getOpenGraphCopy(locale);
+  const guide = getLongTailGuideBySlug(slug, locale);
+  const title = guide?.h1 ?? "Movie Match";
+  const line = title.length > 72 ? `${title.slice(0, 69).trim()}…` : title;
+
   return new ImageResponse(
     <div
       style={{
@@ -32,21 +42,18 @@ export default function GuidesOpenGraphImage() {
           margin: 0,
         }}
       >
-        Movie Match
+        {copy.guideLabel}
       </p>
       <p
         style={{
           marginTop: 28,
-          fontSize: 56,
+          fontSize: 52,
           fontWeight: 800,
-          lineHeight: 1.1,
-          maxWidth: 1000,
+          lineHeight: 1.12,
+          maxWidth: 1040,
         }}
       >
-        {copy.guidesTitle}
-      </p>
-      <p style={{ marginTop: 20, fontSize: 28, opacity: 0.92, maxWidth: 900 }}>
-        {copy.guidesSubtitle}
+        {line}
       </p>
     </div>,
     { ...size },

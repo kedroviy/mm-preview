@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { getLongTailGuideBySlug } from "@/src/shared/seo/long-tail-guides";
+import { getOpenGraphCopy } from "@/src/shared/seo/opengraph-copy";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -9,6 +10,7 @@ export default async function GuideOpenGraphImage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  const copy = getOpenGraphCopy("ru");
   const { slug } = await params;
   const guide = getLongTailGuideBySlug(slug);
   const title = guide?.h1 ?? "Movie Match";
@@ -39,7 +41,7 @@ export default async function GuideOpenGraphImage({
           margin: 0,
         }}
       >
-        Movie Match · гайд
+        {copy.guideLabel}
       </p>
       <p
         style={{
