@@ -401,5 +401,11 @@ export function getLandingMessage(
     locale: SupportedLocale,
     key: string,
 ): string {
-    return messages[key] ?? FALLBACK_MESSAGES[locale]?.[key] ?? FALLBACK_MESSAGES.en[key] ?? key;
+    return (
+        messages[key] ??
+        FALLBACK_MESSAGES[locale]?.[key] ??
+        FALLBACK_MESSAGES.en[key] ??
+        FALLBACK_MESSAGES.ru[key] ??
+        key
+    );
 }
