@@ -7,9 +7,9 @@ import {
   type SupportedLocale,
 } from "@/src/shared/config/metadata";
 import {
-  getLandingDictionary,
   getLandingMessage,
-} from "@/src/shared/i18n/landing-dictionary";
+} from "@/src/shared/i18n/landing-messages";
+import { getLandingDictionary } from "@/src/shared/i18n/landing-dictionary.server";
 import { getGuideJsonLdString } from "@/src/shared/seo/guide-json-ld";
 import {
   getAllGuideSlugs,

@@ -7,7 +7,7 @@ import type { SupportedLocale } from "@/src/shared/config/metadata";
 import {
   getLandingMessage,
   type LandingMessages,
-} from "@/src/shared/i18n/landing-dictionary";
+} from "@/src/shared/i18n/landing-messages";
 import { LONG_TAIL_GUIDES } from "@/src/shared/seo/long-tail-guides";
 import { LandingFaq } from "@/src/shared/ui/landing-faq/LandingFaq";
 import { Reveal } from "@/src/shared/ui/reveal";

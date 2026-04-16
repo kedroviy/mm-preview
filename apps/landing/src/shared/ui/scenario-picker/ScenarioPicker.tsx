@@ -5,7 +5,7 @@ import type { SupportedLocale } from "@/src/shared/config/metadata";
 import {
   getLandingMessage,
   type LandingMessages,
-} from "@/src/shared/i18n/landing-dictionary";
+} from "@/src/shared/i18n/landing-messages";
 
 type Scenario = "friends" | "couple" | "solo";
 

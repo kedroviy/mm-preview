@@ -8,7 +8,7 @@ import {
   type SupportedLocale,
   metadataByLang,
 } from "@/src/shared/config/metadata";
-import { getLandingDictionary } from "@/src/shared/i18n/landing-dictionary";
+import { getLandingDictionary } from "@/src/shared/i18n/landing-dictionary.server";
 import { Header } from "@/src/shared/ui/header";
 
 const MainBlock = nextDynamic(

@@ -6,7 +6,7 @@ import { getGooglePlayUrl } from "@/src/shared/config/constants";
 import {
   type SupportedLocale,
 } from "@/src/shared/config/metadata";
-import type { HeaderCopy } from "@/src/shared/i18n/landing-dictionary";
+import type { HeaderCopy } from "@/src/shared/i18n/landing-messages";
 
 function buildLocalizedPath(pathname: string, nextLang: SupportedLocale) {
   const parts = pathname.split("/");

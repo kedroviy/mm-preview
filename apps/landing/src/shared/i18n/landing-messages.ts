@@ -1,8 +1,6 @@
-import { cookies } from 'next/headers';
 import type { SupportedLocale } from '@/src/shared/config/metadata';
 
 export type LandingMessages = Record<string, string>;
-const LANDING_SEGMENT_LOCALE_COOKIE = 'mm_landing_segment_locale';
 
 export type HeaderCopy = Readonly<{
     features: string;
@@ -20,11 +18,6 @@ export type LandingDictionary = Readonly<{
     header: HeaderCopy;
     switcherLocales: SupportedLocale[];
     messages: LandingMessages;
-}>;
-
-type LandingDictionaryApiResponse = Readonly<{
-    switcherLocales?: string[];
-    messages?: Record<string, string>;
 }>;
 
 export const FALLBACK_MESSAGES: Record<SupportedLocale, LandingMessages> = {
@@ -319,13 +312,30 @@ export const FALLBACK_HEADER_COPY: Record<SupportedLocale, HeaderCopy> = {
     },
 };
 
-function getServerApiBaseUrl(): string {
-    const envBase =
-        process.env.API_URL || process.env.BACKEND_URL || 'http://localhost:4000';
-    return envBase.replace(/\/$/, '');
+export function mapHeaderFromMessages(
+    locale: SupportedLocale,
+    messages?: Record<string, string>,
+): HeaderCopy {
+    const fallback = FALLBACK_HEADER_COPY[locale] ?? FALLBACK_HEADER_COPY.en;
+    if (!messages) return fallback;
+
+    return {
+        features: messages['header.features'] ?? fallback.features,
+        guides: messages['header.guides'] ?? fallback.guides,
+        download: messages['header.download'] ?? fallback.download,
+        faq: messages['header.faq'] ?? fallback.faq,
+        reviews: messages['header.reviews'] ?? fallback.reviews,
+        start: messages['header.start'] ?? fallback.start,
+        startAria: messages['header.startAria'] ?? fallback.startAria,
+        brandAria: messages['header.brandAria'] ?? fallback.brandAria,
+        langAria: messages['header.langAria'] ?? fallback.langAria,
+    };
 }
 
-function normalizeSwitcherLocales(locale: SupportedLocale, source?: string[]): SupportedLocale[] {
+export function normalizeSwitcherLocales(
+    locale: SupportedLocale,
+    source?: string[],
+): SupportedLocale[] {
     const fallback = locale === 'en' ? ['en'] : ['en', locale];
     if (!source || source.length === 0) {
         return fallback;
@@ -343,76 +353,7 @@ function normalizeSwitcherLocales(locale: SupportedLocale, source?: string[]): S
     const preferred = locale === 'en' ? ['en'] : ['en', locale];
     const merged = [...preferred, ...supported];
     const deduped = [...new Set(merged)];
-    return deduped.filter(
-        (item) => item === 'en' || item === locale,
-    );
-}
-
-async function getSegmentLocale(currentLocale: SupportedLocale): Promise<SupportedLocale> {
-    const cookieStore = await cookies();
-    const cookieLocale = cookieStore.get(LANDING_SEGMENT_LOCALE_COOKIE)?.value;
-    if (cookieLocale === 'ru' || cookieLocale === 'en' || cookieLocale === 'es') {
-        return cookieLocale;
-    }
-    return currentLocale;
-}
-
-function mapHeaderFromMessages(locale: SupportedLocale, messages?: Record<string, string>): HeaderCopy {
-    const fallback = FALLBACK_HEADER_COPY[locale] ?? FALLBACK_HEADER_COPY.en;
-    if (!messages) return fallback;
-
-    return {
-        features: messages['header.features'] ?? fallback.features,
-        guides: messages['header.guides'] ?? fallback.guides,
-        download: messages['header.download'] ?? fallback.download,
-        faq: messages['header.faq'] ?? fallback.faq,
-        reviews: messages['header.reviews'] ?? fallback.reviews,
-        start: messages['header.start'] ?? fallback.start,
-        startAria: messages['header.startAria'] ?? fallback.startAria,
-        brandAria: messages['header.brandAria'] ?? fallback.brandAria,
-        langAria: messages['header.langAria'] ?? fallback.langAria,
-    };
-}
-
-export async function getLandingDictionary(locale: SupportedLocale): Promise<LandingDictionary> {
-    const url = `${getServerApiBaseUrl()}/api/v1/i18n/landing?locale=${locale}`;
-    const fallbackMessages = FALLBACK_MESSAGES[locale] ?? FALLBACK_MESSAGES.en;
-    const segmentLocale = await getSegmentLocale(locale);
-    const defaultSwitcherLocales =
-        segmentLocale === 'en' ? ['en'] : ['en', segmentLocale];
-
-    try {
-        const response = await fetch(url, {
-            method: 'GET',
-            next: { revalidate: 300 },
-            headers: { Accept: 'application/json' },
-        });
-
-        if (!response.ok) {
-            return {
-                header: FALLBACK_HEADER_COPY[locale] ?? FALLBACK_HEADER_COPY.en,
-                switcherLocales: defaultSwitcherLocales,
-                messages: fallbackMessages,
-            };
-        }
-
-        const payload = (await response.json()) as LandingDictionaryApiResponse;
-        const mergedMessages = {
-            ...fallbackMessages,
-            ...(payload.messages ?? {}),
-        };
-        return {
-            header: mapHeaderFromMessages(locale, mergedMessages),
-            switcherLocales: normalizeSwitcherLocales(segmentLocale, payload.switcherLocales),
-            messages: mergedMessages,
-        };
-    } catch {
-        return {
-            header: FALLBACK_HEADER_COPY[locale] ?? FALLBACK_HEADER_COPY.en,
-            switcherLocales: defaultSwitcherLocales,
-            messages: fallbackMessages,
-        };
-    }
+    return deduped.filter((item) => item === 'en' || item === locale);
 }
 
 export function getLandingMessage(
