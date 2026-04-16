@@ -7,6 +7,7 @@ import {
   type SupportedLocale,
 } from "@/src/shared/config/metadata";
 import { getGuidesPagesCopy } from "@/src/shared/i18n/guides-pages";
+import { getLandingDictionary } from "@/src/shared/i18n/landing-dictionary.server";
 import { getGuidesIndexJsonLdString } from "@/src/shared/seo/guides-index-json-ld";
 import { getGuidesForLocale } from "@/src/shared/seo/long-tail-guides";
 import { getOpenGraphCopy } from "@/src/shared/seo/opengraph-copy";
@@ -72,6 +73,7 @@ export default async function GuidesIndexPage({
   const g = getGuidesPagesCopy(locale);
   const guides = getGuidesForLocale(locale);
   const jsonLd = getGuidesIndexJsonLdString(locale);
+  const dictionary = await getLandingDictionary(locale);
 
   return (
     <div className="min-h-svh">
@@ -85,7 +87,11 @@ export default async function GuidesIndexPage({
           __html: jsonLd,
         }}
       />
-      <Header lang={locale} />
+      <Header
+        lang={locale}
+        copy={dictionary.header}
+        switcherLocales={dictionary.switcherLocales}
+      />
       <main
         id="top"
         tabIndex={-1}

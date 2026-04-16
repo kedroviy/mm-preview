@@ -7,6 +7,7 @@ import {
   type SupportedLocale,
 } from "@/src/shared/config/metadata";
 import { getGuidesPagesCopy } from "@/src/shared/i18n/guides-pages";
+import { getLandingDictionary } from "@/src/shared/i18n/landing-dictionary.server";
 import { getGuideJsonLdString } from "@/src/shared/seo/guide-json-ld";
 import {
   getAllGuideSlugs,
@@ -92,6 +93,7 @@ export default async function GuideArticlePage({
 
   const g = getGuidesPagesCopy(locale);
   const jsonLd = getGuideJsonLdString(guide, locale);
+  const dictionary = await getLandingDictionary(locale);
 
   return (
     <div className="min-h-svh">
@@ -105,7 +107,11 @@ export default async function GuideArticlePage({
           __html: jsonLd,
         }}
       />
-      <Header lang={locale} />
+      <Header
+        lang={locale}
+        copy={dictionary.header}
+        switcherLocales={dictionary.switcherLocales}
+      />
       <main id="top" tabIndex={-1}>
         <article className="mx-auto max-w-3xl px-4 pb-24 pt-28 sm:px-6 sm:pt-32 lg:px-8">
           <nav

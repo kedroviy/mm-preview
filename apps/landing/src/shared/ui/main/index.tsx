@@ -1,10 +1,13 @@
-"use client";
+﻿"use client";
 
 import { ButtonShadcn } from "@mm-preview/ui/light";
 import Link from "next/link";
 import { getAppUrls, getGooglePlayUrl } from "@/src/shared/config/constants";
 import type { SupportedLocale } from "@/src/shared/config/metadata";
-import { getLandingCopy } from "@/src/shared/i18n/landing-content";
+import {
+  getLandingMessage,
+  type LandingMessages,
+} from "@/src/shared/i18n/landing-messages";
 import { getGuidesForLocale } from "@/src/shared/seo/long-tail-guides";
 import { LandingFaq } from "@/src/shared/ui/landing-faq/LandingFaq";
 import { Reveal } from "@/src/shared/ui/reveal";
@@ -61,47 +64,19 @@ function GooglePlayBadge({
         {bottomLine}
       </text>
       <defs>
-        <linearGradient
-          id="gp-a"
-          x1="8"
-          y1="40"
-          x2="26"
-          y2="22"
-          gradientUnits="userSpaceOnUse"
-        >
+        <linearGradient id="gp-a" x1="8" y1="40" x2="26" y2="22" gradientUnits="userSpaceOnUse">
           <stop stopColor="#00D4FF" />
           <stop offset="1" stopColor="#00F076" />
         </linearGradient>
-        <linearGradient
-          id="gp-b"
-          x1="8"
-          y1="10"
-          x2="34"
-          y2="24"
-          gradientUnits="userSpaceOnUse"
-        >
+        <linearGradient id="gp-b" x1="8" y1="10" x2="34" y2="24" gradientUnits="userSpaceOnUse">
           <stop stopColor="#FFD800" />
           <stop offset="1" stopColor="#FF4E00" />
         </linearGradient>
-        <linearGradient
-          id="gp-c"
-          x1="10"
-          y1="42"
-          x2="34"
-          y2="28"
-          gradientUnits="userSpaceOnUse"
-        >
+        <linearGradient id="gp-c" x1="10" y1="42" x2="34" y2="28" gradientUnits="userSpaceOnUse">
           <stop stopColor="#FF4E00" />
           <stop offset="1" stopColor="#FC1964" />
         </linearGradient>
-        <linearGradient
-          id="gp-d"
-          x1="26"
-          y1="20"
-          x2="38"
-          y2="32"
-          gradientUnits="userSpaceOnUse"
-        >
+        <linearGradient id="gp-d" x1="26" y1="20" x2="38" y2="32" gradientUnits="userSpaceOnUse">
           <stop stopColor="#00F076" />
           <stop offset="1" stopColor="#00D4FF" />
         </linearGradient>
@@ -110,10 +85,20 @@ function GooglePlayBadge({
   );
 }
 
-export function MainBlock({ lang }: { lang: SupportedLocale }) {
-  const t = getLandingCopy(lang);
+export function MainBlock({
+  lang,
+  messages,
+}: {
+  lang: SupportedLocale;
+  messages: LandingMessages;
+}) {
   const guides = getGuidesForLocale(lang);
-  const { features, reviews } = t;
+  const t = (key: string) => getLandingMessage(messages, lang, key);
+  const badgeByLang: Record<SupportedLocale, { top: string; bottom: string }> = {
+    ru: { top: "GET IT ON", bottom: "Google Play" },
+    en: { top: "GET IT ON", bottom: "Google Play" },
+    es: { top: "DISPONIBLE EN", bottom: "Google Play" },
+  };
 
   const handleCreateUser = () => {
     const urls = getAppUrls();
@@ -121,6 +106,20 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
   };
 
   const playUrl = getGooglePlayUrl();
+  const heroMarquee = Array.from({ length: 11 }, (_, index) =>
+    t(`hero.marquee.${index + 1}`),
+  );
+  const features = [
+    { title: t("features.item.1.title"), desc: t("features.item.1.desc"), icon: "pi-comment", span: "md:col-span-2" },
+    { title: t("features.item.2.title"), desc: t("features.item.2.desc"), icon: "pi-users", span: "md:col-span-1" },
+    { title: t("features.item.3.title"), desc: t("features.item.3.desc"), icon: "pi-heart", span: "md:col-span-1" },
+    { title: t("features.item.4.title"), desc: t("features.item.4.desc"), icon: "pi-android", span: "md:col-span-2" },
+  ] as const;
+  const reviews = [
+    { quote: t("reviews.item.1.quote"), name: t("reviews.item.1.name"), role: t("reviews.item.1.role") },
+    { quote: t("reviews.item.2.quote"), name: t("reviews.item.2.name"), role: t("reviews.item.2.role") },
+    { quote: t("reviews.item.3.quote"), name: t("reviews.item.3.name"), role: t("reviews.item.3.role") },
+  ] as const;
 
   return (
     <>
@@ -140,36 +139,31 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
                 </span>
-                {t.heroEyebrow}
+                {t("hero.badge")}
               </p>
               <h1 className="font-[family-name:var(--font-syne)] text-4xl font-extrabold leading-[1.05] tracking-tight text-[var(--landing-ink)] sm:text-6xl lg:text-7xl">
-                {t.heroTitleBefore}
-                <span className="landing-headline-gradient">
-                  {t.heroTitleHighlight}
-                </span>
-                <br className="hidden sm:block" /> {t.heroTitleLine2}
+                {t("hero.title.before")} <span className="landing-headline-gradient">{t("hero.title.highlight")}</span>
+                <br className="hidden sm:block" /> {t("hero.title.after")}
               </h1>
-              <p className="mx-auto mt-6 max-w-2xl text-lg text-[var(--landing-muted)] sm:text-xl">
-                {t.heroSubtitle}
-              </p>
+              <p className="mx-auto mt-6 max-w-2xl text-lg text-[var(--landing-muted)] sm:text-xl">{t("hero.description")}</p>
               <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-5">
                 <ButtonShadcn
                   type="button"
                   onClick={handleCreateUser}
                   className="group relative overflow-hidden rounded-full border-0 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-violet-600 bg-[length:200%_100%] px-8 py-3 text-base font-semibold text-white shadow-xl shadow-violet-500/30 transition hover:bg-[position:100%_0]"
-                  aria-label={t.ctaCreateAccountAria}
+                  aria-label={t("hero.webCtaAria")}
                 >
-                  {t.ctaCreateAccount}
+                  {t("hero.webCta")}
                 </ButtonShadcn>
                 <a
                   href={playUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-white px-8 py-3 text-base font-semibold text-violet-900 shadow-md shadow-violet-100 transition hover:border-violet-300 hover:bg-violet-50/90"
-                  aria-label={t.ctaDownloadPlayAria}
+                  aria-label={t("hero.playCtaAria")}
                 >
                   <i className="pi pi-google text-lg" aria-hidden />
-                  {t.ctaDownloadPlay}
+                  {t("hero.playCta")}
                 </a>
               </div>
             </Reveal>
@@ -178,25 +172,13 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
               <div className="landing-glass relative overflow-hidden rounded-3xl border border-violet-100 p-1 shadow-md shadow-violet-100/40">
                 <div className="landing-shimmer-line absolute inset-x-0 top-0 h-px" />
                 <div className="flex overflow-hidden rounded-[1.35rem] bg-gradient-to-r from-white via-violet-50/40 to-emerald-50/30 py-3">
-                  <div
-                    className="landing-marquee-track gap-12 pr-12 text-sm font-medium text-[var(--landing-muted)]"
-                    aria-hidden
-                  >
+                  <div className="landing-marquee-track gap-12 pr-12 text-sm font-medium text-[var(--landing-muted)]" aria-hidden>
                     {(["marquee-a", "marquee-b"] as const).map((marqueeKey) => (
-                      <div
-                        key={marqueeKey}
-                        className="flex shrink-0 items-center gap-12"
-                      >
-                        {t.marquee.map((label) => (
-                          <span
-                            key={`${marqueeKey}-${label}`}
-                            className="flex items-center gap-2 whitespace-nowrap"
-                          >
-                            <i
-                              className="pi pi-film text-violet-500"
-                              aria-hidden
-                            />
-                            {label}
+                      <div key={marqueeKey} className="flex shrink-0 items-center gap-12">
+                        {heroMarquee.map((itemText) => (
+                          <span key={`${marqueeKey}-${itemText}`} className="flex items-center gap-2 whitespace-nowrap">
+                            <i className="pi pi-film text-violet-500" aria-hidden />
+                            {itemText}
                           </span>
                         ))}
                       </div>
@@ -211,12 +193,8 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                 <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-violet-300/35 blur-3xl" />
                 <div className="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
                   <div>
-                    <p className="text-sm font-medium text-violet-600">
-                      {t.scenarioCardKicker}
-                    </p>
-                    <p className="mt-2 max-w-md text-2xl font-semibold text-[var(--landing-ink)] sm:text-3xl">
-                      {t.scenarioCardTitle}
-                    </p>
+                    <p className="text-sm font-medium text-violet-600">{t("hero.appScenarioLabel")}</p>
+                    <p className="mt-2 max-w-md text-2xl font-semibold text-[var(--landing-ink)] sm:text-3xl">{t("hero.appScenarioTitle")}</p>
                   </div>
                   <div className="flex gap-3" aria-hidden>
                     <div className="h-24 w-20 rounded-2xl bg-gradient-to-br from-violet-100 to-violet-50 ring-1 ring-violet-200/80 transition hover:rotate-[-4deg]" />
@@ -227,45 +205,20 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
               </div>
               <div className="landing-glass landing-card-hover flex flex-col justify-between rounded-3xl p-8">
                 <div>
-                  <p className="text-4xl font-[family-name:var(--font-syne)] font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">
-                    {t.playBrand}
-                  </p>
-                  <p className="mt-1 text-sm text-[var(--landing-muted)]">
-                    {t.playCardSub}
-                  </p>
+                  <p className="text-4xl font-[family-name:var(--font-syne)] font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">Play</p>
+                  <p className="mt-1 text-sm text-[var(--landing-muted)]">{t("hero.playNote")}</p>
                 </div>
                 <div className="mt-8 space-y-3 border-t border-violet-100 pt-6">
-                  <div className="flex items-center gap-3 text-sm text-slate-700">
-                    <i
-                      className="pi pi-check-circle text-emerald-500"
-                      aria-hidden
-                    />
-                    {t.playCheck1}
-                  </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-700">
-                    <i
-                      className="pi pi-check-circle text-emerald-500"
-                      aria-hidden
-                    />
-                    {t.playCheck2}
-                  </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-700">
-                    <i
-                      className="pi pi-check-circle text-emerald-500"
-                      aria-hidden
-                    />
-                    {t.playCheck3}
-                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-700"><i className="pi pi-check-circle text-emerald-500" aria-hidden />{t("hero.playBullet.1")}</div>
+                  <div className="flex items-center gap-3 text-sm text-slate-700"><i className="pi pi-check-circle text-emerald-500" aria-hidden />{t("hero.playBullet.2")}</div>
+                  <div className="flex items-center gap-3 text-sm text-slate-700"><i className="pi pi-check-circle text-emerald-500" aria-hidden />{t("hero.playBullet.3")}</div>
                 </div>
               </div>
             </Reveal>
           </div>
         </section>
 
-        <section
-          id="download"
-          className="relative scroll-mt-28 py-12 sm:scroll-mt-32 sm:py-20"
-        >
+        <section id="download" className="relative scroll-mt-28 py-12 sm:scroll-mt-32 sm:py-20">
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-violet-100/40 to-emerald-50/30" />
           <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <Reveal>
@@ -274,65 +227,28 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                   <div className="absolute left-1/2 top-0 h-40 w-[min(90%,480px)] -translate-x-1/2 rounded-full bg-violet-200/50 blur-[100px]" />
                   <div className="relative grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16">
                     <div className="min-w-0">
-                      <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-violet-800 ring-1 ring-violet-200/80">
-                        {t.downloadKicker}
-                      </span>
+                      <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-violet-800 ring-1 ring-violet-200/80">{t("download.badge")}</span>
                       <h2 className="mt-5 font-[family-name:var(--font-syne)] text-3xl font-bold leading-[1.2] tracking-tight text-[var(--landing-ink)] sm:text-4xl sm:leading-[1.18] lg:text-5xl lg:leading-[1.15]">
-                        {t.downloadTitleBefore}
-                        <span className="landing-gradient-clip bg-gradient-to-r from-emerald-600 to-teal-600">
-                          {t.downloadTitleBrand}
-                        </span>
-                        {t.downloadTitleAfter}
+                        {t("download.title.before")} <span className="landing-gradient-clip bg-gradient-to-r from-emerald-600 to-teal-600">Movie Match</span> {t("download.title.after")}
                       </h2>
-                      <p className="mt-4 max-w-xl text-lg text-[var(--landing-muted)]">
-                        {t.downloadBody}
-                      </p>
+                      <p className="mt-4 max-w-xl text-lg text-[var(--landing-muted)]">{t("download.description")}</p>
                     </div>
 
                     <div className="flex flex-col items-center justify-center gap-6">
                       <div className="relative flex w-full max-w-sm flex-col items-center rounded-2xl border border-violet-100 bg-gradient-to-b from-white to-violet-50/40 p-8 shadow-md shadow-violet-100/60 transition hover:border-violet-200">
                         <div className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br from-violet-100/60 via-transparent to-emerald-100/40" />
-                        <a
-                          href={playUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="group flex w-full flex-col items-center gap-5 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
-                          aria-label={t.downloadCardAria}
-                        >
-                          <GooglePlayBadge
-                            className="h-14 w-auto drop-shadow-[0_12px_32px_rgba(0,0,0,0.5)] transition group-hover:scale-[1.03]"
-                            topLine={t.googlePlayBadgeTop}
-                            bottomLine={t.googlePlayBadgeBottom}
-                          />
+                        <a href={playUrl} target="_blank" rel="noopener noreferrer" className="group flex w-full flex-col items-center gap-5 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400" aria-label={t("download.cardAria")}>
+                          <GooglePlayBadge className="h-14 w-auto drop-shadow-[0_12px_32px_rgba(0,0,0,0.5)] transition group-hover:scale-[1.03]" topLine={badgeByLang[lang].top} bottomLine={badgeByLang[lang].bottom} />
                           <div className="hidden w-full grid-cols-[1fr_auto] items-center gap-4 rounded-2xl border border-violet-100/80 bg-white/70 p-4 md:grid">
-                            <span className="text-sm text-[var(--landing-muted)]">
-                              {t.downloadQrCaption}
-                            </span>
+                            <span className="text-sm text-[var(--landing-muted)]">{t("download.qrHint")}</span>
                             <span className="rounded-xl bg-white p-2 shadow-sm">
-                              <img
-                                src="/qr-google-play.svg"
-                                alt={t.downloadQrAlt}
-                                width={104}
-                                height={104}
-                                loading="lazy"
-                                decoding="async"
-                              />
+                              <img src="/qr-google-play.svg" alt={t("download.qrAlt")} width={104} height={104} loading="lazy" decoding="async" />
                             </span>
                           </div>
-                          <span className="text-center text-sm text-[var(--landing-muted)]">
-                            {t.downloadCardHint}
-                          </span>
+                          <span className="text-center text-sm text-[var(--landing-muted)]">{t("download.cardHint")}</span>
                         </a>
                       </div>
-                      <a
-                        href={playUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm font-medium text-violet-600 underline-offset-4 hover:text-violet-800 hover:underline"
-                        aria-label={t.downloadLinkAria}
-                      >
-                        {t.downloadLinkText}
-                      </a>
+                      <a href={playUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-violet-600 underline-offset-4 hover:text-violet-800 hover:underline" aria-label={t("download.linkAria")}>{t("download.link")}</a>
                     </div>
                   </div>
                 </div>
@@ -341,35 +257,17 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
           </div>
         </section>
 
-        <section
-          id="features"
-          className="scroll-mt-28 py-16 sm:scroll-mt-32 sm:py-24"
-        >
+        <section id="features" className="scroll-mt-28 py-16 sm:scroll-mt-32 sm:py-24">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <Reveal className="mx-auto max-w-2xl text-center">
-              <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
-                {t.featuresHeading}
-              </h2>
-              <p className="mt-3 text-[var(--landing-muted)]">
-                {t.featuresSub}
-              </p>
+              <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">{t("features.title")}</h2>
+              <p className="mt-3 text-[var(--landing-muted)]">{t("features.description")}</p>
             </Reveal>
             <div className="mt-12 grid gap-5 md:grid-cols-3">
               {features.map((f, i) => (
-                <Reveal
-                  key={f.title}
-                  delay={i * 70}
-                  className={`landing-glass landing-card-hover rounded-3xl p-8 ${f.span}`}
-                >
-                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-fuchsia-100 ring-1 ring-violet-200/80">
-                    <i
-                      className={`pi ${f.icon} text-xl text-violet-600`}
-                      aria-hidden
-                    />
-                  </div>
-                  <h3 className="font-[family-name:var(--font-syne)] text-xl font-semibold text-[var(--landing-ink)]">
-                    {f.title}
-                  </h3>
+                <Reveal key={f.title} delay={i * 70} className={`landing-glass landing-card-hover rounded-3xl p-8 ${f.span}`}>
+                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-fuchsia-100 ring-1 ring-violet-200/80"><i className={`pi ${f.icon} text-xl text-violet-600`} aria-hidden /></div>
+                  <h3 className="font-[family-name:var(--font-syne)] text-xl font-semibold text-[var(--landing-ink)]">{f.title}</h3>
                   <p className="mt-2 text-[var(--landing-muted)]">{f.desc}</p>
                 </Reveal>
               ))}
@@ -377,93 +275,53 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
           </div>
         </section>
 
-        <ScenarioPicker lang={lang} />
+        <ScenarioPicker lang={lang} messages={messages} />
 
-        <section
-          id="guides"
-          className="scroll-mt-28 border-t border-violet-100/90 py-16 sm:scroll-mt-32 sm:py-24"
-        >
+        <section id="guides" className="scroll-mt-28 border-t border-violet-100/90 py-16 sm:scroll-mt-32 sm:py-24">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <Reveal className="mx-auto max-w-2xl text-center">
-              <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
-                {t.guidesHeading}
-              </h2>
-              <p className="mt-3 text-[var(--landing-muted)]">{t.guidesSub}</p>
+              <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">{t("guides.sectionTitle")}</h2>
+              <p className="mt-3 text-[var(--landing-muted)]">{t("guides.sectionDescription")}</p>
             </Reveal>
-            <ul
-              className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-              aria-label={t.guidesListAria}
-            >
+            <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label={t("guides.sectionAria")}>
               {guides.map((g, i) => (
                 <li key={g.slug} className="min-h-0">
                   <Reveal delay={i * 40} className="h-full">
-                    <Link
-                      href={`/${lang}/guides/${g.slug}`}
-                      className="landing-glass landing-card-hover flex h-full min-h-0 flex-col rounded-2xl border border-violet-100/90 p-6 no-underline transition hover:border-violet-200"
-                    >
-                      <span className="font-[family-name:var(--font-syne)] text-lg font-semibold text-[var(--landing-ink)]">
-                        {g.h1}
-                      </span>
-                      <span className="mt-2 line-clamp-3 text-sm text-[var(--landing-muted)]">
-                        {g.metaDescription}
-                      </span>
-                      <span className="mt-4 text-sm font-medium text-violet-600">
-                        {t.guidesReadMore}
-                      </span>
+                    <Link href={`/${lang}/guides/${g.slug}`} className="landing-glass landing-card-hover flex h-full min-h-0 flex-col rounded-2xl border border-violet-100/90 p-6 no-underline transition hover:border-violet-200">
+                      <span className="font-[family-name:var(--font-syne)] text-lg font-semibold text-[var(--landing-ink)]">{g.h1}</span>
+                      <span className="mt-2 line-clamp-3 text-sm text-[var(--landing-muted)]">{g.metaDescription}</span>
+                      <span className="mt-4 text-sm font-medium text-violet-600">{t("guides.readMore")}</span>
                     </Link>
                   </Reveal>
                 </li>
               ))}
             </ul>
             <p className="mt-8 text-center">
-              <Link
-                href={`/${lang}/guides`}
-                className="text-sm font-semibold text-violet-600 underline-offset-4 hover:text-violet-800 hover:underline"
-              >
-                {t.guidesAllLink}
+              <Link href={`/${lang}/guides`} className="text-sm font-semibold text-violet-600 underline-offset-4 hover:text-violet-800 hover:underline" aria-label={t("guides.allGuidesAria")}>
+                {t("guides.allGuides")}
               </Link>
             </p>
           </div>
         </section>
 
-        <LandingFaq lang={lang} />
+        <LandingFaq lang={lang} messages={messages} />
 
-        <section
-          id="reviews"
-          className="scroll-mt-28 border-t border-violet-100/90 py-16 sm:scroll-mt-32 sm:py-24"
-        >
+        <section id="reviews" className="scroll-mt-28 border-t border-violet-100/90 py-16 sm:scroll-mt-32 sm:py-24">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <Reveal className="mx-auto max-w-2xl text-center">
-              <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
-                {t.reviewsHeading}
-              </h2>
-              <p className="mt-3 text-[var(--landing-muted)]">{t.reviewsSub}</p>
+              <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">{t("reviews.title")}</h2>
+              <p className="mt-3 text-[var(--landing-muted)]">{t("reviews.description")}</p>
             </Reveal>
             <div className="mt-12 grid auto-rows-fr gap-6 md:grid-cols-3">
               {reviews.map((r, i) => (
-                <Reveal
-                  key={`${r.name}-${i}`}
-                  delay={i * 80}
-                  className="h-full min-h-0"
-                >
+                <Reveal key={`${r.name}-${i}`} delay={i * 80} className="h-full min-h-0">
                   <blockquote className="landing-glass landing-card-hover flex h-full min-h-0 flex-col rounded-3xl p-8">
-                    <p className="text-lg leading-relaxed text-slate-700">
-                      «{r.quote}»
-                    </p>
+                    <p className="text-lg leading-relaxed text-slate-700">«{r.quote}»</p>
                     <footer className="mt-auto flex items-center gap-3 border-t border-violet-100 pt-6">
-                      <div
-                        className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 text-sm font-bold text-white"
-                        aria-hidden
-                      >
-                        {r.name[0]}
-                      </div>
+                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 text-sm font-bold text-white" aria-hidden>{r.name[0]}</div>
                       <div>
-                        <cite className="not-italic font-semibold text-[var(--landing-ink)]">
-                          {r.name}
-                        </cite>
-                        <p className="text-sm text-[var(--landing-muted)]">
-                          {r.role}
-                        </p>
+                        <cite className="not-italic font-semibold text-[var(--landing-ink)]">{r.name}</cite>
+                        <p className="text-sm text-[var(--landing-muted)]">{r.role}</p>
                       </div>
                     </footer>
                   </blockquote>
@@ -479,29 +337,25 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
               <div className="landing-glass relative overflow-hidden rounded-[2rem] px-8 py-14 sm:px-16">
                 <div className="pointer-events-none absolute -left-24 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-violet-200/60 blur-[90px]" />
                 <div className="pointer-events-none absolute -right-24 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-amber-100/80 blur-[90px]" />
-                <h2 className="relative font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
-                  {t.closingHeading}
-                </h2>
-                <p className="relative mx-auto mt-4 max-w-lg text-[var(--landing-muted)]">
-                  {t.closingBody}
-                </p>
+                <h2 className="relative font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">{t("cta.title")}</h2>
+                <p className="relative mx-auto mt-4 max-w-lg text-[var(--landing-muted)]">{t("cta.description")}</p>
                 <div className="relative mt-8 flex flex-wrap justify-center gap-4">
                   <ButtonShadcn
                     type="button"
                     onClick={handleCreateUser}
                     className="rounded-full border-0 bg-gradient-to-r from-violet-600 to-fuchsia-600 px-8 py-3 text-base font-semibold text-white shadow-lg shadow-violet-300/50 transition hover:brightness-105"
-                    aria-label={t.closingWebAria}
+                    aria-label={t("cta.webAria")}
                   >
-                    {t.closingWeb}
+                    {t("cta.web")}
                   </ButtonShadcn>
                   <a
                     href={playUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center rounded-full border border-violet-200 bg-white px-8 py-3 text-base font-semibold text-violet-900 shadow-sm transition hover:border-violet-300 hover:bg-violet-50"
-                    aria-label={t.closingPlayAria}
+                    aria-label={t("cta.playAria")}
                   >
-                    {t.closingPlay}
+                    {t("cta.play")}
                   </a>
                 </div>
               </div>

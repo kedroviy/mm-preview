@@ -3,15 +3,42 @@
 import { useState } from "react";
 import type { SupportedLocale } from "@/src/shared/config/metadata";
 import {
-  type ScenarioKey,
-  getLandingCopy,
-} from "@/src/shared/i18n/landing-content";
+  getLandingMessage,
+  type LandingMessages,
+} from "@/src/shared/i18n/landing-messages";
+
+type Scenario = "friends" | "couple" | "solo";
 
 /** Лёгкий интерактив без тяжёлых зависимостей — удержание на странице. */
-export function ScenarioPicker({ lang }: { lang: SupportedLocale }) {
-  const [scenario, setScenario] = useState<ScenarioKey>("friends");
-  const copy = getLandingCopy(lang);
-  const scenarioCopy = copy.scenarioByKey;
+export function ScenarioPicker({
+  lang,
+  messages,
+}: {
+  lang: SupportedLocale;
+  messages: LandingMessages;
+}) {
+  const [scenario, setScenario] = useState<Scenario>("friends");
+  const t = (key: string) => getLandingMessage(messages, lang, key);
+  const scenarioCopy: Record<
+    Scenario,
+    { label: string; body: string; hint: string }
+  > = {
+    friends: {
+      label: t("scenario.friends.label"),
+      body: t("scenario.friends.body"),
+      hint: t("scenario.friends.hint"),
+    },
+    couple: {
+      label: t("scenario.couple.label"),
+      body: t("scenario.couple.body"),
+      hint: t("scenario.couple.hint"),
+    },
+    solo: {
+      label: t("scenario.solo.label"),
+      body: t("scenario.solo.body"),
+      hint: t("scenario.solo.hint"),
+    },
+  };
 
   const active = scenarioCopy[scenario];
 
@@ -25,21 +52,21 @@ export function ScenarioPicker({ lang }: { lang: SupportedLocale }) {
           id="scenario-heading"
           className="text-center font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl"
         >
-          {copy.scenarioHeading}
+          {t("scenario.title")}
         </h2>
         <p
           id="scenario-description"
           className="mx-auto mt-3 max-w-lg text-center text-[var(--landing-muted)]"
         >
-          {copy.scenarioSub}
+          {t("scenario.description")}
         </p>
         <fieldset
           className="mt-8 flex flex-wrap justify-center gap-3 border-0 p-0"
           aria-labelledby="scenario-heading"
           aria-describedby="scenario-description"
         >
-          <legend className="sr-only">{copy.scenarioLegend}</legend>
-          {(["friends", "couple", "solo"] as const).map((key) => (
+          <legend className="sr-only">{t("scenario.legend")}</legend>
+          {(Object.keys(scenarioCopy) as Scenario[]).map((key) => (
             <label
               key={key}
               className={

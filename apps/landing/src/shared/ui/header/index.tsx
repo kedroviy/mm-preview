@@ -4,73 +4,32 @@ import { ButtonShadcn } from "@mm-preview/ui/light";
 import { usePathname, useRouter } from "next/navigation";
 import { getGooglePlayUrl } from "@/src/shared/config/constants";
 import {
-  SUPPORTED_LOCALES,
   type SupportedLocale,
 } from "@/src/shared/config/metadata";
-
-const labels: Record<
-  SupportedLocale,
-  {
-    features: string;
-    guides: string;
-    download: string;
-    faq: string;
-    reviews: string;
-    start: string;
-    startAria: string;
-    brandAria: string;
-    langAria: string;
-  }
-> = {
-  ru: {
-    features: "Возможности",
-    guides: "Гайды",
-    download: "Google Play",
-    faq: "Вопросы",
-    reviews: "Отзывы",
-    start: "Начать",
-    startAria: "Начать: открыть приложение в Google Play",
-    brandAria: "Movie Match — перейти к началу страницы",
-    langAria: "Язык",
-  },
-  en: {
-    features: "Features",
-    guides: "Guides",
-    download: "Google Play",
-    faq: "FAQ",
-    reviews: "Reviews",
-    start: "Start",
-    startAria: "Start: open the app on Google Play",
-    brandAria: "Movie Match — jump to top",
-    langAria: "Language",
-  },
-  es: {
-    features: "Funciones",
-    guides: "Guías",
-    download: "Google Play",
-    faq: "Preguntas",
-    reviews: "Reseñas",
-    start: "Empezar",
-    startAria: "Empezar: abrir la app en Google Play",
-    brandAria: "Movie Match — ir al inicio",
-    langAria: "Idioma",
-  },
-};
+import type { HeaderCopy } from "@/src/shared/i18n/landing-messages";
 
 function buildLocalizedPath(pathname: string, nextLang: SupportedLocale) {
   const parts = pathname.split("/");
   const current = parts[1] as SupportedLocale | undefined;
-  if (current && SUPPORTED_LOCALES.includes(current)) {
+  if (current && (current === "ru" || current === "en" || current === "es")) {
     parts[1] = nextLang;
     return parts.join("/") || `/${nextLang}`;
   }
   return `/${nextLang}${pathname === "/" ? "" : pathname}`;
 }
 
-export function Header({ lang }: { lang: SupportedLocale }) {
+export function Header({
+  lang,
+  copy,
+  switcherLocales,
+}: {
+  lang: SupportedLocale;
+  copy: HeaderCopy;
+  switcherLocales: SupportedLocale[];
+}) {
   const router = useRouter();
   const pathname = usePathname();
-  const text = labels[lang] ?? labels.ru;
+  const text = copy;
   const base = `/${lang}`;
   const nav = [
     { href: `${base}#features`, label: text.features },
@@ -125,9 +84,11 @@ export function Header({ lang }: { lang: SupportedLocale }) {
               className="h-9 rounded-full border border-violet-200/70 bg-white/70 px-3 text-sm text-[var(--landing-ink)] shadow-sm backdrop-blur focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 dark:bg-white/10"
               aria-label={text.langAria}
             >
-              <option value="ru">RU</option>
-              <option value="en">EN</option>
-              <option value="es">ES</option>
+              {switcherLocales.map((localeCode) => (
+                <option key={localeCode} value={localeCode}>
+                  {localeCode.toUpperCase()}
+                </option>
+              ))}
             </select>
             <ButtonShadcn
               type="button"
