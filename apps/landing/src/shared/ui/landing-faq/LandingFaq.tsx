@@ -1,7 +1,23 @@
-import { LANDING_FAQ_ITEMS } from "@/src/shared/seo/landing-faq";
+import type { SupportedLocale } from "@/src/shared/config/metadata";
+import {
+  getLandingMessage,
+  type LandingMessages,
+} from "@/src/shared/i18n/landing-dictionary";
 
 /** Видимый FAQ — совпадает с разметкой FAQPage в JSON-LD на главной. */
-export function LandingFaq() {
+export function LandingFaq({
+  lang,
+  messages,
+}: {
+  lang: SupportedLocale;
+  messages: LandingMessages;
+}) {
+  const t = (key: string) => getLandingMessage(messages, lang, key);
+  const items = Array.from({ length: 7 }, (_, index) => ({
+    question: t(`faq.item.${index + 1}.question`),
+    answer: t(`faq.item.${index + 1}.answer`),
+  }));
+
   return (
     <section
       id="faq"
@@ -12,14 +28,13 @@ export function LandingFaq() {
           id="faq-heading"
           className="text-center font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl"
         >
-          Вопросы и ответы
+          {t("faq.title")}
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-center text-[var(--landing-muted)]">
-          Лобби, приглашение, совместный и соло-подбор — и как это связано с
-          Google Play.
+          {t("faq.description")}
         </p>
         <ul className="mt-10 space-y-3" aria-labelledby="faq-heading">
-          {LANDING_FAQ_ITEMS.map((item) => (
+          {items.map((item) => (
             <li key={item.question}>
               <details className="landing-glass group rounded-2xl border border-violet-100/90 px-5 py-1 shadow-sm open:shadow-md">
                 <summary className="cursor-pointer list-none py-4 font-semibold text-[var(--landing-ink)] marker:content-none [&::-webkit-details-marker]:hidden">

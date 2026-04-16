@@ -8,6 +8,7 @@ import {
   type SupportedLocale,
   metadataByLang,
 } from "@/src/shared/config/metadata";
+import { getLandingDictionary } from "@/src/shared/i18n/landing-dictionary";
 import { Header } from "@/src/shared/ui/header";
 
 const MainBlock = nextDynamic(
@@ -47,6 +48,7 @@ export default async function Home({
   }
   const locale = lang as SupportedLocale;
   const jsonLd = getLandingJsonLdString();
+  const dictionary = await getLandingDictionary(locale);
 
   return (
     <>
@@ -61,8 +63,12 @@ export default async function Home({
         }}
       />
       <div className="min-h-svh">
-        <Header lang={locale} />
-        <MainBlock lang={locale} />
+        <Header
+          lang={locale}
+          copy={dictionary.header}
+          switcherLocales={dictionary.switcherLocales}
+        />
+        <MainBlock lang={locale} messages={dictionary.messages} />
       </div>
     </>
   );

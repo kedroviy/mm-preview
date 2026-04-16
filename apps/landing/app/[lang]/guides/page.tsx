@@ -6,6 +6,10 @@ import {
   SUPPORTED_LOCALES,
   type SupportedLocale,
 } from "@/src/shared/config/metadata";
+import {
+  getLandingDictionary,
+  getLandingMessage,
+} from "@/src/shared/i18n/landing-dictionary";
 import { getGuidesIndexJsonLdString } from "@/src/shared/seo/guides-index-json-ld";
 import { LONG_TAIL_GUIDES } from "@/src/shared/seo/long-tail-guides";
 import { Header } from "@/src/shared/ui/header";
@@ -56,6 +60,8 @@ export default async function GuidesIndexPage({
   }
   const locale = lang as SupportedLocale;
   const jsonLd = getGuidesIndexJsonLdString();
+  const dictionary = await getLandingDictionary(locale);
+  const t = (key: string) => getLandingMessage(dictionary.messages, locale, key);
 
   return (
     <div className="min-h-svh">
@@ -69,7 +75,11 @@ export default async function GuidesIndexPage({
           __html: jsonLd,
         }}
       />
-      <Header lang={locale} />
+      <Header
+        lang={locale}
+        copy={dictionary.header}
+        switcherLocales={dictionary.switcherLocales}
+      />
       <main
         id="top"
         tabIndex={-1}
@@ -80,27 +90,27 @@ export default async function GuidesIndexPage({
           className="text-sm text-[var(--landing-muted)]"
         >
           <Link href={`/${locale}`} className="text-violet-600 hover:underline">
-            Home
+            {t("guidesPage.breadcrumbHome")}
           </Link>
           <span className="mx-2" aria-hidden>
             /
           </span>
-          <span className="text-[var(--landing-ink)]">Guides</span>
+          <span className="text-[var(--landing-ink)]">
+            {t("guidesPage.breadcrumbCurrent")}
+          </span>
         </nav>
         <h1 className="mt-6 font-[family-name:var(--font-syne)] text-3xl font-bold tracking-tight text-[var(--landing-ink)] sm:text-4xl">
-          Guides: pick together or solo
+          {t("guidesPage.title")}
         </h1>
         <p className="mt-4 text-lg text-[var(--landing-muted)]">
-          Each page is a separate topic with static generation (SSG). Movie Match
-          on Google Play: a lobby and invite flow for picking together, plus a
-          solo picker when you choose a movie for yourself.
+          {t("guidesPage.description")}
         </p>
         <p className="mt-6">
           <Link
             href={`/${locale}#download`}
             className="text-sm font-semibold text-violet-600 underline-offset-4 hover:text-violet-800 hover:underline"
           >
-            ← Back to home: Google Play and web start
+            {t("guidesPage.backToHome")}
           </Link>
         </p>
         <ul className="mt-10 space-y-4">
@@ -125,7 +135,7 @@ export default async function GuidesIndexPage({
         <p>
           © {new Date().getFullYear()} Movie Match ·{" "}
           <Link href={`/${locale}`} className="text-violet-600 hover:underline">
-            Home
+            {t("guidesPage.footerHome")}
           </Link>
         </p>
       </footer>

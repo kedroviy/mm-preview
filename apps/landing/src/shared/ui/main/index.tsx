@@ -4,11 +4,14 @@ import { ButtonShadcn } from "@mm-preview/ui/light";
 import Link from "next/link";
 import { getAppUrls, getGooglePlayUrl } from "@/src/shared/config/constants";
 import type { SupportedLocale } from "@/src/shared/config/metadata";
+import {
+  getLandingMessage,
+  type LandingMessages,
+} from "@/src/shared/i18n/landing-dictionary";
 import { LONG_TAIL_GUIDES } from "@/src/shared/seo/long-tail-guides";
 import { LandingFaq } from "@/src/shared/ui/landing-faq/LandingFaq";
 import { Reveal } from "@/src/shared/ui/reveal";
 import { ScenarioPicker } from "@/src/shared/ui/scenario-picker/ScenarioPicker";
-import { features, reviews } from "./lib/constants";
 
 function GooglePlayBadge({ className = "" }: { className?: string }) {
   return (
@@ -102,13 +105,66 @@ function GooglePlayBadge({ className = "" }: { className?: string }) {
   );
 }
 
-export function MainBlock({ lang }: { lang: SupportedLocale }) {
+export function MainBlock({
+  lang,
+  messages,
+}: {
+  lang: SupportedLocale;
+  messages: LandingMessages;
+}) {
   const handleCreateUser = () => {
     const urls = getAppUrls();
     window.location.href = urls.USER_CREATION;
   };
 
   const playUrl = getGooglePlayUrl();
+  const t = (key: string) => getLandingMessage(messages, lang, key);
+  const heroMarquee = Array.from({ length: 11 }, (_, index) =>
+    t(`hero.marquee.${index + 1}`),
+  );
+  const features = [
+    {
+      title: t("features.item.1.title"),
+      desc: t("features.item.1.desc"),
+      icon: "pi-comment",
+      span: "md:col-span-2",
+    },
+    {
+      title: t("features.item.2.title"),
+      desc: t("features.item.2.desc"),
+      icon: "pi-users",
+      span: "md:col-span-1",
+    },
+    {
+      title: t("features.item.3.title"),
+      desc: t("features.item.3.desc"),
+      icon: "pi-heart",
+      span: "md:col-span-1",
+    },
+    {
+      title: t("features.item.4.title"),
+      desc: t("features.item.4.desc"),
+      icon: "pi-android",
+      span: "md:col-span-2",
+    },
+  ] as const;
+  const reviews = [
+    {
+      quote: t("reviews.item.1.quote"),
+      name: t("reviews.item.1.name"),
+      role: t("reviews.item.1.role"),
+    },
+    {
+      quote: t("reviews.item.2.quote"),
+      name: t("reviews.item.2.name"),
+      role: t("reviews.item.2.role"),
+    },
+    {
+      quote: t("reviews.item.3.quote"),
+      name: t("reviews.item.3.name"),
+      role: t("reviews.item.3.role"),
+    },
+  ] as const;
 
   return (
     <>
@@ -128,37 +184,36 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
                 </span>
-                Movie Match · развлечения · Google Play
+                {t("hero.badge")}
               </p>
               <h1 className="font-[family-name:var(--font-syne)] text-4xl font-extrabold leading-[1.05] tracking-tight text-[var(--landing-ink)] sm:text-6xl lg:text-7xl">
-                Фильм для вечера —{" "}
-                <span className="landing-headline-gradient">без споров</span>
-                <br className="hidden sm:block" /> с друзьями, парой или в соло
+                {t("hero.title.before")}{" "}
+                <span className="landing-headline-gradient">
+                  {t("hero.title.highlight")}
+                </span>
+                <br className="hidden sm:block" /> {t("hero.title.after")}
               </h1>
               <p className="mx-auto mt-6 max-w-2xl text-lg text-[var(--landing-muted)] sm:text-xl">
-                Как в приложении в Google Play: лобби, приглашение и совместный
-                выбор с друзьями или партнёром — или соло-подбор, когда один
-                человек подбирает себе кино на вечер без лобби и без второго
-                участника.
+                {t("hero.description")}
               </p>
               <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-5">
                 <ButtonShadcn
                   type="button"
                   onClick={handleCreateUser}
                   className="group relative overflow-hidden rounded-full border-0 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-violet-600 bg-[length:200%_100%] px-8 py-3 text-base font-semibold text-white shadow-xl shadow-violet-500/30 transition hover:bg-[position:100%_0]"
-                  aria-label="Создать аккаунт Movie Match в браузере"
+                  aria-label={t("hero.webCtaAria")}
                 >
-                  Создать аккаунт (веб)
+                  {t("hero.webCta")}
                 </ButtonShadcn>
                 <a
                   href={playUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-white px-8 py-3 text-base font-semibold text-violet-900 shadow-md shadow-violet-100 transition hover:border-violet-300 hover:bg-violet-50/90"
-                  aria-label="Скачать Movie Match в Google Play (откроется в новой вкладке)"
+                  aria-label={t("hero.playCtaAria")}
                 >
                   <i className="pi pi-google text-lg" aria-hidden />
-                  Скачать в Google Play
+                  {t("hero.playCta")}
                 </a>
               </div>
             </Reveal>
@@ -176,28 +231,16 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                         key={marqueeKey}
                         className="flex shrink-0 items-center gap-12"
                       >
-                        {[
-                          "Лобби",
-                          "Приглашение друга",
-                          "Соло-подбор",
-                          "Компания друзей",
-                          "Вдвоём с партнёром",
-                          "Драма",
-                          "Комедия",
-                          "Триллер",
-                          "Совместный выбор",
-                          "Без споров",
-                          "Как в Google Play",
-                        ].map((t) => (
+                        {heroMarquee.map((itemText) => (
                           <span
-                            key={`${marqueeKey}-${t}`}
+                            key={`${marqueeKey}-${itemText}`}
                             className="flex items-center gap-2 whitespace-nowrap"
                           >
                             <i
                               className="pi pi-film text-violet-500"
                               aria-hidden
                             />
-                            {t}
+                            {itemText}
                           </span>
                         ))}
                       </div>
@@ -213,11 +256,10 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                 <div className="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <p className="text-sm font-medium text-violet-600">
-                      Сценарий из приложения
+                      {t("hero.appScenarioLabel")}
                     </p>
                     <p className="mt-2 max-w-md text-2xl font-semibold text-[var(--landing-ink)] sm:text-3xl">
-                      Лобби → приглашение → совместный подбор — и отдельно
-                      соло-подбор для вечера одному.
+                      {t("hero.appScenarioTitle")}
                     </p>
                   </div>
                   <div className="flex gap-3" aria-hidden>
@@ -233,7 +275,7 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                     Play
                   </p>
                   <p className="mt-1 text-sm text-[var(--landing-muted)]">
-                    приложение уже в каталоге Google Play (Entertainment)
+                    {t("hero.playNote")}
                   </p>
                 </div>
                 <div className="mt-8 space-y-3 border-t border-violet-100 pt-6">
@@ -242,21 +284,21 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                       className="pi pi-check-circle text-emerald-500"
                       aria-hidden
                     />
-                    Лобби и приглашение друга
+                    {t("hero.playBullet.1")}
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-700">
                     <i
                       className="pi pi-check-circle text-emerald-500"
                       aria-hidden
                     />
-                    Совместный выбор без споров
+                    {t("hero.playBullet.2")}
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-700">
                     <i
                       className="pi pi-check-circle text-emerald-500"
                       aria-hidden
                     />
-                    Соло-подбор фильма на вечер
+                    {t("hero.playBullet.3")}
                   </div>
                 </div>
               </div>
@@ -278,21 +320,17 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                   <div className="relative grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16">
                     <div className="min-w-0">
                       <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-violet-800 ring-1 ring-violet-200/80">
-                        Google Play · Entertainment
+                        {t("download.badge")}
                       </span>
                       <h2 className="mt-5 font-[family-name:var(--font-syne)] text-3xl font-bold leading-[1.2] tracking-tight text-[var(--landing-ink)] sm:text-4xl sm:leading-[1.18] lg:text-5xl lg:leading-[1.15]">
-                        Скачай{" "}
+                        {t("download.title.before")}{" "}
                         <span className="landing-gradient-clip bg-gradient-to-r from-emerald-600 to-teal-600">
                           Movie Match
                         </span>{" "}
-                        в Google Play
+                        {t("download.title.after")}
                       </h2>
                       <p className="mt-4 max-w-xl text-lg text-[var(--landing-muted)]">
-                        Официальное описание в магазине: приложение помогает
-                        выбрать фильм в компании друзей или супругов — больше
-                        никаких споров при совместном выборе. Плюс в приложении
-                        есть соло-подбор: один человек может подобрать себе кино
-                        на вечер. Лобби и приглашение — когда смотрите вместе.
+                        {t("download.description")}
                       </p>
                   
                     </div>
@@ -305,17 +343,17 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="group flex w-full flex-col items-center gap-5 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
-                          aria-label="Скачать Movie Match в Google Play. Откроется карточка приложения в новой вкладке."
+                          aria-label={t("download.cardAria")}
                         >
                           <GooglePlayBadge className="h-14 w-auto drop-shadow-[0_12px_32px_rgba(0,0,0,0.5)] transition group-hover:scale-[1.03]" />
                           <div className="hidden w-full grid-cols-[1fr_auto] items-center gap-4 rounded-2xl border border-violet-100/80 bg-white/70 p-4 md:grid">
                             <span className="text-sm text-[var(--landing-muted)]">
-                              Сканируй QR с телефона — откроется Google Play
+                              {t("download.qrHint")}
                             </span>
                             <span className="rounded-xl bg-white p-2 shadow-sm">
                               <img
                                 src="/qr-google-play.svg"
-                                alt="QR-код: открыть Movie Match в Google Play"
+                                alt={t("download.qrAlt")}
                                 width={104}
                                 height={104}
                                 loading="lazy"
@@ -324,7 +362,7 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                             </span>
                           </div>
                           <span className="text-center text-sm text-[var(--landing-muted)]">
-                            Откроется карточка приложения в Google Play
+                            {t("download.cardHint")}
                           </span>
                         </a>
                       </div>
@@ -333,9 +371,9 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm font-medium text-violet-600 underline-offset-4 hover:text-violet-800 hover:underline"
-                        aria-label="Открыть Movie Match в Google Play в новой вкладке"
+                        aria-label={t("download.linkAria")}
                       >
-                        Открыть Movie Match в Google Play →
+                        {t("download.link")}
                       </a>
                     </div>
                   </div>
@@ -352,11 +390,10 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <Reveal className="mx-auto max-w-2xl text-center">
               <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
-                Совместно и в одиночку
+                {t("features.title")}
               </h2>
               <p className="mt-3 text-[var(--landing-muted)]">
-                В карточке приложения: лобби, приглашение и совместный выбор — и
-                соло-подбор, когда фильм на вечер выбираете только вы.
+                {t("features.description")}
               </p>
             </Reveal>
             <div className="mt-12 grid gap-5 md:grid-cols-3">
@@ -382,7 +419,7 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
           </div>
         </section>
 
-        <ScenarioPicker />
+        <ScenarioPicker lang={lang} messages={messages} />
 
         <section
           id="guides"
@@ -391,16 +428,15 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <Reveal className="mx-auto max-w-2xl text-center">
               <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
-                Гайды: выбор фильма и Movie Match
+                {t("guides.sectionTitle")}
               </h2>
               <p className="mt-3 text-[var(--landing-muted)]">
-                Отдельные страницы под узкие запросы — лобби, пара, компания,
-                соло-подбор, Google Play. Всё в одном приложении.
+                {t("guides.sectionDescription")}
               </p>
             </Reveal>
             <ul
               className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-              aria-label="Тематические гайды по выбору фильма и приложению"
+              aria-label={t("guides.sectionAria")}
             >
               {LONG_TAIL_GUIDES.map((g, i) => (
                 <li key={g.slug} className="min-h-0">
@@ -416,7 +452,7 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                         {g.metaDescription}
                       </span>
                       <span className="mt-4 text-sm font-medium text-violet-600">
-                        Читать →
+                        {t("guides.readMore")}
                       </span>
                     </Link>
                   </Reveal>
@@ -427,15 +463,15 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
               <Link
                 href={`/${lang}/guides`}
                 className="text-sm font-semibold text-violet-600 underline-offset-4 hover:text-violet-800 hover:underline"
-                aria-label="Все гайды на одной странице"
+                aria-label={t("guides.allGuidesAria")}
               >
-                Все материалы на одной странице →
+                {t("guides.allGuides")}
               </Link>
             </p>
           </div>
         </section>
 
-        <LandingFaq />
+        <LandingFaq lang={lang} messages={messages} />
 
         <section
           id="reviews"
@@ -444,10 +480,10 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <Reveal className="mx-auto max-w-2xl text-center">
               <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
-                Отзывы
+                {t("reviews.title")}
               </h2>
               <p className="mt-3 text-[var(--landing-muted)]">
-                Коротко — как это ощущается в жизни, а не в презентации.
+                {t("reviews.description")}
               </p>
             </Reveal>
             <div className="mt-12 grid auto-rows-fr gap-6 md:grid-cols-3">
@@ -487,30 +523,28 @@ export function MainBlock({ lang }: { lang: SupportedLocale }) {
                 <div className="pointer-events-none absolute -left-24 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-violet-200/60 blur-[90px]" />
                 <div className="pointer-events-none absolute -right-24 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-amber-100/80 blur-[90px]" />
                 <h2 className="relative font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
-                  Готов убрать хаос из выбора фильма?
+                  {t("cta.title")}
                 </h2>
                 <p className="relative mx-auto mt-4 max-w-lg text-[var(--landing-muted)]">
-                  В вебе — быстрый старт с аккаунтом; в Android — то же Movie
-                  Match из Google Play: совместный выбор в лобби или соло-подбор
-                  фильма на вечер одному.
+                  {t("cta.description")}
                 </p>
                 <div className="relative mt-8 flex flex-wrap justify-center gap-4">
                   <ButtonShadcn
                     type="button"
                     onClick={handleCreateUser}
                     className="rounded-full border-0 bg-gradient-to-r from-violet-600 to-fuchsia-600 px-8 py-3 text-base font-semibold text-white shadow-lg shadow-violet-300/50 transition hover:brightness-105"
-                    aria-label="Начать в браузере: создать аккаунт Movie Match"
+                    aria-label={t("cta.webAria")}
                   >
-                    Начать в браузере
+                    {t("cta.web")}
                   </ButtonShadcn>
                   <a
                     href={playUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center rounded-full border border-violet-200 bg-white px-8 py-3 text-base font-semibold text-violet-900 shadow-sm transition hover:border-violet-300 hover:bg-violet-50"
-                    aria-label="Открыть Movie Match в Google Play в новой вкладке"
+                    aria-label={t("cta.playAria")}
                   >
-                    Открыть в Google Play
+                    {t("cta.play")}
                   </a>
                 </div>
               </div>

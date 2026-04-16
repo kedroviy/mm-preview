@@ -6,6 +6,10 @@ import {
   SUPPORTED_LOCALES,
   type SupportedLocale,
 } from "@/src/shared/config/metadata";
+import {
+  getLandingDictionary,
+  getLandingMessage,
+} from "@/src/shared/i18n/landing-dictionary";
 import { getGuideJsonLdString } from "@/src/shared/seo/guide-json-ld";
 import {
   getAllGuideSlugs,
@@ -83,6 +87,8 @@ export default async function GuideArticlePage({
   }
 
   const jsonLd = getGuideJsonLdString(guide);
+  const dictionary = await getLandingDictionary(locale);
+  const t = (key: string) => getLandingMessage(dictionary.messages, locale, key);
 
   return (
     <div className="min-h-svh">
@@ -96,7 +102,11 @@ export default async function GuideArticlePage({
           __html: jsonLd,
         }}
       />
-      <Header lang={locale} />
+      <Header
+        lang={locale}
+        copy={dictionary.header}
+        switcherLocales={dictionary.switcherLocales}
+      />
       <main id="top" tabIndex={-1}>
         <article className="mx-auto max-w-3xl px-4 pb-24 pt-28 sm:px-6 sm:pt-32 lg:px-8">
           <nav
@@ -107,7 +117,7 @@ export default async function GuideArticlePage({
               href={`/${locale}`}
               className="text-violet-600 hover:underline"
             >
-              Home
+              {t("guidePage.breadcrumbHome")}
             </Link>
             <span className="mx-2" aria-hidden>
               /
@@ -116,7 +126,7 @@ export default async function GuideArticlePage({
               href={`/${locale}/guides`}
               className="text-violet-600 hover:underline"
             >
-              Guides
+              {t("guidePage.breadcrumbGuides")}
             </Link>
             <span className="mx-2" aria-hidden>
               /
@@ -148,13 +158,13 @@ export default async function GuideArticlePage({
               href={`/${locale}/guides`}
               className="text-sm font-semibold text-violet-600 hover:underline"
             >
-              ← All guides
+              {t("guidePage.allGuides")}
             </Link>
             <Link
               href={`/${locale}#download`}
               className="text-sm font-semibold text-violet-600 hover:underline"
             >
-              Google Play and web start
+              {t("guidePage.backToStart")}
             </Link>
           </div>
         </article>
