@@ -336,7 +336,8 @@ export function normalizeSwitcherLocales(
     locale: SupportedLocale,
     source?: string[],
 ): SupportedLocale[] {
-    const fallback = locale === 'en' ? ['en'] : ['en', locale];
+    const fallback: SupportedLocale[] =
+        locale === 'en' ? ['en'] : ['en', locale];
     if (!source || source.length === 0) {
         return fallback;
     }
@@ -350,7 +351,8 @@ export function normalizeSwitcherLocales(
         return fallback;
     }
 
-    const preferred = locale === 'en' ? ['en'] : ['en', locale];
+    const preferred: SupportedLocale[] =
+        locale === 'en' ? ['en'] : ['en', locale];
     const merged = [...preferred, ...supported];
     const deduped = [...new Set(merged)];
     return deduped.filter((item) => item === 'en' || item === locale);
