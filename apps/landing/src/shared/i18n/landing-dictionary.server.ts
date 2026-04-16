@@ -34,8 +34,9 @@ export async function getLandingDictionary(locale: SupportedLocale): Promise<Lan
     const url = `${getServerApiBaseUrl()}/api/v1/i18n/landing?locale=${locale}`;
     const fallbackMessages = FALLBACK_MESSAGES[locale] ?? FALLBACK_MESSAGES.en;
     const segmentLocale = await getSegmentLocale(locale);
-    const defaultSwitcherLocales: SupportedLocale[] =
-        segmentLocale === 'en' ? ['en'] : ['en', segmentLocale];
+    const defaultSwitcherLocales: SupportedLocale[] = [
+        ...new Set(['en', segmentLocale, 'ru', 'es']),
+    ];
 
     try {
         const response = await fetch(url, {

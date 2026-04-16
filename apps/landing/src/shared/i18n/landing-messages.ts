@@ -336,10 +336,9 @@ export function normalizeSwitcherLocales(
     locale: SupportedLocale,
     source?: string[],
 ): SupportedLocale[] {
-    const fallback: SupportedLocale[] =
-        locale === 'en' ? ['en'] : ['en', locale];
+    const fallback: SupportedLocale[] = ['en', locale, 'ru', 'es'];
     if (!source || source.length === 0) {
-        return fallback;
+        return [...new Set(fallback)];
     }
 
     const supported = source.filter(
@@ -348,14 +347,12 @@ export function normalizeSwitcherLocales(
     );
 
     if (supported.length === 0) {
-        return fallback;
+        return [...new Set(fallback)];
     }
 
-    const preferred: SupportedLocale[] =
-        locale === 'en' ? ['en'] : ['en', locale];
+    const preferred: SupportedLocale[] = ['en', locale, 'ru', 'es'];
     const merged = [...preferred, ...supported];
-    const deduped = [...new Set(merged)];
-    return deduped.filter((item) => item === 'en' || item === locale);
+    return [...new Set(merged)];
 }
 
 export function getLandingMessage(
