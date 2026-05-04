@@ -11,6 +11,13 @@ export const SUPPORTED_LOCALES: readonly SupportedLocale[] = [
 
 export const DEFAULT_LOCALE: SupportedLocale = "ru";
 
+/** Коды hreflang для alternates в HTML и в sitemap (BCP 47). */
+export const HREFLANG_FOR_LOCALE: Record<SupportedLocale, string> = {
+  ru: "ru-RU",
+  en: "en-US",
+  es: "es-ES",
+};
+
 export interface MetadataConfig {
   titleDefault: string;
   titleTemplate: string;
@@ -214,9 +221,9 @@ export function createLandingMetadata(lang: SupportedLocale): Metadata {
     alternates: {
       canonical,
       languages: {
-        "ru-RU": "/ru",
-        "en-US": "/en",
-        "es-ES": "/es",
+        [HREFLANG_FOR_LOCALE.ru]: "/ru",
+        [HREFLANG_FOR_LOCALE.en]: "/en",
+        [HREFLANG_FOR_LOCALE.es]: "/es",
         "x-default": `/${DEFAULT_LOCALE}`,
       },
     },
