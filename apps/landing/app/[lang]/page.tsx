@@ -35,6 +35,7 @@ export async function generateMetadata({
     description: meta.description,
     openGraph: {
       description: meta.openGraph.description,
+      url: `/${locale}`,
       images: [
         {
           url: `/${locale}/opengraph-image`,

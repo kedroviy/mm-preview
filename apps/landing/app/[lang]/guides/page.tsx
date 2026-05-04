@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import {
+  HREFLANG_FOR_LOCALE,
   SUPPORTED_LOCALES,
   type SupportedLocale,
 } from "@/src/shared/config/metadata";
@@ -33,9 +34,9 @@ export async function generateMetadata({
     alternates: {
       canonical: `/${locale}/guides`,
       languages: {
-        "ru-RU": "/ru/guides",
-        "en-US": "/en/guides",
-        "es-ES": "/es/guides",
+        [HREFLANG_FOR_LOCALE.ru]: "/ru/guides",
+        [HREFLANG_FOR_LOCALE.en]: "/en/guides",
+        [HREFLANG_FOR_LOCALE.es]: "/es/guides",
         "x-default": "/ru/guides",
       },
     },

@@ -1,15 +1,19 @@
 import type { MetadataRoute } from "next";
+import {
+  DEFAULT_LOCALE,
+  HREFLANG_FOR_LOCALE,
+  SUPPORTED_LOCALES,
+} from "@/src/shared/config/metadata";
 import { getLandingSiteUrl } from "@/src/shared/config/site-url";
-import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "@/src/shared/config/metadata";
 import { getGuidesForLocale } from "@/src/shared/seo/long-tail-guides";
 
 function buildLanguageAlternates(
-  byLocale: Record<string, string>,
+  byHreflang: Record<string, string>,
 ): MetadataRoute.Sitemap[number]["alternates"] {
   return {
     languages: {
-      ...byLocale,
-      "x-default": byLocale[DEFAULT_LOCALE],
+      ...byHreflang,
+      "x-default": byHreflang[HREFLANG_FOR_LOCALE[DEFAULT_LOCALE]],
     },
   };
 }
@@ -24,7 +28,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const localizedGuides = SUPPORTED_LOCALES.flatMap((lang) => {
     const guidesIndexAlternates = buildLanguageAlternates(
       Object.fromEntries(
-        SUPPORTED_LOCALES.map((locale) => [locale, `${base}/${locale}/guides`]),
+        SUPPORTED_LOCALES.map((locale) => [
+          HREFLANG_FOR_LOCALE[locale],
+          `${base}/${locale}/guides`,
+        ]),
       ),
     );
     const guidesIndex: MetadataRoute.Sitemap[number] = {
@@ -38,7 +45,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       const alternates = buildLanguageAlternates(
         Object.fromEntries(
           SUPPORTED_LOCALES.map((locale) => [
-            locale,
+            HREFLANG_FOR_LOCALE[locale],
             `${base}/${locale}/guides/${g.slug}`,
           ]),
         ),
@@ -58,7 +65,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...SUPPORTED_LOCALES.map((lang) => {
       const alternates = buildLanguageAlternates(
         Object.fromEntries(
-          SUPPORTED_LOCALES.map((locale) => [locale, `${base}/${locale}`]),
+          SUPPORTED_LOCALES.map((locale) => [
+            HREFLANG_FOR_LOCALE[locale],
+            `${base}/${locale}`,
+          ]),
         ),
       );
       return {
