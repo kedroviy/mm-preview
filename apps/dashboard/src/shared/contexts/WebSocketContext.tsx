@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  type WebSocketServiceEvents,
-  webSocketService,
-} from "@mm-preview/sdk";
+import { type WebSocketServiceEvents, webSocketService } from "@mm-preview/sdk";
 import {
   createContext,
   type PropsWithChildren,
@@ -15,20 +12,21 @@ import {
   useState,
 } from "react";
 import { getAppUrls } from "../config/constants";
+import { isMovieMatchLegacy, movieMatchWebSocketService } from "../movie-match";
 
 const MAX_AUTH_RETRIES = 2;
+
+function getRoomWs() {
+  return isMovieMatchLegacy() ? movieMatchWebSocketService : webSocketService;
+}
 
 interface WebSocketContextValue {
   isConnected: boolean;
   getMyRooms: () => void;
-  joinRoom: (publicCode: string, userId: string) => void;
+  joinRoom: (publicCode: string, userId: string, clientRoomId?: string) => void;
   leaveRoom: (roomId: string, userId: string) => void;
   sendMessage: (roomId: string, message: string) => void;
-  reconnectToRoom: (
-    roomId: string,
-    publicCode: string,
-    userId: string,
-  ) => void;
+  reconnectToRoom: (roomId: string, publicCode: string, userId: string) => void;
   getCurrentRoomId: () => string | null;
   refreshTokenAndReconnect: () => Promise<void>;
   on: <T extends keyof WebSocketServiceEvents>(
@@ -56,11 +54,9 @@ export function WebSocketProvider({
     fetch("/api/auth/token", { credentials: "include" })
       .then((res) => res.json())
       .then(({ accessToken }: { accessToken: string | null }) => {
-        // Если accessToken пришел в JSON - передаем его, 
-        // но если нет - просто коннектимся, полагаясь на куки
-        webSocketService.connect(accessToken ?? undefined);
+        getRoomWs().connect(accessToken ?? undefined);
       })
-      .catch(() => webSocketService.connect());
+      .catch(() => getRoomWs().connect());
   }, []);
 
   const redirectToLogin = useCallback(() => {
@@ -70,6 +66,7 @@ export function WebSocketProvider({
   }, []);
 
   useEffect(() => {
+    const ws = getRoomWs();
     const handleConnect = () => setIsConnected(true);
     const handleDisconnect = () => setIsConnected(false);
 
@@ -78,19 +75,13 @@ export function WebSocketProvider({
       isRetrying.current = false;
     };
 
-    const unsubscribeConnect = webSocketService.on("connect", handleConnect);
-    const unsubscribeDisconnect = webSocketService.on(
-      "disconnect",
-      handleDisconnect,
-    );
-    const unsubJoinedRoom = webSocketService.on("joinedRoom", resetAuthRetries);
-    const unsubMyRooms = webSocketService.on("myRooms", resetAuthRetries);
-    const unsubTokenRefreshed = webSocketService.on(
-      "tokenRefreshed",
-      resetAuthRetries,
-    );
+    const unsubscribeConnect = ws.on("connect", handleConnect);
+    const unsubscribeDisconnect = ws.on("disconnect", handleDisconnect);
+    const unsubJoinedRoom = ws.on("joinedRoom", resetAuthRetries);
+    const unsubMyRooms = ws.on("myRooms", resetAuthRetries);
+    const unsubTokenRefreshed = ws.on("tokenRefreshed", resetAuthRetries);
 
-    setIsConnected(webSocketService.isConnected());
+    setIsConnected(ws.isConnected());
 
     if (autoConnect && !isInitialized.current) {
       isInitialized.current = true;
@@ -107,12 +98,16 @@ export function WebSocketProvider({
   }, [autoConnect, connectWithToken]);
 
   useEffect(() => {
+    if (isMovieMatchLegacy()) {
+      return;
+    }
+
     const handleError = (error: { code: string; message?: string }) => {
       if (error.code !== "UNAUTHORIZED") return;
       if (isRetrying.current) return;
 
       authRetryCount.current++;
-      
+
       if (authRetryCount.current > MAX_AUTH_RETRIES) {
         redirectToLogin();
         return;
@@ -121,7 +116,7 @@ export function WebSocketProvider({
       isRetrying.current = true;
       fetch("/api/auth/refresh", {
         method: "POST",
-        credentials: "include", // Обязательно: отправляет старый refresh_token и получает новый Set-Cookie
+        credentials: "include",
       })
         .then((res) => {
           if (!res.ok) throw new Error("refresh failed");
@@ -131,7 +126,6 @@ export function WebSocketProvider({
           isRetrying.current = false;
 
           if (data?.accessToken) {
-            // Закрываем текущее (анонимное) соединение и подключаемся с токеном
             webSocketService.disconnect();
             webSocketService.connect(data.accessToken);
           } else {
@@ -139,58 +133,55 @@ export function WebSocketProvider({
           }
         })
         .catch(() => {
-          console.error(error)
           isRetrying.current = false;
           redirectToLogin();
         });
-
     };
 
     const unsubscribe = webSocketService.on("error", handleError);
     return () => unsubscribe();
-  }, [connectWithToken, redirectToLogin]);
+  }, [redirectToLogin]);
 
-  const getMyRooms = useCallback(() => webSocketService.getMyRooms(), []);
+  const getMyRooms = useCallback(() => getRoomWs().getMyRooms(), []);
   const joinRoom = useCallback(
-    (publicCode: string, userId: string) =>
-      webSocketService.joinRoom(publicCode, userId),
+    (publicCode: string, userId: string, clientRoomId?: string) =>
+      getRoomWs().joinRoom(publicCode, userId, clientRoomId),
     [],
   );
   const leaveRoom = useCallback(
-    (roomId: string, userId: string) =>
-      webSocketService.leaveRoom(roomId, userId),
+    (roomId: string, userId: string) => getRoomWs().leaveRoom(roomId, userId),
     [],
   );
   const sendMessage = useCallback(
     (roomId: string, message: string) =>
-      webSocketService.sendMessage(roomId, message),
+      getRoomWs().sendMessage(roomId, message),
     [],
   );
   const reconnectToRoom = useCallback(
     (roomId: string, publicCode: string, userId: string) =>
-      webSocketService.reconnectToRoom(roomId, publicCode, userId),
+      getRoomWs().reconnectToRoom(roomId, publicCode, userId),
     [],
   );
   const getCurrentRoomId = useCallback(
-    () => webSocketService.getCurrentRoomId(),
+    () => getRoomWs().getCurrentRoomId(),
     [],
   );
   const refreshTokenAndReconnect = useCallback(
-    () => webSocketService.refreshTokenAndReconnect(),
+    () => getRoomWs().refreshTokenAndReconnect(),
     [],
   );
   const on = useCallback(
     <T extends keyof WebSocketServiceEvents>(
       event: T,
       listener: WebSocketServiceEvents[T],
-    ) => webSocketService.on(event, listener),
+    ) => getRoomWs().on(event, listener),
     [],
   );
   const off = useCallback(
     <T extends keyof WebSocketServiceEvents>(
       event: T,
       listener: WebSocketServiceEvents[T],
-    ) => webSocketService.off(event, listener),
+    ) => getRoomWs().off(event, listener),
     [],
   );
 

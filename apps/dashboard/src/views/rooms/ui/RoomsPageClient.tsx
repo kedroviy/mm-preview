@@ -135,6 +135,7 @@ export function RoomsPageClient({
             </div>
 
             <CreateRoomForm
+              userId={userId}
               onSuccess={handleCreateSuccess}
               onCancel={() => setViewMode("menu")}
             />

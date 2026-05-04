@@ -1,92 +1,78 @@
 "use client";
 
+import type { RoomMember } from "@mm-preview/sdk";
+import { useUsersController_getProfile } from "@mm-preview/sdk";
 import {
-  useLeaveRoom,
-  useRoom,
-  useRoomMembers,
-  useUsersController_getProfile,
-} from "@mm-preview/sdk";
-import { Button, notificationService, ProgressSpinner } from "@mm-preview/ui";
-import { Suspense, useCallback, useMemo } from "react";
-import Loading from "@/app/loading";
-import { ChatWindow, useChat } from "@/src/features/chat";
+  Button,
+  Card,
+  notificationService,
+  ProgressSpinner,
+} from "@mm-preview/ui";
+import { useCallback, useMemo } from "react";
 import {
   useViewTransition,
   ViewTransition,
 } from "@/src/shared/components/ViewTransition";
-import { isMovieMatchLegacy } from "@/src/shared/movie-match";
+import {
+  useMovieMatchLeaveRoom,
+  useMovieMatchRoom,
+} from "@/src/shared/hooks/useMovieMatchRooms";
 import { RoomChoices } from "@/src/widgets/room-choices";
 import { RoomHeader } from "@/src/widgets/room-header";
 import { RoomMembers } from "@/src/widgets/room-members";
 import { RoomNotMember } from "@/src/widgets/room-not-member";
-import { LegacyRoomDetailContent } from "./LegacyRoomDetailContent";
-
-type ViewConfig = {
-  view: "loading" | "error" | "not-member" | "member";
-  render: () => React.ReactElement | null;
-};
-
-interface RoomDetailPageProps {
-  userId: string;
-  roomId: string;
-}
 
 type ProfileType = {
   userId: string;
   name: string;
-  role?: string;
-  lastActive?: number;
-  recentRooms?: string[];
-  rooms?: unknown[];
 };
 
-function RoomContent({ userId, roomId }: RoomDetailPageProps) {
-  const { data: room, isLoading: roomLoading } = useRoom(roomId);
+interface LegacyRoomDetailContentProps {
+  userId: string;
+  roomId: string;
+}
+
+export function LegacyRoomDetailContent({
+  userId,
+  roomId,
+}: LegacyRoomDetailContentProps) {
+  const {
+    data: room,
+    isLoading: roomLoading,
+    isError,
+  } = useMovieMatchRoom(roomId, userId);
   const { data: profileData } = useUsersController_getProfile();
   const profile = profileData as ProfileType | null | undefined;
-  const { data: members } = useRoomMembers(roomId);
-  const leaveRoom = useLeaveRoom();
+  const leaveRoom = useMovieMatchLeaveRoom();
   const { navigate, isPending } = useViewTransition();
 
-  const {
-    messages: chatMessages,
-    isConnected: isChatConnected,
-    isMuted,
-    isReadyToSend,
-    sendMessage: sendChatMessage,
-  } = useChat({
-    roomId,
-    publicCode: room?.publicCode,
-    userId,
-    enabled: !!(roomId && room?.isMember && userId),
-  });
+  const members = useMemo<RoomMember[]>(() => [], []);
 
   const handleLeaveRoom = useCallback(async () => {
-    if (!userId || !roomId) {
+    if (!room?.publicCode) {
       return;
     }
-
     try {
-      await leaveRoom.mutateAsync({ roomId, userId });
+      await leaveRoom.mutateAsync(room.publicCode);
       notificationService.showSuccess("Вы покинули комнату");
       navigate(`/${userId}/rooms`);
     } catch (_error) {
       notificationService.showError("Не удалось покинуть комнату");
     }
-  }, [userId, roomId, leaveRoom, navigate]);
+  }, [userId, room, leaveRoom, navigate]);
 
   const handleBack = useCallback(
     () => navigate(`/${userId}/rooms`),
     [navigate, userId],
   );
+
   const handleRemoveMember = useCallback((_memberUserId: string) => {
     notificationService.showInfo("Функция удаления участника будет добавлена");
   }, []);
 
-  const viewConfig: ViewConfig = useMemo(() => {
+  const viewConfig = useMemo(() => {
     if (!userId) {
       return {
-        view: "error",
         render: () => (
           <div className="min-h-screen p-8 flex items-center justify-center">
             <div className="text-center">
@@ -99,7 +85,6 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
 
     if (roomLoading) {
       return {
-        view: "loading",
         render: () => (
           <div className="min-h-screen p-8 flex items-center justify-center">
             <div className="text-center">
@@ -110,13 +95,12 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
       };
     }
 
-    if (!room) {
+    if (isError || !room) {
       return {
-        view: "error",
         render: () => (
           <div className="min-h-screen p-8 flex items-center justify-center">
             <div className="text-center">
-              <p className="text-lg text-red-600">Room not found</p>
+              <p className="text-lg text-red-600">Комната не найдена</p>
               <Button
                 onClick={handleBack}
                 className="mt-4"
@@ -132,7 +116,6 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
 
     if (!room.isMember) {
       return {
-        view: "not-member",
         render: () => (
           <ViewTransition name="page">
             <div className="min-h-screen p-8">
@@ -164,7 +147,6 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
     }
 
     return {
-      view: "member",
       render: () => (
         <ViewTransition name="page">
           <div className="min-h-screen p-8">
@@ -187,15 +169,17 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
                 />
                 <RoomChoices room={room} currentUserId={userId} />
               </div>
-              {profileData && (
-                <ChatWindow
-                  userId={profileData.userId}
-                  messages={chatMessages}
-                  onSendMessage={sendChatMessage}
-                  isLoading={!isChatConnected || !isReadyToSend}
-                  isMuted={isMuted}
-                />
-              )}
+              <Card title="Чат" className="mt-6">
+                <p className="text-muted-color m-0">
+                  В режиме API movieMatcher используется другой протокол чата;
+                  окно чата нового бэкенда отключено.
+                </p>
+                {profile && (
+                  <p className="text-sm text-muted-color mt-2 mb-0">
+                    Пользователь: {profile.userId}
+                  </p>
+                )}
+              </Card>
             </div>
           </div>
         </ViewTransition>
@@ -204,13 +188,10 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
   }, [
     userId,
     roomLoading,
+    isError,
     room,
     members,
     profile,
-    chatMessages,
-    isChatConnected,
-    isMuted,
-    sendChatMessage,
     leaveRoom.isPending,
     isPending,
     handleBack,
@@ -219,16 +200,4 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
   ]);
 
   return viewConfig.render();
-}
-
-export function RoomDetailPage({ userId, roomId }: RoomDetailPageProps) {
-  return (
-    <Suspense fallback={<Loading />}>
-      {isMovieMatchLegacy() ? (
-        <LegacyRoomDetailContent userId={userId} roomId={roomId} />
-      ) : (
-        <RoomContent userId={userId} roomId={roomId} />
-      )}
-    </Suspense>
-  );
 }

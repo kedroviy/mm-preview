@@ -12,6 +12,8 @@ import {
 } from "@mm-preview/ui";
 import type { MouseEvent } from "react";
 import type { Room } from "@/src/entities/room";
+import { useMovieMatchMyRooms } from "@/src/shared/hooks/useMovieMatchRooms";
+import { isMovieMatchLegacy } from "@/src/shared/movie-match";
 import type { RoomListProps } from "../model/types";
 import styles from "./RoomList.module.css";
 
@@ -21,12 +23,17 @@ export function RoomList({
   onConnect,
   onDelete,
 }: RoomListProps) {
-  // Используем REST запрос вместо WebSocket
-  const { data: restRooms, isLoading: isRestLoading } = useMyRooms(
-    userId ? undefined : { enabled: false },
+  const legacy = isMovieMatchLegacy();
+  const { data: sdkRooms, isLoading: sdkLoading } = useMyRooms({
+    enabled: !legacy && !!userId,
+  });
+  const { data: mmRooms, isLoading: mmLoading } = useMovieMatchMyRooms(
+    legacy && !!userId,
   );
 
-  // Используем данные из REST запроса, если они есть, иначе initialRooms
+  const restRooms = legacy ? mmRooms : sdkRooms;
+  const isRestLoading = legacy ? mmLoading : sdkLoading;
+
   const rooms =
     restRooms && restRooms.length > 0 ? (restRooms as Room[]) : initialRooms;
   const isRoomsLoading = isRestLoading;
@@ -73,7 +80,6 @@ export function RoomList({
     );
   }
 
-  // Показываем пустое сообщение только после завершения загрузки, если комнат нет
   if (!isRoomsLoading && (!rooms || rooms.length === 0)) {
     return (
       <Card className="mt-6">
@@ -143,10 +149,8 @@ export function RoomList({
           <Column
             header="Действия"
             body={(room: Room) => {
-              // Создаем actions без useMemo (хуки нельзя вызывать в колбэках)
               const actions = [];
 
-              // Подключиться - слева
               actions.push({
                 label: "Подключиться",
                 icon: <ConnectIcon className="w-4 h-4" />,
@@ -168,7 +172,6 @@ export function RoomList({
                 },
               });
 
-              // Удалить - справа (если создатель)
               if (room.isCreator && onDelete) {
                 actions.push({
                   label: "Удалить",

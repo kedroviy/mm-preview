@@ -3,6 +3,8 @@
 import { useJoinRoom } from "@mm-preview/sdk";
 import { Button, Card, InputOtp, notificationService } from "@mm-preview/ui";
 import { useState } from "react";
+import { useMovieMatchJoinRoom } from "@/src/shared/hooks/useMovieMatchRooms";
+import { isMovieMatchLegacy } from "@/src/shared/movie-match";
 import type { JoinRoomFormProps } from "../model/types";
 
 export function JoinRoomForm({
@@ -12,6 +14,7 @@ export function JoinRoomForm({
 }: JoinRoomFormProps) {
   const [roomCode, setRoomCode] = useState("");
   const joinRoom = useJoinRoom();
+  const movieMatchJoin = useMovieMatchJoinRoom();
 
   const handleSubmit = async () => {
     if (!userId || !roomCode) {
@@ -25,6 +28,15 @@ export function JoinRoomForm({
     }
 
     try {
+      if (isMovieMatchLegacy()) {
+        const result = await movieMatchJoin.mutateAsync({
+          publicCode: roomCode,
+          userId,
+        });
+        notificationService.showSuccess("Вы успешно присоединились к комнате!");
+        onSuccess?.(result);
+        return;
+      }
       const result = await joinRoom.mutateAsync({
         publicCode: roomCode,
         userId,
@@ -37,6 +49,10 @@ export function JoinRoomForm({
       );
     }
   };
+
+  const pending = isMovieMatchLegacy()
+    ? movieMatchJoin.isPending
+    : joinRoom.isPending;
 
   return (
     <Card>
@@ -66,10 +82,10 @@ export function JoinRoomForm({
           )}
           <Button
             onClick={handleSubmit}
-            disabled={joinRoom.isPending || roomCode.length !== 6}
+            disabled={pending || roomCode.length !== 6}
             className="flex-1"
           >
-            {joinRoom.isPending ? "Присоединение..." : "Присоединиться"}
+            {pending ? "Присоединение..." : "Присоединиться"}
           </Button>
         </div>
       </div>
