@@ -24,7 +24,7 @@ export {
 } from "./hooks/useUsers";
 // Query Client
 export { createQueryClient, defaultQueryClient } from "./query-client";
-export type { AuthResponse, LoginRequest, RegisterRequest } from "./services/auth";
+export type { LoginRequest, LoginResponse } from "./services/auth";
 // Auth
 export { authApi } from "./services/auth";
 export type {
