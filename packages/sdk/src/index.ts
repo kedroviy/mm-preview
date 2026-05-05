@@ -96,6 +96,12 @@ export {
 // Server client (use in server components / RSC)
 export { createServerClient } from "./client-server";
 
+// Generated TanStack Query hooks (safe subset; avoids NSI barrel conflicts)
+export * from "./generated/hooks/useHealth";
+export * from "./generated/hooks/useAuth";
+export * from "./generated/hooks/useUsers";
+export * from "./generated/hooks/useRooms";
+
 export * from "./generated/requests";
 export * from "./generated/schemas";
 // Generated exports (will be available after running generate:all)
