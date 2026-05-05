@@ -1,6 +1,6 @@
 "use client";
 
-import { authApi, getAccessToken, getUserIdFromToken } from "@mm-preview/sdk";
+import { authApi } from "@mm-preview/sdk";
 import { Button, InputText, notificationService } from "@mm-preview/ui";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -9,13 +9,11 @@ import { useTranslation } from "@/src/shared/i18n/useTranslation";
 import { getErrorMessage } from "../utils/error";
 
 interface UserFormData {
-  email: string;
-  password: string;
+  name: string;
 }
 
 export function UserCreationForm() {
   const { t } = useTranslation();
-  const [mode, setMode] = useState<"login" | "register">("login");
   const [isPending, setIsPending] = useState(false);
 
   const {
@@ -25,17 +23,13 @@ export function UserCreationForm() {
     reset,
   } = useForm<UserFormData>({
     defaultValues: {
-      email: "",
-      password: "",
+      name: "",
     },
     mode: "onSubmit",
     reValidateMode: "onChange",
   });
 
-  const redirectToDashboard = () => {
-    const token = getAccessToken();
-    const userId = getUserIdFromToken(token);
-    if (!userId) return;
+  const redirectToDashboard = (userId: string) => {
     const dashboardUrl = getAppUrls().DASHBOARD;
     window.location.href = `${dashboardUrl}/${userId}/rooms`;
   };
@@ -43,24 +37,14 @@ export function UserCreationForm() {
   const onSubmit = async (data: UserFormData) => {
     setIsPending(true);
     try {
-      if (mode === "register") {
-        await authApi.register({ email: data.email, password: data.password });
+      const loginRes = await authApi.login({ name: data.name });
+      const userId = loginRes.data?.userId;
+      if (!userId) {
+        throw new Error("No userId in response");
       }
 
-      const loginRes = await authApi.login({
-        email: data.email,
-        password: data.password,
-      });
-
-      if (!loginRes.data?.token) {
-        throw new Error("No token in response");
-      }
-
-      notificationService.showSuccess(
-        mode === "register" ? "Registered" : "Logged in",
-      );
-
-      redirectToDashboard();
+      notificationService.showSuccess("Logged in");
+      redirectToDashboard(userId);
     } catch (error) {
       notificationService.showError(getErrorMessage(error, t("error")));
       reset(undefined, {
@@ -83,96 +67,48 @@ export function UserCreationForm() {
       suppressHydrationWarning
     >
       <div className="card w-full max-w-md" suppressHydrationWarning>
-        <h1 className="text-3xl font-bold mb-6 text-center">
-          {mode === "login" ? "Login" : "Register"}
-        </h1>
+        <h1 className="text-3xl font-bold mb-6 text-center">Login</h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <label htmlFor="email" className="font-medium">
-              Email
+            <label htmlFor="name" className="font-medium">
+              Name
             </label>
             <Controller
-              name="email"
+              name="name"
               control={control}
               rules={{
-                required: "Email is required",
+                required: "Name is required",
+                minLength: { value: 1, message: "Name is required" },
+                maxLength: { value: 100, message: "Max length is 100" },
               }}
               render={({ field }) => (
                 <InputText
-                  id="email"
+                  id="name"
                   {...field}
                   value={field.value || ""}
                   className={
-                    errors.email
+                    errors.name
                       ? "p-invalid !bg-red-50 dark:!bg-red-900/20"
                       : ""
                   }
-                  placeholder="you@example.com"
+                  placeholder="John Doe"
                 />
               )}
             />
-            {errors.email && (
+            {errors.name && (
               <small className="p-error text-red-600 dark:text-red-400">
-                {errors.email.message}
-              </small>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label htmlFor="password" className="font-medium">
-              Password
-            </label>
-            <Controller
-              name="password"
-              control={control}
-              rules={{
-                required: "Password is required",
-                minLength: { value: 6, message: "Min length is 6" },
-              }}
-              render={({ field }) => (
-                <InputText
-                  id="password"
-                  type="password"
-                  {...field}
-                  value={field.value || ""}
-                  className={
-                    errors.password
-                      ? "p-invalid !bg-red-50 dark:!bg-red-900/20"
-                      : ""
-                  }
-                  placeholder="******"
-                />
-              )}
-            />
-            {errors.password && (
-              <small className="p-error text-red-600 dark:text-red-400">
-                {errors.password.message}
+                {errors.name.message}
               </small>
             )}
           </div>
 
           <Button
             type="submit"
-            disabled={isPending || !!errors.email || !!errors.password}
+            disabled={isPending || !!errors.name}
             className="w-full text-lg px-6 py-3"
           >
-            {isPending
-              ? mode === "login"
-                ? "Logging in..."
-                : "Registering..."
-              : mode === "login"
-                ? "Login"
-                : "Register"}
-          </Button>
-
-          <Button
-            type="button"
-            severity="secondary"
-            onClick={() => setMode((m) => (m === "login" ? "register" : "login"))}
-            className="w-full"
-          >
-            {mode === "login" ? "Create account" : "I already have an account"}
+            {isPending ? "Logging in..." : "Login"}
           </Button>
         </form>
       </div>

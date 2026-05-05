@@ -1,43 +1,30 @@
 import { api } from "../client";
-import { removeAllAuthTokens, setAccessToken } from "../utils/cookies";
-
-export interface AuthResponse {
-  token: string;
-}
 
 export interface LoginRequest {
-  email: string;
-  password: string;
+  name: string;
 }
 
-export interface RegisterRequest {
-  email: string;
-  password: string;
+export interface LoginResponse {
+  userId: string;
+  name: string;
 }
 
 export const authApi = {
   /**
-   * Login (movie-match): POST /auth/login -> { token }
+   * Login by name: POST /api/v1/auth/login -> { userId, name }
+   *
+   * Backend sets JWT tokens in HTTP-only cookies.
    */
   login: async (data: LoginRequest) => {
-    const res = await api.post<AuthResponse>("/auth/login", data);
-    if (res.data?.token) setAccessToken(res.data.token);
-    return res;
+    return api.post<LoginResponse>("/api/v1/auth/login", data);
   },
 
   /**
-   * Register (movie-match): POST /auth/register -> { message }
-   * We keep it typed loosely and allow chaining login on the client.
-   */
-  register: async (data: RegisterRequest) => {
-    return api.post<{ message?: string }>("/auth/register", data);
-  },
-
-  /**
-   * Logout (client-side only): clears stored JWT.
+   * Logout: POST /api/v1/auth/logout
+   *
+   * Clears auth cookies on the backend.
    */
   logout: async () => {
-    removeAllAuthTokens();
-    return { data: undefined, status: 200, statusText: "OK" };
+    return api.post<void>("/api/v1/auth/logout");
   },
 };

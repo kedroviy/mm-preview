@@ -5,10 +5,21 @@ const path = require("node:path");
 
 const OUTPUT_PATH = path.join(__dirname, "../swagger.json");
 
-// Выбираем URL в зависимости от окружения
-const SWAGGER_URL = process.env.NODE_ENV === 'production'
-  ? "https://api.moviematch.space/api/docs-json"
-  : "http://localhost:4000/api/docs-json";
+function stripTrailingSlash(url) {
+  return String(url || "").replace(/\/$/, "");
+}
+
+// Prefer explicit override; otherwise reuse app backend env.
+// This lets us switch between backends (movie-match vs admin) without code changes.
+const SWAGGER_BASE =
+  process.env.SWAGGER_URL ||
+  process.env.BACKEND_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === "production"
+    ? "https://api.moviematch.space"
+    : "http://localhost:4000");
+
+const SWAGGER_URL = `${stripTrailingSlash(SWAGGER_BASE)}/api/docs-json`;
 
 async function main() {
   console.log(`📡 Fetching swagger from: ${SWAGGER_URL}...`);
