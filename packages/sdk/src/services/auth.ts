@@ -1,29 +1,43 @@
 import { api } from "../client";
-
-export interface RefreshTokenRequest {
-  refreshToken?: string;
-}
+import { removeAllAuthTokens, setAccessToken } from "../utils/cookies";
 
 export interface AuthResponse {
-  accessToken?: string;
-  refreshToken?: string;
-  // Может быть и другой формат ответа
-  [key: string]: unknown;
+  token: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
 }
 
 export const authApi = {
   /**
-   * Обновить access token используя refresh token
-   * Refresh token может быть в cookie или в теле запроса
+   * Login (movie-match): POST /auth/login -> { token }
    */
-  refreshToken: async (data?: RefreshTokenRequest) => {
-    return api.post<AuthResponse>("/api/v1/auth/refresh", data);
+  login: async (data: LoginRequest) => {
+    const res = await api.post<AuthResponse>("/auth/login", data);
+    if (res.data?.token) setAccessToken(res.data.token);
+    return res;
   },
 
   /**
-   * Выйти из системы (удаляет refresh token и очищает cookies)
+   * Register (movie-match): POST /auth/register -> { message }
+   * We keep it typed loosely and allow chaining login on the client.
+   */
+  register: async (data: RegisterRequest) => {
+    return api.post<{ message?: string }>("/auth/register", data);
+  },
+
+  /**
+   * Logout (client-side only): clears stored JWT.
    */
   logout: async () => {
-    return api.post<void>("/api/v1/auth/logout");
+    removeAllAuthTokens();
+    return { data: undefined, status: 200, statusText: "OK" };
   },
 };

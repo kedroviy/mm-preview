@@ -4,8 +4,6 @@ import type { Room } from "@mm-preview/sdk";
 import { useCreateRoom } from "@mm-preview/sdk";
 import { Button, Card, InputText, notificationService } from "@mm-preview/ui";
 import { useCallback, useState } from "react";
-import { useMovieMatchCreateRoom } from "@/src/shared/hooks/useMovieMatchRooms";
-import { isMovieMatchLegacy } from "@/src/shared/movie-match";
 import type { CreateRoomFormProps } from "../model/types";
 
 function mapCreateResponseToRoom(result: {
@@ -35,29 +33,6 @@ export function CreateRoomForm({
 }: CreateRoomFormProps) {
   const [roomName, setRoomName] = useState("");
   const createRoom = useCreateRoom();
-  const movieMatchCreate = useMovieMatchCreateRoom();
-  const legacy = isMovieMatchLegacy();
-
-  const submitLegacy = useCallback(async () => {
-    const uid = userId ? Number(userId) : Number.NaN;
-    if (!userId || !Number.isFinite(uid)) {
-      notificationService.showError(
-        "Не удалось определить пользователя. Откройте комнаты со страницы дашборда.",
-      );
-      return;
-    }
-    try {
-      const result: Room = await movieMatchCreate.mutateAsync(uid);
-      notificationService.showSuccess(
-        `Комната создана! Код: ${result.publicCode}`,
-      );
-      onSuccess?.(result);
-    } catch (_error) {
-      notificationService.showError(
-        "Не удалось создать комнату. Попробуйте еще раз.",
-      );
-    }
-  }, [userId, movieMatchCreate, onSuccess]);
 
   const submitNewApi = useCallback(async () => {
     try {
@@ -76,31 +51,25 @@ export function CreateRoomForm({
   }, [roomName, createRoom, onSuccess]);
 
   const handleSubmit = async () => {
-    if (legacy) {
-      await submitLegacy();
-      return;
-    }
     await submitNewApi();
   };
 
-  const pending = legacy ? movieMatchCreate.isPending : createRoom.isPending;
+  const pending = createRoom.isPending;
 
   return (
     <Card>
       <div className="flex flex-col gap-4">
-        {!legacy && (
-          <div className="flex flex-col gap-2">
-            <label htmlFor="roomName" className="font-medium">
-              Название комнаты (необязательно)
-            </label>
-            <InputText
-              id="roomName"
-              value={roomName}
-              onChange={(e) => setRoomName(e.target.value)}
-              placeholder="Например: Вечерний просмотр"
-            />
-          </div>
-        )}
+        <div className="flex flex-col gap-2">
+          <label htmlFor="roomName" className="font-medium">
+            Название комнаты (необязательно)
+          </label>
+          <InputText
+            id="roomName"
+            value={roomName}
+            onChange={(e) => setRoomName(e.target.value)}
+            placeholder="Например: Вечерний просмотр"
+          />
+        </div>
 
         <div className="flex gap-2">
           {onCancel && (

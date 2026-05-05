@@ -1,65 +1,28 @@
-import { QueryClient } from "@tanstack/react-query";
-import { cookies } from "next/headers";
-import { Suspense } from "react";
-import type { Room } from "@/src/entities/room";
+"use client";
+
+import { useEffect } from "react";
 import { DashboardClient } from "@/src/views/dashboard/ui/DashboardClient";
-import { createServerClient, getProfileOptions } from "@mm-preview/sdk";
+import { getAccessToken, getUserIdFromToken } from "@mm-preview/sdk";
 
-async function buildServerClient() {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
-
-  if (!accessToken) return null;
-
-  const client = createServerClient();
-  const cookieString = cookieStore.toString();
-
-  return {
-    client,
-    headers: {
-      Cookie: cookieString,
-      Authorization: `Bearer ${accessToken}`,
-    } as HeadersInit,
-  };
-}
-
-export default async function UserDashboardPage({
+export default function UserDashboardPage({
   params,
 }: {
-  params: Promise<{ userId: string }>;
+  params: { userId: string };
 }) {
-  const { userId } = await params;
-  const ctx = await buildServerClient();
+  const userId = params.userId;
 
-  let initialProfile = null;
-
-  if (ctx) {
-    const queryClient = new QueryClient();
-    try {
-      await queryClient.prefetchQuery({
-        ...getProfileOptions({
-          client: ctx.client,
-          credentials: "include",
-          headers: ctx.headers,
-        }),
-      });
-
-      initialProfile = queryClient.getQueryData<{
-        userId: string;
-        name: string;
-        role?: string;
-        lastActive?: number;
-        recentRooms?: string[];
-        rooms?: Room[];
-      }>(["users", "getProfile"]) ?? null;
-    } catch (error) {
-      console.error("[dashboard page] Profile prefetch failed:", error);
+  useEffect(() => {
+    const token = getAccessToken();
+    const tokenUserId = getUserIdFromToken(token);
+    if (!tokenUserId) {
+      const url = process.env.NEXT_PUBLIC_USER_CREATION_URL;
+      if (url) window.location.href = url;
+      return;
     }
-  }
+    if (tokenUserId !== userId) {
+      window.location.replace(`/${tokenUserId}`);
+    }
+  }, [userId]);
 
-  return (
-    <Suspense fallback={null}>
-      <DashboardClient userId={userId} initialProfile={initialProfile} />
-    </Suspense>
-  );
+  return <DashboardClient userId={userId} initialProfile={null} />;
 }

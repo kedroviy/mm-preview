@@ -70,12 +70,12 @@ export function useLeaveRoom() {
   return useMutation({
     mutationFn: async ({
       roomId,
-      userId,
+      roomKey,
     }: {
       roomId: string;
-      userId: string;
+      roomKey: string;
     }) => {
-      const response = await roomsApi.leaveRoom(roomId, { userId });
+      const response = await roomsApi.leaveRoom(roomId, { roomKey });
       return response.data;
     },
     onSuccess: (data) => {
@@ -91,14 +91,12 @@ export function useChooseMovie() {
   return useMutation({
     mutationFn: async ({
       roomId,
-      userId,
       movieId,
     }: {
       roomId: string;
-      userId: string;
       movieId: string;
     }) => {
-      const response = await roomsApi.chooseMovie(roomId, { userId, movieId });
+      const response = await roomsApi.chooseMovie(roomId, { movieId });
       return response.data;
     },
     onSuccess: (data) => {

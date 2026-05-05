@@ -1,22 +1,22 @@
 "use client";
 
-import type { User } from "@mm-preview/sdk";
+import { authApi, getAccessToken, getUserIdFromToken } from "@mm-preview/sdk";
 import { Button, InputText, notificationService } from "@mm-preview/ui";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { getAppUrls } from "@/src/shared/config/constants";
 import { useTranslation } from "@/src/shared/i18n/useTranslation";
-import { NAME_MIN_LENGTH, NAME_PATTERN } from "../constants/validation";
-import { useCreateUser } from "../hooks/useCreateUser";
 import { getErrorMessage } from "../utils/error";
 
 interface UserFormData {
-  name: string;
+  email: string;
+  password: string;
 }
 
 export function UserCreationForm() {
   const { t } = useTranslation();
-  const [createdUser, setCreatedUser] = useState<User | null>(null);
+  const [mode, setMode] = useState<"login" | "register">("login");
+  const [isPending, setIsPending] = useState(false);
 
   const {
     control,
@@ -25,77 +25,57 @@ export function UserCreationForm() {
     reset,
   } = useForm<UserFormData>({
     defaultValues: {
-      name: "",
+      email: "",
+      password: "",
     },
     mode: "onSubmit",
     reValidateMode: "onChange",
   });
 
-  const { mutate, isPending } = useCreateUser();
-
-  const handleContinue = () => {
-    if (!createdUser?.userId) {
-      return;
-    }
-
+  const redirectToDashboard = () => {
+    const token = getAccessToken();
+    const userId = getUserIdFromToken(token);
+    if (!userId) return;
     const dashboardUrl = getAppUrls().DASHBOARD;
-    window.location.href = `${dashboardUrl}/${createdUser.userId}`;
+    window.location.href = `${dashboardUrl}/${userId}/rooms`;
   };
 
-  const onSubmit = (data: UserFormData) => {
-    mutate(
-      {
-        name: data.name,
-      },
-      {
-        onSuccess: (user: unknown) => {
-          setCreatedUser(user as User);
-          Promise.resolve().then(() => {
-            notificationService.showSuccess(t("successNotification"));
-          });
-        },
-        onError: (error: unknown) => {
-          notificationService.showError(getErrorMessage(error, t("error")));
-          reset(undefined, {
-            keepValues: true,
-            keepErrors: false,
-            keepDirty: true,
-            keepIsSubmitted: false,
-            keepTouched: true,
-            keepIsValid: false,
-            keepSubmitCount: false,
-          });
-        },
-      },
-    );
-  };
+  const onSubmit = async (data: UserFormData) => {
+    setIsPending(true);
+    try {
+      if (mode === "register") {
+        await authApi.register({ email: data.email, password: data.password });
+      }
 
-  if (createdUser) {
-    return (
-      <div
-        className="flex items-center justify-center min-h-screen p-4"
-        suppressHydrationWarning
-      >
-        <div className="card w-full max-w-md" suppressHydrationWarning>
-          <div className="flex flex-col items-center gap-6">
-            <div className="text-center">
-              <h1 className="text-3xl font-bold mb-4">{t("successTitle")}</h1>
-              <p className="text-lg text-muted-color">
-                {t("successMessage")} <strong>{createdUser.name}</strong>{" "}
-                {t("successCreated")}.
-              </p>
-            </div>
-            <Button
-              onClick={handleContinue}
-              className="w-full text-lg px-6 py-3"
-            >
-              {t("successContinue")}
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+      const loginRes = await authApi.login({
+        email: data.email,
+        password: data.password,
+      });
+
+      if (!loginRes.data?.token) {
+        throw new Error("No token in response");
+      }
+
+      notificationService.showSuccess(
+        mode === "register" ? "Registered" : "Logged in",
+      );
+
+      redirectToDashboard();
+    } catch (error) {
+      notificationService.showError(getErrorMessage(error, t("error")));
+      reset(undefined, {
+        keepValues: true,
+        keepErrors: false,
+        keepDirty: true,
+        keepIsSubmitted: false,
+        keepTouched: true,
+        keepIsValid: false,
+        keepSubmitCount: false,
+      });
+    } finally {
+      setIsPending(false);
+    }
+  };
 
   return (
     <div
@@ -103,54 +83,96 @@ export function UserCreationForm() {
       suppressHydrationWarning
     >
       <div className="card w-full max-w-md" suppressHydrationWarning>
-        <h1 className="text-3xl font-bold mb-6 text-center">{t("title")}</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center">
+          {mode === "login" ? "Login" : "Register"}
+        </h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <label htmlFor="name" className="font-medium">
-              {t("nameLabel")}
+            <label htmlFor="email" className="font-medium">
+              Email
             </label>
             <Controller
-              name="name"
+              name="email"
               control={control}
               rules={{
-                required: t("nameRequired"),
-                minLength: {
-                  value: NAME_MIN_LENGTH,
-                  message: t("nameMinLength"),
-                },
-                pattern: {
-                  value: NAME_PATTERN,
-                  message: t("nameInvalid"),
-                },
+                required: "Email is required",
               }}
               render={({ field }) => (
                 <InputText
-                  id="name"
+                  id="email"
                   {...field}
                   value={field.value || ""}
                   className={
-                    errors.name
+                    errors.email
                       ? "p-invalid !bg-red-50 dark:!bg-red-900/20"
                       : ""
                   }
-                  placeholder={t("namePlaceholder")}
+                  placeholder="you@example.com"
                 />
               )}
             />
-            {errors.name && (
+            {errors.email && (
               <small className="p-error text-red-600 dark:text-red-400">
-                {errors.name.message}
+                {errors.email.message}
+              </small>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="password" className="font-medium">
+              Password
+            </label>
+            <Controller
+              name="password"
+              control={control}
+              rules={{
+                required: "Password is required",
+                minLength: { value: 6, message: "Min length is 6" },
+              }}
+              render={({ field }) => (
+                <InputText
+                  id="password"
+                  type="password"
+                  {...field}
+                  value={field.value || ""}
+                  className={
+                    errors.password
+                      ? "p-invalid !bg-red-50 dark:!bg-red-900/20"
+                      : ""
+                  }
+                  placeholder="******"
+                />
+              )}
+            />
+            {errors.password && (
+              <small className="p-error text-red-600 dark:text-red-400">
+                {errors.password.message}
               </small>
             )}
           </div>
 
           <Button
             type="submit"
-            disabled={isPending || !!errors.name}
+            disabled={isPending || !!errors.email || !!errors.password}
             className="w-full text-lg px-6 py-3"
           >
-            {isPending ? t("creating") : t("next")}
+            {isPending
+              ? mode === "login"
+                ? "Logging in..."
+                : "Registering..."
+              : mode === "login"
+                ? "Login"
+                : "Register"}
+          </Button>
+
+          <Button
+            type="button"
+            severity="secondary"
+            onClick={() => setMode((m) => (m === "login" ? "register" : "login"))}
+            className="w-full"
+          >
+            {mode === "login" ? "Create account" : "I already have an account"}
           </Button>
         </form>
       </div>

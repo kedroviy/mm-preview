@@ -12,11 +12,10 @@
 
 /**
  * Получить API URL для клиентских запросов
- * В продакшене возвращает /api/v1 (проксируется через Vercel rewrites)
+ * В продакшене может возвращать пустую строку (relative) при прокси
  * В разработке возвращает NEXT_PUBLIC_API_URL или localhost
  *
- * Важно: В сгенерированных requests уже есть /api/v1/ в URL,
- * поэтому baseURL должен быть пустым при прокси или содержать полный путь без /api/v1
+ * Важно: `movie-match` не использует `/api/v1` префикс.
  */
 export function getClientApiUrl(): string {
   // Если NEXT_PUBLIC_API_URL начинается с /, это означает что используется прокси
@@ -30,15 +29,13 @@ export function getClientApiUrl(): string {
       (!publicApiUrl || publicApiUrl.startsWith("/")));
 
   if (useProxy) {
-    // При прокси возвращаем пустую строку, так как в requests уже есть /api/v1/
-    // Next.js rewrites настроены на /api/v1/:path* → ${BACKEND_URL}/api/v1/:path*
+    // При прокси возвращаем пустую строку, чтобы запросы были относительными к домену
     return "";
   }
 
-  // В разработке возвращаем полный URL без /api/v1, так как в requests уже есть /api/v1/
+  // В разработке возвращаем полный URL бэкенда (без модификации path)
   const apiUrl = publicApiUrl || "http://localhost:4000";
-  // Убираем /api/v1 из конца, если есть, так как в requests уже есть /api/v1/
-  return apiUrl.replace(/\/api\/v1\/?$/, "");
+  return apiUrl.replace(/\/$/, "");
 }
 
 /**
@@ -56,7 +53,7 @@ export function getServerApiUrl(): string {
   // Если NEXT_PUBLIC_API_URL - это полный URL, используем его
   const publicApiUrl = process.env.NEXT_PUBLIC_API_URL;
   if (publicApiUrl && !publicApiUrl.startsWith("/")) {
-    return publicApiUrl.replace(/\/api\/v1\/?$/, "");
+    return publicApiUrl.replace(/\/$/, "");
   }
 
   // Fallback на другие переменные или localhost

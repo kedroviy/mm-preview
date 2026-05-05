@@ -12,8 +12,6 @@ import {
 } from "@mm-preview/ui";
 import type { MouseEvent } from "react";
 import type { Room } from "@/src/entities/room";
-import { useMovieMatchMyRooms } from "@/src/shared/hooks/useMovieMatchRooms";
-import { isMovieMatchLegacy } from "@/src/shared/movie-match";
 import type { RoomListProps } from "../model/types";
 import styles from "./RoomList.module.css";
 
@@ -23,20 +21,13 @@ export function RoomList({
   onConnect,
   onDelete,
 }: RoomListProps) {
-  const legacy = isMovieMatchLegacy();
   const { data: sdkRooms, isLoading: sdkLoading } = useMyRooms({
-    enabled: !legacy && !!userId,
+    enabled: !!userId,
   });
-  const { data: mmRooms, isLoading: mmLoading } = useMovieMatchMyRooms(
-    legacy && !!userId,
-  );
-
-  const restRooms = legacy ? mmRooms : sdkRooms;
-  const isRestLoading = legacy ? mmLoading : sdkLoading;
 
   const rooms =
-    restRooms && restRooms.length > 0 ? (restRooms as Room[]) : initialRooms;
-  const isRoomsLoading = isRestLoading;
+    sdkRooms && sdkRooms.length > 0 ? (sdkRooms as Room[]) : initialRooms;
+  const isRoomsLoading = sdkLoading;
 
   if (isRoomsLoading && rooms.length === 0) {
     return (
