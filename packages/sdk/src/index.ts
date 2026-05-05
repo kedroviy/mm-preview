@@ -96,8 +96,6 @@ export {
 // Server client (use in server components / RSC)
 export { createServerClient } from "./client-server";
 
-export * from "./generated/hooks";
-export * from "./generated/options";
 export * from "./generated/requests";
 export * from "./generated/schemas";
 // Generated exports (will be available after running generate:all)
