@@ -12,33 +12,33 @@
 
 /**
  * Получить API URL для клиентских запросов
- * В продакшене возвращает /api/v1 (проксируется через Vercel rewrites)
+ * В продакшене может возвращать пустую строку (relative) при прокси
  * В разработке возвращает NEXT_PUBLIC_API_URL или localhost
  *
- * Важно: В сгенерированных requests уже есть /api/v1/ в URL,
- * поэтому baseURL должен быть пустым при прокси или содержать полный путь без /api/v1
+ * Важно: `movie-match` не использует `/api/v1` префикс.
  */
 export function getClientApiUrl(): string {
-  // Если NEXT_PUBLIC_API_URL начинается с /, это означает что используется прокси
-  // (например, /api/v1 означает что запросы идут через rewrites)
   const publicApiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const isProduction = process.env.NODE_ENV === "production";
 
-  // Проверяем, нужно ли использовать прокси
+  // Прокси используем ТОЛЬКО когда это явно указано.
+  // В Vercel/Next "production" может быть без rewrites для /auth/* и т.п.,
+  // поэтому безопаснее по умолчанию ходить на полный backend URL.
   const useProxy =
     process.env.NEXT_PUBLIC_USE_API_PROXY === "true" ||
-    (process.env.NODE_ENV === "production" &&
-      (!publicApiUrl || publicApiUrl.startsWith("/")));
+    (publicApiUrl ? publicApiUrl.startsWith("/") : false);
 
   if (useProxy) {
-    // При прокси возвращаем пустую строку, так как в requests уже есть /api/v1/
-    // Next.js rewrites настроены на /api/v1/:path* → ${BACKEND_URL}/api/v1/:path*
+    // При прокси возвращаем пустую строку, чтобы запросы были относительными к домену
     return "";
   }
 
-  // В разработке возвращаем полный URL без /api/v1, так как в requests уже есть /api/v1/
-  const apiUrl = publicApiUrl || "http://localhost:4000";
-  // Убираем /api/v1 из конца, если есть, так как в requests уже есть /api/v1/
-  return apiUrl.replace(/\/api\/v1\/?$/, "");
+  // В продакшене по умолчанию используем реальный API домен.
+  // В деве — localhost, если переменная не задана.
+  const apiUrl =
+    publicApiUrl ||
+    (isProduction ? "https://movie-api.moviematch.space" : "http://localhost:4000");
+  return apiUrl.replace(/\/$/, "");
 }
 
 /**
@@ -56,11 +56,16 @@ export function getServerApiUrl(): string {
   // Если NEXT_PUBLIC_API_URL - это полный URL, используем его
   const publicApiUrl = process.env.NEXT_PUBLIC_API_URL;
   if (publicApiUrl && !publicApiUrl.startsWith("/")) {
-    return publicApiUrl.replace(/\/api\/v1\/?$/, "");
+    return publicApiUrl.replace(/\/$/, "");
   }
 
-  // Fallback на другие переменные или localhost
-  return process.env.API_URL || "http://localhost:4000";
+  // Fallback на другие переменные или дефолтный продовый домен
+  return (
+    process.env.API_URL ||
+    (process.env.NODE_ENV === "production"
+      ? "https://movie-api.moviematch.space"
+      : "http://localhost:4000")
+  );
 }
 
 /**
@@ -76,7 +81,7 @@ export function getWebSocketRoomsUrl(): string {
   
   if (isProduction) {
     // В продакшене отдаем приоритет BACKEND_URL, но если его нет — фиксированному адресу
-    baseUrl = process.env.BACKEND_URL || "https://api.moviematch.space";
+    baseUrl = process.env.BACKEND_URL || "https://movie-api.moviematch.space";
   } else {
     const publicApiUrl = process.env.NEXT_PUBLIC_API_URL;
     baseUrl = publicApiUrl && !publicApiUrl.startsWith("/")

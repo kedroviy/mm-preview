@@ -1,5 +1,6 @@
 import type { ApiError, ApiResponse, RequestConfig } from "./types";
 import { getClientApiUrl } from "./utils/api-url";
+import { getAccessToken } from "./utils/cookies";
 
 class ApiClient {
   private baseURL: string;
@@ -57,19 +58,19 @@ class ApiClient {
       ...(fetchConfig.headers as Record<string, string>),
     };
 
+    const token = getAccessToken();
+    if (token && !("Authorization" in headers) && !("authorization" in headers)) {
+      headers.Authorization = `Bearer ${token}`;
+    }
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
-      // Удаляем credentials из fetchConfig, чтобы гарантировать использование "include"
-      const { credentials: _, ...restFetchConfig } = fetchConfig;
-
       const response = await fetch(fullURL, {
-        ...restFetchConfig,
+        ...fetchConfig,
         headers,
         signal: controller.signal,
-        credentials: "include", // Включаем отправку кук для CORS (браузер автоматически отправит HttpOnly куки)
       });
 
       clearTimeout(timeoutId);

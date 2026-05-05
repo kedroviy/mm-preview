@@ -1,13 +1,11 @@
 "use client";
 
-import type { User } from "@mm-preview/sdk";
+import { authApi } from "@mm-preview/sdk";
 import { Button, InputText, notificationService } from "@mm-preview/ui";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { getAppUrls } from "@/src/shared/config/constants";
 import { useTranslation } from "@/src/shared/i18n/useTranslation";
-import { NAME_MIN_LENGTH, NAME_PATTERN } from "../constants/validation";
-import { useCreateUser } from "../hooks/useCreateUser";
 import { getErrorMessage } from "../utils/error";
 
 interface UserFormData {
@@ -16,7 +14,7 @@ interface UserFormData {
 
 export function UserCreationForm() {
   const { t } = useTranslation();
-  const [createdUser, setCreatedUser] = useState<User | null>(null);
+  const [isPending, setIsPending] = useState(false);
 
   const {
     control,
@@ -31,71 +29,37 @@ export function UserCreationForm() {
     reValidateMode: "onChange",
   });
 
-  const { mutate, isPending } = useCreateUser();
-
-  const handleContinue = () => {
-    if (!createdUser?.userId) {
-      return;
-    }
-
+  const redirectToDashboard = (userId: string) => {
     const dashboardUrl = getAppUrls().DASHBOARD;
-    window.location.href = `${dashboardUrl}/${createdUser.userId}`;
+    window.location.href = `${dashboardUrl}/${userId}/rooms`;
   };
 
-  const onSubmit = (data: UserFormData) => {
-    mutate(
-      {
-        name: data.name,
-      },
-      {
-        onSuccess: (user: unknown) => {
-          setCreatedUser(user as User);
-          Promise.resolve().then(() => {
-            notificationService.showSuccess(t("successNotification"));
-          });
-        },
-        onError: (error: unknown) => {
-          notificationService.showError(getErrorMessage(error, t("error")));
-          reset(undefined, {
-            keepValues: true,
-            keepErrors: false,
-            keepDirty: true,
-            keepIsSubmitted: false,
-            keepTouched: true,
-            keepIsValid: false,
-            keepSubmitCount: false,
-          });
-        },
-      },
-    );
-  };
+  const onSubmit = async (data: UserFormData) => {
+    setIsPending(true);
+    try {
+      const loginRes = await authApi.login({ name: data.name });
+      const userId = loginRes.data?.userId;
+      if (!userId) {
+        throw new Error("No userId in response");
+      }
 
-  if (createdUser) {
-    return (
-      <div
-        className="flex items-center justify-center min-h-screen p-4"
-        suppressHydrationWarning
-      >
-        <div className="card w-full max-w-md" suppressHydrationWarning>
-          <div className="flex flex-col items-center gap-6">
-            <div className="text-center">
-              <h1 className="text-3xl font-bold mb-4">{t("successTitle")}</h1>
-              <p className="text-lg text-muted-color">
-                {t("successMessage")} <strong>{createdUser.name}</strong>{" "}
-                {t("successCreated")}.
-              </p>
-            </div>
-            <Button
-              onClick={handleContinue}
-              className="w-full text-lg px-6 py-3"
-            >
-              {t("successContinue")}
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+      notificationService.showSuccess("Logged in");
+      redirectToDashboard(userId);
+    } catch (error) {
+      notificationService.showError(getErrorMessage(error, t("error")));
+      reset(undefined, {
+        keepValues: true,
+        keepErrors: false,
+        keepDirty: true,
+        keepIsSubmitted: false,
+        keepTouched: true,
+        keepIsValid: false,
+        keepSubmitCount: false,
+      });
+    } finally {
+      setIsPending(false);
+    }
+  };
 
   return (
     <div
@@ -103,26 +67,20 @@ export function UserCreationForm() {
       suppressHydrationWarning
     >
       <div className="card w-full max-w-md" suppressHydrationWarning>
-        <h1 className="text-3xl font-bold mb-6 text-center">{t("title")}</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center">Login</h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <label htmlFor="name" className="font-medium">
-              {t("nameLabel")}
+              Name
             </label>
             <Controller
               name="name"
               control={control}
               rules={{
-                required: t("nameRequired"),
-                minLength: {
-                  value: NAME_MIN_LENGTH,
-                  message: t("nameMinLength"),
-                },
-                pattern: {
-                  value: NAME_PATTERN,
-                  message: t("nameInvalid"),
-                },
+                required: "Name is required",
+                minLength: { value: 1, message: "Name is required" },
+                maxLength: { value: 100, message: "Max length is 100" },
               }}
               render={({ field }) => (
                 <InputText
@@ -134,7 +92,7 @@ export function UserCreationForm() {
                       ? "p-invalid !bg-red-50 dark:!bg-red-900/20"
                       : ""
                   }
-                  placeholder={t("namePlaceholder")}
+                  placeholder="John Doe"
                 />
               )}
             />
@@ -150,7 +108,7 @@ export function UserCreationForm() {
             disabled={isPending || !!errors.name}
             className="w-full text-lg px-6 py-3"
           >
-            {isPending ? t("creating") : t("next")}
+            {isPending ? "Logging in..." : "Login"}
           </Button>
         </form>
       </div>

@@ -234,7 +234,7 @@ export function useWebSocketChat({
         }
 
         joiningRoomRef.current = roomId;
-        joinRoom(publicCode, userId);
+        joinRoom(publicCode, userId, roomId);
 
         joinTimeoutRef.current = setTimeout(() => {
           if (

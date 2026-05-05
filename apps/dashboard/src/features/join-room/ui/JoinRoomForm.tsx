@@ -14,7 +14,7 @@ export function JoinRoomForm({
   const joinRoom = useJoinRoom();
 
   const handleSubmit = async () => {
-    if (!userId || !roomCode) {
+    if (!roomCode) {
       notificationService.showError("Введите код комнаты");
       return;
     }
@@ -27,7 +27,6 @@ export function JoinRoomForm({
     try {
       const result = await joinRoom.mutateAsync({
         publicCode: roomCode,
-        userId,
       });
       notificationService.showSuccess("Вы успешно присоединились к комнате!");
       onSuccess?.(result);
@@ -37,6 +36,8 @@ export function JoinRoomForm({
       );
     }
   };
+
+  const pending = joinRoom.isPending;
 
   return (
     <Card>
@@ -66,10 +67,10 @@ export function JoinRoomForm({
           )}
           <Button
             onClick={handleSubmit}
-            disabled={joinRoom.isPending || roomCode.length !== 6}
+            disabled={pending || roomCode.length !== 6}
             className="flex-1"
           >
-            {joinRoom.isPending ? "Присоединение..." : "Присоединиться"}
+            {pending ? "Присоединение..." : "Присоединиться"}
           </Button>
         </div>
       </div>

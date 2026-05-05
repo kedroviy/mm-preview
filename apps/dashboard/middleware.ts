@@ -1,4 +1,3 @@
-import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 /**
@@ -33,20 +32,9 @@ function getUserCreationUrl(): string {
   return "https://start.moviematch.space";
 }
 
-export async function middleware(request: NextRequest) {
-  // Проверяем наличие access_token и refresh_token
-  const accessToken = request.cookies.get("access_token")?.value;
-  const refreshToken = request.cookies.get("refresh_token")?.value;
-
-  // Если обоих токенов нет - редирект на страницу создания пользователя
-  if (!accessToken && !refreshToken) {
-    const userCreationUrl = getUserCreationUrl();
-    const url = request.nextUrl.clone();
-    url.href = userCreationUrl;
-    return NextResponse.redirect(url);
-  }
-
-  // Если хотя бы один токен есть - пропускаем запрос
+export function middleware() {
+  // JWT хранится в localStorage (к нему нет доступа из middleware).
+  // Поэтому auth guard выполняется на клиенте.
   return NextResponse.next();
 }
 

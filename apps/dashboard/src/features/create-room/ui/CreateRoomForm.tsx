@@ -1,15 +1,40 @@
 "use client";
 
+import type { Room } from "@mm-preview/sdk";
 import { useCreateRoom } from "@mm-preview/sdk";
 import { Button, Card, InputText, notificationService } from "@mm-preview/ui";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import type { CreateRoomFormProps } from "../model/types";
 
-export function CreateRoomForm({ onSuccess, onCancel }: CreateRoomFormProps) {
+function mapCreateResponseToRoom(result: {
+  roomId: string;
+  publicCode: string;
+}): Room {
+  return {
+    roomId: result.roomId,
+    publicCode: result.publicCode,
+    createdBy: null,
+    users: [],
+    userRoles: {},
+    choices: {},
+    isMember: true,
+    isCreator: true,
+    canManage: true,
+    currentUserRole: "room_creator",
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+}
+
+export function CreateRoomForm({
+  userId,
+  onSuccess,
+  onCancel,
+}: CreateRoomFormProps) {
   const [roomName, setRoomName] = useState("");
   const createRoom = useCreateRoom();
 
-  const handleSubmit = async () => {
+  const submitNewApi = useCallback(async () => {
     try {
       const result = await createRoom.mutateAsync(
         roomName ? { name: roomName } : undefined,
@@ -17,13 +42,19 @@ export function CreateRoomForm({ onSuccess, onCancel }: CreateRoomFormProps) {
       notificationService.showSuccess(
         `Комната создана! Код: ${result.publicCode}`,
       );
-      onSuccess?.(result);
+      onSuccess?.(mapCreateResponseToRoom(result));
     } catch (_error) {
       notificationService.showError(
         "Не удалось создать комнату. Попробуйте еще раз.",
       );
     }
+  }, [roomName, createRoom, onSuccess]);
+
+  const handleSubmit = async () => {
+    await submitNewApi();
   };
+
+  const pending = createRoom.isPending;
 
   return (
     <Card>
@@ -46,12 +77,8 @@ export function CreateRoomForm({ onSuccess, onCancel }: CreateRoomFormProps) {
               Отмена
             </Button>
           )}
-          <Button
-            onClick={handleSubmit}
-            disabled={createRoom.isPending}
-            className="flex-1"
-          >
-            {createRoom.isPending ? "Создание..." : "Создать комнату"}
+          <Button onClick={handleSubmit} disabled={pending} className="flex-1">
+            {pending ? "Создание..." : "Создать комнату"}
           </Button>
         </div>
       </div>

@@ -24,7 +24,7 @@ export {
 } from "./hooks/useUsers";
 // Query Client
 export { createQueryClient, defaultQueryClient } from "./query-client";
-export type { AuthResponse, RefreshTokenRequest } from "./services/auth";
+export type { LoginRequest, LoginResponse } from "./services/auth";
 // Auth
 export { authApi } from "./services/auth";
 export type {
@@ -96,8 +96,12 @@ export {
 // Server client (use in server components / RSC)
 export { createServerClient } from "./client-server";
 
-export * from "./generated/hooks";
-export * from "./generated/options";
+// Generated TanStack Query hooks (safe subset; avoids NSI barrel conflicts)
+export * from "./generated/hooks/useHealth";
+export * from "./generated/hooks/useAuth";
+export * from "./generated/hooks/useUsers";
+export * from "./generated/hooks/useRooms";
+
 export * from "./generated/requests";
 export * from "./generated/schemas";
 // Generated exports (will be available after running generate:all)

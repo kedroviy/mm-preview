@@ -1,39 +1,19 @@
 /**
- * Утилиты для работы с куками на клиенте
+ * Token storage utilities.
+ *
+ * `movie-match` backend returns a single JWT in body: `{ token }`.
+ * We store it client-side (memory + localStorage). No refresh cookies.
  */
 
-import { getSameSiteConfig } from "./cookie-config";
+const ACCESS_TOKEN_KEY = "mm_access_token";
 
-const COOKIE_NAME = "access_token";
+let inMemoryAccessToken: string | null = null;
 
-export function getCookie(name: string): string | null {
-  if (typeof document === "undefined") {
-    return null;
-  }
+function canUseStorage(): boolean {
+  return typeof window !== "undefined" && typeof localStorage !== "undefined";
+}
 
-  // Проверяем все cookies для отладки
-  const allCookies = document.cookie;
-
-  // Пробуем стандартный способ
-  const value = `; ${allCookies}`;
-  const parts = value.split(`; ${name}=`);
-
-  if (parts.length === 2) {
-    const cookieValue = parts.pop()?.split(";").shift()?.trim();
-    if (cookieValue) {
-      return cookieValue;
-    }
-  }
-
-  // Если не нашли, пробуем альтернативный способ (на случай если есть пробелы)
-  const cookies = allCookies.split(";");
-  for (const cookie of cookies) {
-    const [cookieName, cookieValue] = cookie.split("=").map((c) => c.trim());
-    if (cookieName === name && cookieValue) {
-      return cookieValue;
-    }
-  }
-
+export function getCookie(_name: string): string | null {
   return null;
 }
 
@@ -58,39 +38,51 @@ export function getCookie(name: string): string | null {
 //   document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=${sameSite};${secure}`;
 // }
 
-export function deleteCookie(name: string): void {
-  if (typeof document === "undefined") {
-    return;
-  }
-
-  // biome-ignore lint/suspicious/noDocumentCookie: Standard way to delete cookies in browser
-  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+export function deleteCookie(_name: string): void {
+  // no-op
 }
 
 export function getAccessToken(): string | null {
-  const token = getCookie(COOKIE_NAME);
-  return token;
+  if (inMemoryAccessToken) return inMemoryAccessToken;
+  if (!canUseStorage()) return null;
+
+  try {
+    const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+    if (token) inMemoryAccessToken = token;
+    return token;
+  } catch {
+    return null;
+  }
 }
 
-// export function setAccessToken(token: string): void {
-//   setCookie(COOKIE_NAME, token);
-// }
+export function setAccessToken(token: string): void {
+  inMemoryAccessToken = token;
+  if (!canUseStorage()) return;
+  try {
+    localStorage.setItem(ACCESS_TOKEN_KEY, token);
+  } catch {
+    // ignore
+  }
+}
 
 export function removeAccessToken(): void {
-  deleteCookie(COOKIE_NAME);
+  inMemoryAccessToken = null;
+  if (!canUseStorage()) return;
+  try {
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+  } catch {
+    // ignore
+  }
 }
 
-const REFRESH_COOKIE_NAME = "refresh_token";
-
 export function getRefreshToken(): string | null {
-  return getCookie(REFRESH_COOKIE_NAME);
+  return null;
 }
 
 export function removeRefreshToken(): void {
-  deleteCookie(REFRESH_COOKIE_NAME);
+  // no-op
 }
 
 export function removeAllAuthTokens(): void {
   removeAccessToken();
-  removeRefreshToken();
 }

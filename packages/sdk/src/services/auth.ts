@@ -1,27 +1,28 @@
 import { api } from "../client";
 
-export interface RefreshTokenRequest {
-  refreshToken?: string;
+export interface LoginRequest {
+  name: string;
 }
 
-export interface AuthResponse {
-  accessToken?: string;
-  refreshToken?: string;
-  // Может быть и другой формат ответа
-  [key: string]: unknown;
+export interface LoginResponse {
+  userId: string;
+  name: string;
 }
 
 export const authApi = {
   /**
-   * Обновить access token используя refresh token
-   * Refresh token может быть в cookie или в теле запроса
+   * Login by name: POST /api/v1/auth/login -> { userId, name }
+   *
+   * Backend sets JWT tokens in HTTP-only cookies.
    */
-  refreshToken: async (data?: RefreshTokenRequest) => {
-    return api.post<AuthResponse>("/api/v1/auth/refresh", data);
+  login: async (data: LoginRequest) => {
+    return api.post<LoginResponse>("/api/v1/auth/login", data);
   },
 
   /**
-   * Выйти из системы (удаляет refresh token и очищает cookies)
+   * Logout: POST /api/v1/auth/logout
+   *
+   * Clears auth cookies on the backend.
    */
   logout: async () => {
     return api.post<void>("/api/v1/auth/logout");

@@ -173,8 +173,8 @@ export class WebSocketService {
     this.socket.emit(CLIENT_EVENTS.LEAVE_ROOM, { roomId, userId });
   }
 
-  reconnectToRoom(_roomId: string, publicCode: string, userId: string): void {
-    this.joinRoom(publicCode, userId);
+  reconnectToRoom(roomId: string, publicCode: string, userId: string): void {
+    this.joinRoom(publicCode, userId, roomId);
   }
 
   /**
@@ -240,7 +240,14 @@ export class WebSocketService {
     }
   }
 
-  joinRoom(publicCode: string, userId: string): void {
+  joinRoom(
+    publicCode: string,
+    userId: string,
+    clientRoomId?: string,
+  ): void {
+    if (clientRoomId) {
+      this.currentRoomId = clientRoomId;
+    }
     if (!this.socket?.connected) {
       if (!this.isConnecting) this.connect();
       let attempts = 0;

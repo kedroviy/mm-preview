@@ -8,6 +8,7 @@ import {
   ViewTransition,
 } from "@/src/shared/components/ViewTransition";
 import { useWebSocketMyRooms } from "@/src/shared/hooks/useWebSocketMyRooms";
+import { useEffect } from "react";
 
 interface DashboardClientProps {
   userId: string;
@@ -53,6 +54,17 @@ export function DashboardClient({
     !!profileUserId,
   );
   const { navigate, isPending } = useViewTransition();
+
+  useEffect(() => {
+    const status =
+      (error as any)?.status ??
+      (error as any)?.statusCode ??
+      (error as any)?.response?.status;
+    if (status === 401) {
+      const url = process.env.NEXT_PUBLIC_USER_CREATION_URL;
+      if (url) window.location.href = url;
+    }
+  }, [error]);
 
   if (isLoading && !initialProfile) {
     return (

@@ -2,6 +2,7 @@
 
 import {
   type WebSocketServiceEvents,
+  getAccessToken,
   webSocketService,
 } from "@mm-preview/sdk";
 import {
@@ -21,14 +22,10 @@ const MAX_AUTH_RETRIES = 2;
 interface WebSocketContextValue {
   isConnected: boolean;
   getMyRooms: () => void;
-  joinRoom: (publicCode: string, userId: string) => void;
+  joinRoom: (publicCode: string, userId: string, clientRoomId?: string) => void;
   leaveRoom: (roomId: string, userId: string) => void;
   sendMessage: (roomId: string, message: string) => void;
-  reconnectToRoom: (
-    roomId: string,
-    publicCode: string,
-    userId: string,
-  ) => void;
+  reconnectToRoom: (roomId: string, publicCode: string, userId: string) => void;
   getCurrentRoomId: () => string | null;
   refreshTokenAndReconnect: () => Promise<void>;
   on: <T extends keyof WebSocketServiceEvents>(
@@ -53,14 +50,8 @@ export function WebSocketProvider({
   const isRetrying = useRef(false);
 
   const connectWithToken = useCallback(() => {
-    fetch("/api/auth/token", { credentials: "include" })
-      .then((res) => res.json())
-      .then(({ accessToken }: { accessToken: string | null }) => {
-        // Если accessToken пришел в JSON - передаем его, 
-        // но если нет - просто коннектимся, полагаясь на куки
-        webSocketService.connect(accessToken ?? undefined);
-      })
-      .catch(() => webSocketService.connect());
+    const token = getAccessToken();
+    webSocketService.connect(token ?? undefined);
   }, []);
 
   const redirectToLogin = useCallback(() => {
@@ -70,6 +61,7 @@ export function WebSocketProvider({
   }, []);
 
   useEffect(() => {
+    const ws = webSocketService;
     const handleConnect = () => setIsConnected(true);
     const handleDisconnect = () => setIsConnected(false);
 
@@ -78,19 +70,13 @@ export function WebSocketProvider({
       isRetrying.current = false;
     };
 
-    const unsubscribeConnect = webSocketService.on("connect", handleConnect);
-    const unsubscribeDisconnect = webSocketService.on(
-      "disconnect",
-      handleDisconnect,
-    );
-    const unsubJoinedRoom = webSocketService.on("joinedRoom", resetAuthRetries);
-    const unsubMyRooms = webSocketService.on("myRooms", resetAuthRetries);
-    const unsubTokenRefreshed = webSocketService.on(
-      "tokenRefreshed",
-      resetAuthRetries,
-    );
+    const unsubscribeConnect = ws.on("connect", handleConnect);
+    const unsubscribeDisconnect = ws.on("disconnect", handleDisconnect);
+    const unsubJoinedRoom = ws.on("joinedRoom", resetAuthRetries);
+    const unsubMyRooms = ws.on("myRooms", resetAuthRetries);
+    const unsubTokenRefreshed = ws.on("tokenRefreshed", resetAuthRetries);
 
-    setIsConnected(webSocketService.isConnected());
+    setIsConnected(ws.isConnected());
 
     if (autoConnect && !isInitialized.current) {
       isInitialized.current = true;
@@ -112,48 +98,24 @@ export function WebSocketProvider({
       if (isRetrying.current) return;
 
       authRetryCount.current++;
-      
+
       if (authRetryCount.current > MAX_AUTH_RETRIES) {
         redirectToLogin();
         return;
       }
 
-      isRetrying.current = true;
-      fetch("/api/auth/refresh", {
-        method: "POST",
-        credentials: "include", // Обязательно: отправляет старый refresh_token и получает новый Set-Cookie
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error("refresh failed");
-          return res.json();
-        })
-        .then((data: { accessToken?: string } | undefined) => {
-          isRetrying.current = false;
-
-          if (data?.accessToken) {
-            // Закрываем текущее (анонимное) соединение и подключаемся с токеном
-            webSocketService.disconnect();
-            webSocketService.connect(data.accessToken);
-          } else {
-            redirectToLogin();
-          }
-        })
-        .catch(() => {
-          console.error(error)
-          isRetrying.current = false;
-          redirectToLogin();
-        });
-
+      // No refresh flow in movie-match; token is single JWT in localStorage.
+      redirectToLogin();
     };
 
     const unsubscribe = webSocketService.on("error", handleError);
     return () => unsubscribe();
-  }, [connectWithToken, redirectToLogin]);
+  }, [redirectToLogin]);
 
   const getMyRooms = useCallback(() => webSocketService.getMyRooms(), []);
   const joinRoom = useCallback(
-    (publicCode: string, userId: string) =>
-      webSocketService.joinRoom(publicCode, userId),
+    (publicCode: string, userId: string, clientRoomId?: string) =>
+      webSocketService.joinRoom(publicCode, userId, clientRoomId),
     [],
   );
   const leaveRoom = useCallback(

@@ -21,15 +21,13 @@ export function RoomList({
   onConnect,
   onDelete,
 }: RoomListProps) {
-  // Используем REST запрос вместо WebSocket
-  const { data: restRooms, isLoading: isRestLoading } = useMyRooms(
-    userId ? undefined : { enabled: false },
-  );
+  const { data: sdkRooms, isLoading: sdkLoading } = useMyRooms({
+    enabled: !!userId,
+  });
 
-  // Используем данные из REST запроса, если они есть, иначе initialRooms
   const rooms =
-    restRooms && restRooms.length > 0 ? (restRooms as Room[]) : initialRooms;
-  const isRoomsLoading = isRestLoading;
+    sdkRooms && sdkRooms.length > 0 ? (sdkRooms as Room[]) : initialRooms;
+  const isRoomsLoading = sdkLoading;
 
   if (isRoomsLoading && rooms.length === 0) {
     return (
@@ -73,7 +71,6 @@ export function RoomList({
     );
   }
 
-  // Показываем пустое сообщение только после завершения загрузки, если комнат нет
   if (!isRoomsLoading && (!rooms || rooms.length === 0)) {
     return (
       <Card className="mt-6">
@@ -143,10 +140,8 @@ export function RoomList({
           <Column
             header="Действия"
             body={(room: Room) => {
-              // Создаем actions без useMemo (хуки нельзя вызывать в колбэках)
               const actions = [];
 
-              // Подключиться - слева
               actions.push({
                 label: "Подключиться",
                 icon: <ConnectIcon className="w-4 h-4" />,
@@ -168,7 +163,6 @@ export function RoomList({
                 },
               });
 
-              // Удалить - справа (если создатель)
               if (room.isCreator && onDelete) {
                 actions.push({
                   label: "Удалить",

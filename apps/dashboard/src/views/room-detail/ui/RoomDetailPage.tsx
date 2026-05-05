@@ -1,13 +1,15 @@
 "use client";
 
 import {
+  getAccessToken,
+  getUserIdFromToken,
   useLeaveRoom,
   useRoom,
   useRoomMembers,
-  useUsersController_getProfile,
 } from "@mm-preview/sdk";
 import { Button, notificationService, ProgressSpinner } from "@mm-preview/ui";
 import { Suspense, useCallback, useMemo } from "react";
+import Loading from "@/app/loading";
 import { ChatWindow, useChat } from "@/src/features/chat";
 import {
   useViewTransition,
@@ -17,7 +19,6 @@ import { RoomChoices } from "@/src/widgets/room-choices";
 import { RoomHeader } from "@/src/widgets/room-header";
 import { RoomMembers } from "@/src/widgets/room-members";
 import { RoomNotMember } from "@/src/widgets/room-not-member";
-import Loading from "@/app/loading";
 
 type ViewConfig = {
   view: "loading" | "error" | "not-member" | "member";
@@ -29,19 +30,10 @@ interface RoomDetailPageProps {
   roomId: string;
 }
 
-type ProfileType = {
-  userId: string;
-  name: string;
-  role?: string;
-  lastActive?: number;
-  recentRooms?: string[];
-  rooms?: unknown[];
-};
-
 function RoomContent({ userId, roomId }: RoomDetailPageProps) {
+  const tokenUserId = getUserIdFromToken(getAccessToken());
+  const effectiveUserId = tokenUserId ?? userId;
   const { data: room, isLoading: roomLoading } = useRoom(roomId);
-  const { data: profileData } = useUsersController_getProfile();
-  const profile = profileData as ProfileType | null | undefined;
   const { data: members } = useRoomMembers(roomId);
   const leaveRoom = useLeaveRoom();
   const { navigate, isPending } = useViewTransition();
@@ -55,34 +47,34 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
   } = useChat({
     roomId,
     publicCode: room?.publicCode,
-    userId,
-    enabled: !!(roomId && room?.isMember && userId),
+    userId: effectiveUserId,
+    enabled: !!(roomId && room?.isMember && effectiveUserId),
   });
 
   const handleLeaveRoom = useCallback(async () => {
-    if (!userId || !roomId) {
+    if (!effectiveUserId || !roomId || !room?.publicCode) {
       return;
     }
 
     try {
-      await leaveRoom.mutateAsync({ roomId, userId });
+      await leaveRoom.mutateAsync({ roomId, roomKey: room.publicCode });
       notificationService.showSuccess("Вы покинули комнату");
-      navigate(`/${userId}/rooms`);
+      navigate(`/${effectiveUserId}/rooms`);
     } catch (_error) {
       notificationService.showError("Не удалось покинуть комнату");
     }
-  }, [userId, roomId, leaveRoom, navigate]);
+  }, [effectiveUserId, roomId, room?.publicCode, leaveRoom, navigate]);
 
   const handleBack = useCallback(
-    () => navigate(`/${userId}/rooms`),
-    [navigate, userId],
+    () => navigate(`/${effectiveUserId}/rooms`),
+    [navigate, effectiveUserId],
   );
   const handleRemoveMember = useCallback((_memberUserId: string) => {
     notificationService.showInfo("Функция удаления участника будет добавлена");
   }, []);
 
   const viewConfig: ViewConfig = useMemo(() => {
-    if (!userId) {
+    if (!effectiveUserId) {
       return {
         view: "error",
         render: () => (
@@ -185,26 +177,23 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
                 />
                 <RoomChoices room={room} currentUserId={userId} />
               </div>
-              {profileData && (
-                <ChatWindow
-                  userId={profileData.userId}
-                  messages={chatMessages}
-                  onSendMessage={sendChatMessage}
-                  isLoading={!isChatConnected || !isReadyToSend}
-                  isMuted={isMuted}
-                />
-              )}
+              <ChatWindow
+                userId={effectiveUserId}
+                messages={chatMessages}
+                onSendMessage={sendChatMessage}
+                isLoading={!isChatConnected || !isReadyToSend}
+                isMuted={isMuted}
+              />
             </div>
           </div>
         </ViewTransition>
       ),
     };
   }, [
-    userId,
+    effectiveUserId,
     roomLoading,
     room,
     members,
-    profile,
     chatMessages,
     isChatConnected,
     isMuted,

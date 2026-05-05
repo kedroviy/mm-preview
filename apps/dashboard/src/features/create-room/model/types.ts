@@ -1,6 +1,8 @@
-import type { CreateRoomResponse } from "@mm-preview/sdk";
+import type { Room } from "@mm-preview/sdk";
 
 export interface CreateRoomFormProps {
-  onSuccess?: (result: CreateRoomResponse) => void;
+  /** Нужен для режима movieMatcher API (`NEXT_PUBLIC_USE_MOVIE_MATCH_API`). */
+  userId?: string;
+  onSuccess?: (result: Room) => void;
   onCancel?: () => void;
 }
