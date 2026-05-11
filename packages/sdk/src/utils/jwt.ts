@@ -35,7 +35,11 @@ export function getUserIdFromToken(token: string | null): string | null {
     return null;
   }
 
-  // JWT может содержать userId в разных полях
-  const userId = decoded.userId || decoded.sub || decoded.id;
-  return typeof userId === "string" ? userId : null;
+  const raw = decoded.userId ?? decoded.sub ?? decoded.id;
+  if (raw === undefined || raw === null) {
+    return null;
+  }
+  return typeof raw === "string" || typeof raw === "number"
+    ? String(raw)
+    : null;
 }

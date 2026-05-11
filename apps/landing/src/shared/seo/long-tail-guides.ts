@@ -15,7 +15,6 @@ const GUIDES_BY_LOCALE: Record<SupportedLocale, LongTailGuide[]> = {
   es: LONG_TAIL_GUIDES_ES,
 };
 
-/** Русский каталог (обратная совместимость импортов). */
 export const LONG_TAIL_GUIDES = LONG_TAIL_GUIDES_RU;
 
 export function getGuidesForLocale(locale: SupportedLocale): LongTailGuide[] {

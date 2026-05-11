@@ -28,6 +28,7 @@
     "sdk:update-swagger": "node packages/sdk/scripts/fetch-live-swagger.js && npm run sdk:generate"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.14",
     "@biomejs/biome": "2.2.0",
     "turbo": "^2.9.6",
     "typescript": "^5"

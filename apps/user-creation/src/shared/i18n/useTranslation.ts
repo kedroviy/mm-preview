@@ -9,23 +9,17 @@ function detectLocale(): Locale {
   }
 
   const browserLang = navigator.language || navigator.languages?.[0] || "en";
-  const langCode = browserLang.split("-")[0].toLowerCase();
+  const langCode = browserLang.split("-")[0]?.toLowerCase();
 
-  if (langCode === "ru") {
-    return "ru";
-  }
-
-  return "en";
+  return langCode === "ru" ? "ru" : "en";
 }
 
 export function useTranslation() {
   const locale = useMemo(() => detectLocale(), []);
-  const t = translations[locale];
+  const dictionary = translations[locale];
 
   return {
     locale,
-    t: (key: TranslationKey): string => {
-      return t[key] || key;
-    },
+    t: (key: TranslationKey): string => dictionary[key] || key,
   };
 }
