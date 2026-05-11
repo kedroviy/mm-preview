@@ -13,19 +13,22 @@ function normalizeSwaggerUrl(baseOrUrl) {
   const raw = String(baseOrUrl || "").trim();
   if (!raw) return "";
 
-  // If user provided a full docs-json URL already, use it as-is.
-  if (raw.endsWith("/api/docs-json") || raw.endsWith("/api/docs/api/docs-json")) {
-    // also tolerate accidental double segment; we'll fix below
-    return raw;
-  }
-  if (raw.endsWith("/api/docs-json/")) {
-    return raw.replace(/\/$/, "");
+  let u = stripTrailingSlash(raw);
+
+  // Full OpenAPI JSON URL (NestJS: /api/docs-json). Fix accidental /api/api/.
+  if (u.endsWith("/docs-json")) {
+    return u.replace(/\/api\/api\/docs-json$/, "/api/docs-json");
   }
 
-  // Some deployments expose Swagger UI at /api/docs.
-  // If env points to that, treat it as base host and append /api/docs-json.
-  const cleaned = stripTrailingSlash(raw).replace(/\/api\/docs\/?$/, "");
-  return `${cleaned}/api/docs-json`;
+  // Swagger UI base: strip and treat as API host.
+  u = stripTrailingSlash(u).replace(/\/api\/docs\/?$/, "");
+
+  // Env often sets NEXT_PUBLIC_API_URL to origin.../api — do not append /api again.
+  if (u.endsWith("/api")) {
+    return `${u}/docs-json`;
+  }
+
+  return `${u}/api/docs-json`;
 }
 
 // Prefer explicit override; otherwise reuse app backend env.
@@ -38,10 +41,7 @@ const SWAGGER_BASE =
     ? "https://api.moviematch.space"
     : "http://localhost:4000");
 
-const SWAGGER_URL = normalizeSwaggerUrl(SWAGGER_BASE).replace(
-  "/api/docs/api/docs-json",
-  "/api/docs-json",
-);
+const SWAGGER_URL = normalizeSwaggerUrl(SWAGGER_BASE);
 
 async function main() {
   console.log(`📡 Fetching swagger from: ${SWAGGER_URL}...`);
