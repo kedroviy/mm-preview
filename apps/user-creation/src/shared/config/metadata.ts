@@ -13,77 +13,51 @@ export interface MetadataConfig {
   };
 }
 
-// Метаданные для разных языков
 export const metadataByLang: Record<SupportedLocale, MetadataConfig> = {
   ru: {
-    title: "Создать аккаунт - Movie Match",
+    title: "Авторизация - Movie Match",
     description:
-      "Создайте свой аккаунт в Movie Match. Присоединяйтесь к друзьям, создавайте комнаты и выбирайте фильмы для совместного просмотра.",
+      "Войдите в Movie Match или создайте новый аккаунт, чтобы продолжить.",
     keywords: [
-      "создать аккаунт",
+      "авторизация",
+      "вход",
       "регистрация",
       "movie match",
-      "регистрация в movie match",
-      "создать профиль",
-      "зарегистрироваться",
-      "кино с друзьями",
-      "выбор фильмов",
-      "онлайн кино",
-      "присоединиться",
-      "новый аккаунт",
-      "регистрация бесплатно",
-      "создать учетную запись",
+      "аккаунт movie match",
     ],
     openGraph: {
-      title: "Создать аккаунт - Movie Match",
-      description:
-        "Создайте свой аккаунт и присоединяйтесь к выбору фильмов с друзьями",
+      title: "Авторизация - Movie Match",
+      description: "Вход и регистрация в Movie Match",
       siteName: "Movie Match",
     },
   },
   en: {
-    title: "Create Account - Movie Match",
-    description:
-      "Create your Movie Match account. Join friends, create rooms and choose movies to watch together.",
+    title: "Authentication - Movie Match",
+    description: "Log in to Movie Match or create a new account to continue.",
     keywords: [
-      "create account",
-      "sign up",
-      "register",
+      "authentication",
+      "login",
+      "registration",
       "movie match",
-      "movie match registration",
-      "create profile",
-      "join movie match",
-      "watch movies with friends",
-      "movie selection",
-      "online movies",
-      "new account",
-      "free registration",
-      "create account free",
-      "sign up for movie match",
+      "movie match account",
     ],
     openGraph: {
-      title: "Create Account - Movie Match",
-      description:
-        "Create your account and join friends in choosing movies together",
+      title: "Authentication - Movie Match",
+      description: "Login and registration in Movie Match",
       siteName: "Movie Match",
     },
   },
 };
 
-/**
- * Определяет язык из URL или заголовков
- */
 export function detectLanguage(
   pathname: string,
   acceptLanguage?: string | null,
 ): SupportedLocale {
-  // Проверяем префикс языка в URL (например, /ru/ или /en/)
   const langMatch = pathname.match(/^\/(ru|en)(\/|$)/);
   if (langMatch) {
     return langMatch[1] as SupportedLocale;
   }
 
-  // Если нет в URL, определяем из Accept-Language заголовка
   if (acceptLanguage) {
     const lowerLang = acceptLanguage.toLowerCase();
     if (lowerLang.includes("ru")) {
@@ -94,13 +68,9 @@ export function detectLanguage(
     }
   }
 
-  // По умолчанию русский
   return "ru";
 }
 
-/**
- * Генерирует метаданные для указанного языка
- */
 export function generateMetadataForLang(
   lang: SupportedLocale,
   baseUrl?: string,
@@ -145,26 +115,13 @@ export function generateMetadataForLang(
   };
 }
 
-/**
- * Получает язык из заголовков Next.js
- * Используется в generateMetadata функции
- */
 export async function getLanguageFromHeaders(): Promise<SupportedLocale> {
   const { headers } = await import("next/headers");
   const headersList = await headers();
   const acceptLanguage = headersList.get("accept-language");
-
-  // В Next.js 13+ pathname можно получить из headers или использовать дефолтный
-  // Для более точного определения можно использовать middleware
-  const pathname = "/"; // По умолчанию корневой путь
-
-  return detectLanguage(pathname, acceptLanguage);
+  return detectLanguage("/", acceptLanguage);
 }
 
-/**
- * Генерирует метаданные на основе заголовков запроса
- * Используется в layout.tsx для автоматического определения языка
- */
 export async function generateMetadataFromHeaders(
   baseUrl?: string,
 ): Promise<Metadata> {
