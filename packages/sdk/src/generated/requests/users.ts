@@ -30,6 +30,25 @@ export async function UsersController_getProfile() {
 
 
 /**
+ * Get all user by params (admin only)
+ * Retrieves all users by params. Requires authentication. Only admins can view other users' data.
+ * @param params - Request parameters
+ * @returns any[]
+ */
+export async function UsersController_getAllUsers(params?: { id?: any, name?: any }) {
+  const url = `/api/v1/users/all`;
+  const searchParams = new URLSearchParams();
+  if (params?.id !== undefined) searchParams.append('id', String(params.id));
+  if (params?.name !== undefined) searchParams.append('name', String(params.name));
+  const queryString = searchParams.toString();
+  const fullUrl = queryString ? `${url}?${queryString}` : url;
+  
+  const response = await api.get<any[]>(fullUrl);
+  return response;
+}
+
+
+/**
  * Get user by ID (admin only)
  * Retrieves a user by their userId (UUID). Requires authentication. Only admins can view other users' data.
  * @param params - Request parameters

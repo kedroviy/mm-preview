@@ -67,10 +67,6 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Refresh access token
-         * @description Generates a new access token using a valid refresh token. Refresh token is read from HTTP-only cookie (refresh_token). If cookie is not available, token can be provided in request body (for testing only).
-         */
         post: operations["AuthController_refreshToken"];
         delete?: never;
         options?: never;
@@ -92,6 +88,26 @@ export interface paths {
          * @description Revokes the current refresh token and clears authentication cookies.
          */
         post: operations["AuthController_logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/admin/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Admin login by email
+         * @description Authenticates admin and sets JWT tokens in secure cookies.
+         */
+        post: operations["AuthController_adminLogin"];
         delete?: never;
         options?: never;
         head?: never;
@@ -130,6 +146,26 @@ export interface paths {
          * @description Retrieves the profile of the authenticated user (userId from JWT token) with their rooms. Requires authentication.
          */
         get: operations["UsersController_getProfile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all user by params (admin only)
+         * @description Retrieves all users by params. Requires authentication. Only admins can view other users' data.
+         */
+        get: operations["UsersController_getAllUsers"];
         put?: never;
         post?: never;
         delete?: never;
@@ -386,15 +422,708 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/nsi/genres/import-progress/{jobId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Поток прогресса импорта (SSE)
+         * @description Подключение через EventSource для получения статуса обработки файла.
+         */
+        get: operations["GenresController_sendProgress"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/genres/get-infinity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Список жанров (Infinity Scroll)
+         * @description Возвращает данные с флагом hasNextPage для подгрузки при скролле
+         */
+        get: operations["GenresController_getInfinite"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/genres/get-by-param": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Список жанров (Классическая пагинация)
+         * @description Возвращает данные с общим количеством страниц для админок
+         */
+        get: operations["GenresController_getWithPages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/genres/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получить один жанр по ID */
+        get: operations["GenresController_findOne"];
+        put?: never;
+        post?: never;
+        /** Удалить жанр */
+        delete: operations["GenresController_remove"];
+        options?: never;
+        head?: never;
+        /** Обновить жанр по ID */
+        patch: operations["GenresController_update"];
+        trace?: never;
+    };
+    "/api/v1/nsi/genres": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Создать новый жанр */
+        post: operations["GenresController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/genres/import-excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Импорт жанров из Excel
+         * @description Загрузка файла .xlsx. Заголовки должны совпадать с полями модели.
+         */
+        post: operations["GenresController_importExcel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/countries/import-progress/{jobId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Поток прогресса импорта (SSE)
+         * @description Подключение через EventSource для получения статуса обработки файла.
+         */
+        get: operations["CountriesController_sendProgress"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/countries/get-infinity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Список стран (Infinity Scroll)
+         * @description Возвращает данные с флагом hasNextPage для подгрузки при скролле
+         */
+        get: operations["CountriesController_getInfinite"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/countries/get-by-param": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Список стран (Классическая пагинация)
+         * @description Возвращает данные с общим количеством страниц для админок
+         */
+        get: operations["CountriesController_getWithPages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/countries/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получить один жанр по ID */
+        get: operations["CountriesController_findOne"];
+        put?: never;
+        post?: never;
+        /** Удалить запись о стране */
+        delete: operations["CountriesController_remove"];
+        options?: never;
+        head?: never;
+        /** Обновить страну по ID */
+        patch: operations["CountriesController_update"];
+        trace?: never;
+    };
+    "/api/v1/nsi/countries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Добавить новую запись о стране */
+        post: operations["CountriesController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/countries/import-excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Импорт списка стран из Excel
+         * @description Загрузка файла .xlsx. Заголовки должны совпадать с полями модели.
+         */
+        post: operations["CountriesController_importExcel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/ageRating/import-progress/{jobId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Поток прогресса импорта (SSE)
+         * @description Подключение через EventSource для получения статуса обработки файла.
+         */
+        get: operations["AgeRatingController_sendProgress"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/ageRating/get-infinity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Список возрастных рейтингов (Infinity Scroll)
+         * @description Возвращает данные с флагом hasNextPage для подгрузки при скролле
+         */
+        get: operations["AgeRatingController_getInfinite"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/ageRating/get-by-param": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Список (Классическая пагинация)
+         * @description Возвращает данные с общим количеством страниц для админок
+         */
+        get: operations["AgeRatingController_getWithPages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/ageRating/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получить одину запись по ID */
+        get: operations["AgeRatingController_findOne"];
+        put?: never;
+        post?: never;
+        /** Удалить запись */
+        delete: operations["AgeRatingController_remove"];
+        options?: never;
+        head?: never;
+        /** Обновить запись по ID */
+        patch: operations["AgeRatingController_update"];
+        trace?: never;
+    };
+    "/api/v1/nsi/ageRating": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Добавить новую запись */
+        post: operations["AgeRatingController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/ageRating/import-excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Импорт списка возрастных ограничений из Excel
+         * @description Загрузка файла .xlsx. Заголовки должны совпадать с полями модели.
+         */
+        post: operations["AgeRatingController_importExcel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/award/import-progress/{jobId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Поток прогресса импорта (SSE)
+         * @description Подключение через EventSource для получения статуса обработки файла.
+         */
+        get: operations["AwardsController_sendProgress"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/award/get-infinity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Список возрастных рейтингов (Infinity Scroll)
+         * @description Возвращает данные с флагом hasNextPage для подгрузки при скролле
+         */
+        get: operations["AwardsController_getInfinite"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/award/get-by-param": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Список (Классическая пагинация)
+         * @description Возвращает данные с общим количеством страниц для админок
+         */
+        get: operations["AwardsController_getWithPages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/award/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получить одину запись по ID */
+        get: operations["AwardsController_findOne"];
+        put?: never;
+        post?: never;
+        /** Удалить запись */
+        delete: operations["AwardsController_remove"];
+        options?: never;
+        head?: never;
+        /** Обновить запись по ID */
+        patch: operations["AwardsController_update"];
+        trace?: never;
+    };
+    "/api/v1/nsi/award": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Добавить новую запись */
+        post: operations["AwardsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/award/import-excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Импорт списка возрастных ограничений из Excel
+         * @description Загрузка файла .xlsx. Заголовки должны совпадать с полями модели.
+         */
+        post: operations["AwardsController_importExcel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/contentType/import-progress/{jobId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Поток прогресса импорта (SSE)
+         * @description Подключение через EventSource для получения статуса обработки файла.
+         */
+        get: operations["ContentTypeController_sendProgress"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/contentType/get-infinity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Список возрастных рейтингов (Infinity Scroll)
+         * @description Возвращает данные с флагом hasNextPage для подгрузки при скролле
+         */
+        get: operations["ContentTypeController_getInfinite"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/contentType/get-by-param": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Список (Классическая пагинация)
+         * @description Возвращает данные с общим количеством страниц для админок
+         */
+        get: operations["ContentTypeController_getWithPages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/contentType/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получить одину запись по ID */
+        get: operations["ContentTypeController_findOne"];
+        put?: never;
+        post?: never;
+        /** Удалить запись */
+        delete: operations["ContentTypeController_remove"];
+        options?: never;
+        head?: never;
+        /** Обновить запись по ID */
+        patch: operations["ContentTypeController_update"];
+        trace?: never;
+    };
+    "/api/v1/nsi/contentType": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Добавить новую запись */
+        post: operations["ContentTypeController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/contentType/import-excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Импорт списка возрастных ограничений из Excel
+         * @description Загрузка файла .xlsx. Заголовки должны совпадать с полями модели.
+         */
+        post: operations["ContentTypeController_importExcel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/awardCategory/import-progress/{jobId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Поток прогресса импорта (SSE)
+         * @description Подключение через EventSource для получения статуса обработки файла.
+         */
+        get: operations["AwardCategoryController_sendProgress"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/awardCategory/get-infinity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Список AwardCategory (Infinity Scroll)
+         * @description Возвращает данные с флагом hasNextPage для подгрузки при скролле
+         */
+        get: operations["AwardCategoryController_getInfinite"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/awardCategory/get-by-param": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Список стран (Классическая пагинация)
+         * @description Возвращает данные с общим количеством страниц для админок
+         */
+        get: operations["AwardCategoryController_getWithPages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/awardCategory/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получить один жанр по ID */
+        get: operations["AwardCategoryController_findOne"];
+        put?: never;
+        post?: never;
+        /** Удалить запись о стране */
+        delete: operations["AwardCategoryController_remove"];
+        options?: never;
+        head?: never;
+        /** Обновить страну по ID */
+        patch: operations["AwardCategoryController_update"];
+        trace?: never;
+    };
+    "/api/v1/nsi/awardCategory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Добавить новую запись о стране */
+        post: operations["AwardCategoryController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nsi/awardCategory/import-excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Импорт списка стран из Excel
+         * @description Загрузка файла .xlsx. Заголовки должны совпадать с полями модели.
+         */
+        post: operations["AwardCategoryController_importExcel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         LoginDto: {
-            /**
-             * @description User name for login
-             * @example John Doe
-             */
+            /** @example user name */
             name: string;
         };
         LoginResponseDto: {
@@ -410,45 +1139,25 @@ export interface components {
             name: string;
         };
         ErrorResponseDto: {
-            /**
-             * @description HTTP status code
-             * @example 400
-             */
+            /** @description HTTP status code */
             statusCode: number;
-            /**
-             * @description Error message or array of error messages
-             * @example Invalid room code. Code must be exactly 6 digits.
-             */
+            /** @description Error message or array of error messages */
             message: string | string[];
-            /**
-             * @description Error type name
-             * @example Bad Request
-             */
+            /** @description Error type name */
             error: string;
-            /**
-             * @description ISO timestamp when error occurred
-             * @example 2024-01-15T10:30:00.000Z
-             */
+            /** @description ISO timestamp when error occurred */
             timestamp: string;
-            /**
-             * @description Request path
-             * @example /rooms/join
-             */
+            /** @description Request path */
             path: string;
-            /**
-             * @description HTTP method
-             * @example POST
-             */
+            /** @description HTTP method */
             method: string;
         };
-        RefreshTokenDto: {
-            /**
-             * @description Refresh token (optional if provided in cookie)
-             * @example eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-             */
-            refreshToken?: string;
+        AdminLoginDto: {
+            /** @example admin@mail.com */
+            email: string;
+            /** @example password123 */
+            password: string;
         };
-        AuthResponseDto: Record<string, never>;
         CreateRedisUserDto: {
             /**
              * @description User name
@@ -479,10 +1188,10 @@ export interface components {
             lastActive: number;
             /**
              * @description User role
-             * @example user
+             * @example USER
              * @enum {string}
              */
-            role: "user" | "admin";
+            role: "USER" | "ADMIN";
             /**
              * @description Array of recently visited room IDs (max 10)
              * @example [
@@ -611,6 +1320,36 @@ export interface components {
             /** @description List of rooms where user is a member */
             rooms: components["schemas"]["RoomResponseDto"][];
         };
+        UserResponseDto: {
+            /** @example 123e4567-e89b-12d3-a456-426614174000 */
+            id: string;
+            /** @example john@example.com */
+            email: Record<string, never>;
+            /** @example John Doe */
+            name: Record<string, never>;
+            /**
+             * @example USER
+             * @enum {string}
+             */
+            role: "USER" | "ADMIN";
+            /** @example https://example.com */
+            avatarUrl?: Record<string, never>;
+            /**
+             * Format: date-time
+             * @example 2024-01-01T00:00:00.000Z
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @example 2024-01-01T00:00:00.000Z
+             */
+            updatedAt: string;
+            /**
+             * @description Timestamp in ms
+             * @example 1710671200000
+             */
+            lastActive: number;
+        };
         CreateRoomDto: {
             /**
              * @description Optional room name
@@ -657,6 +1396,358 @@ export interface components {
                 /** @example John Doe */
                 name?: string;
             }[];
+        };
+        CreateGenreDto: {
+            /** @example Боевик */
+            name: string;
+            /** @example action */
+            slug: string;
+            /** @example Описание жанра */
+            description?: string;
+            /**
+             * @example [
+             *       "экшен",
+             *       "драки"
+             *     ]
+             */
+            keywords?: string[];
+        };
+        GenrePaginationResponseDto: {
+            data: components["schemas"]["CreateGenreDto"][];
+            /** @example 100 */
+            totalItems: number;
+            /** @example 10 */
+            totalPages: number;
+            /** @example 1 */
+            page: number;
+            /** @example 10 */
+            limit: number;
+        };
+        IdParamDto: {
+            /** @example 1 */
+            id: number;
+        };
+        GetGenreByIdDto: {
+            /** @example 1 */
+            id: number;
+            /** @example Комедия */
+            name: string;
+            /** @example comedy */
+            slug: string;
+            /**
+             * Format: date-time
+             * @example 2024-03-31T...
+             */
+            createdAt: string;
+        };
+        UpdateGenreDto: {
+            /** @example Боевик */
+            name?: string;
+            /** @example action */
+            slug?: string;
+            /** @example Описание жанра */
+            description?: string;
+            /**
+             * @example [
+             *       "экшен",
+             *       "драки"
+             *     ]
+             */
+            keywords?: string[];
+        };
+        FileUploadDto: {
+            /**
+             * Format: binary
+             * @description Excel файл (.xlsx)
+             */
+            file: string;
+        };
+        CreateCountryDto: {
+            /** @example Германия */
+            name: string;
+            /** @example germany */
+            slug: string;
+            /** @example Описание страны */
+            description?: string;
+            /**
+             * @example [
+             *       "германия",
+             *       "дойчланд"
+             *     ]
+             */
+            keywords?: string[];
+        };
+        CountriesPaginationResponseDto: {
+            data: components["schemas"]["CreateCountryDto"][];
+            /** @example 100 */
+            totalItems: number;
+            /** @example 10 */
+            totalPages: number;
+            /** @example 1 */
+            page: number;
+            /** @example 10 */
+            limit: number;
+        };
+        GetCountryByIdDto: {
+            /** @example 1 */
+            id: number;
+            /** @example Италия */
+            name: string;
+            /** @example italy */
+            slug: string;
+            /**
+             * Format: date-time
+             * @example 2024-03-31T...
+             */
+            createdAt: string;
+        };
+        UpdateCountryDto: {
+            /** @example Германия */
+            name?: string;
+            /** @example germany */
+            slug?: string;
+            /** @example Описание страны */
+            description?: string;
+            /**
+             * @example [
+             *       "германия",
+             *       "дойчланд"
+             *     ]
+             */
+            keywords?: string[];
+        };
+        CreateAgeRatingDto: {
+            /** @example Германия */
+            name: string;
+            /** @example germany */
+            slug: string;
+            /** @example Описание страны */
+            description?: string;
+            /**
+             * @example [
+             *       "германия",
+             *       "дойчланд"
+             *     ]
+             */
+            keywords?: string[];
+        };
+        AgeRatingPaginationResponseDto: {
+            data: components["schemas"]["CreateAgeRatingDto"][];
+            /** @example 100 */
+            totalItems: number;
+            /** @example 10 */
+            totalPages: number;
+            /** @example 1 */
+            page: number;
+            /** @example 10 */
+            limit: number;
+        };
+        GetAgeRatingByIdDto: {
+            /** @example 1 */
+            id: number;
+            /** @example Италия */
+            name: string;
+            /** @example italy */
+            slug: string;
+            /**
+             * Format: date-time
+             * @example 2024-03-31T...
+             */
+            createdAt: string;
+        };
+        UpdateAgeRatingDto: {
+            /** @example Германия */
+            name?: string;
+            /** @example germany */
+            slug?: string;
+            /** @example Описание страны */
+            description?: string;
+            /**
+             * @example [
+             *       "германия",
+             *       "дойчланд"
+             *     ]
+             */
+            keywords?: string[];
+        };
+        CreateAwardDto: {
+            /** @example Германия */
+            name: string;
+            /** @example germany */
+            slug: string;
+            /** @example Описание записи */
+            description?: string;
+            /**
+             * @example [
+             *       "оскар",
+             *       "пальмовая ветвь"
+             *     ]
+             */
+            keywords?: string[];
+        };
+        AwardPaginationResponseDto: {
+            data: components["schemas"]["CreateAwardDto"][];
+            /** @example 100 */
+            totalItems: number;
+            /** @example 10 */
+            totalPages: number;
+            /** @example 1 */
+            page: number;
+            /** @example 10 */
+            limit: number;
+        };
+        GetAwardByIdDto: {
+            /** @example 1 */
+            id: number;
+            /** @example Италия */
+            name: string;
+            /** @example italy */
+            slug: string;
+            /**
+             * Format: date-time
+             * @example 2024-03-31T...
+             */
+            createdAt: string;
+        };
+        UpdateAwardDto: {
+            /** @example Германия */
+            name?: string;
+            /** @example germany */
+            slug?: string;
+            /** @example Описание записи */
+            description?: string;
+            /**
+             * @example [
+             *       "оскар",
+             *       "пальмовая ветвь"
+             *     ]
+             */
+            keywords?: string[];
+        };
+        CreateContentTypeDto: {
+            /** @example Германия */
+            name: string;
+            /** @example germany */
+            slug: string;
+            /** @example Описание записи */
+            description?: string;
+            /**
+             * @example [
+             *       "оскар",
+             *       "пальмовая ветвь"
+             *     ]
+             */
+            keywords?: string[];
+        };
+        ContentTypePaginationResponseDto: {
+            data: components["schemas"]["CreateContentTypeDto"][];
+            /** @example 100 */
+            totalItems: number;
+            /** @example 10 */
+            totalPages: number;
+            /** @example 1 */
+            page: number;
+            /** @example 10 */
+            limit: number;
+        };
+        GetContentTypeByIdDto: {
+            /** @example 1 */
+            id: number;
+            /** @example Италия */
+            name: string;
+            /** @example italy */
+            slug: string;
+            /**
+             * Format: date-time
+             * @example 2024-03-31T...
+             */
+            createdAt: string;
+        };
+        UpdateContentTypeDto: {
+            /** @example Германия */
+            name?: string;
+            /** @example germany */
+            slug?: string;
+            /** @example Описание записи */
+            description?: string;
+            /**
+             * @example [
+             *       "оскар",
+             *       "пальмовая ветвь"
+             *     ]
+             */
+            keywords?: string[];
+        };
+        GetAwardCategoryByIdDto: {
+            /** @example 1 */
+            id: number;
+            /** @example Лучший фильм */
+            name: string;
+            /** @example best-picture */
+            slug: string;
+            /** @example 1 */
+            awardId: number;
+            /**
+             * Format: date-time
+             * @example 2024-03-31T...
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @example 2024-03-31T...
+             */
+            updatedAt: string;
+            /** @example Описание... */
+            description?: string;
+            /**
+             * @example [
+             *       "кино",
+             *       "награда"
+             *     ]
+             */
+            keywords: string[];
+        };
+        CreateAwardCategoryDto: {
+            /** @example Лучший режиссер */
+            name: string;
+            /** @example best-director */
+            slug: string;
+            /**
+             * @description ID премии (напр. Оскар)
+             * @example 1
+             */
+            awardId: number;
+            /** @example Награда за выдающуюся постановку */
+            description?: string;
+            /**
+             * @example [
+             *       "режиссура",
+             *       "постановка",
+             *       "directing"
+             *     ]
+             */
+            keywords?: string[];
+        };
+        UpdateAwardCategoryDto: {
+            /** @example Лучший режиссер */
+            name?: string;
+            /** @example best-director */
+            slug?: string;
+            /**
+             * @description ID премии (напр. Оскар)
+             * @example 1
+             */
+            awardId?: number;
+            /** @example Награда за выдающуюся постановку */
+            description?: string;
+            /**
+             * @example [
+             *       "режиссура",
+             *       "постановка",
+             *       "directing"
+             *     ]
+             */
+            keywords?: string[];
         };
     };
     responses: never;
@@ -762,48 +1853,13 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        /** @description Refresh token (optional - token is read from cookie by default) */
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["RefreshTokenDto"];
-            };
-        };
+        requestBody?: never;
         responses: {
-            /** @description Access token refreshed successfully */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": components["schemas"]["AuthResponseDto"];
-                };
-            };
-            /** @description Refresh token is required */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Invalid or expired refresh token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
+                content?: never;
             };
         };
     };
@@ -839,6 +1895,30 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AuthController_adminLogin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminLoginDto"];
+            };
+        };
+        responses: {
+            /** @description Admin logged in successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoginResponseDto"];
                 };
             };
         };
@@ -922,6 +2002,56 @@ export interface operations {
                 };
             };
             /** @description Access denied. Invalid token or user not found. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    UsersController_getAllUsers: {
+        parameters: {
+            query?: {
+                id?: unknown;
+                name?: unknown;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of users found */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserResponseDto"][];
+                };
+            };
+            /** @description Authentication required. JWT token missing or invalid. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied. Only admins can view other users' data. Use /users/profile for your own profile. */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1789,6 +2919,1872 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    GenresController_sendProgress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Стрим событий прогресса */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example 50 */
+                            progress?: number;
+                            /** @example processing */
+                            status?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    GenresController_getInfinite: {
+        parameters: {
+            query?: {
+                /** @description Номер страницы */
+                page?: number;
+                /** @description Элементов на страницу */
+                limit?: number;
+                /** @description Поиск по названию */
+                name?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Успешное получение списка */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description JWT токен невалиден или отсутствует */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    GenresController_getWithPages: {
+        parameters: {
+            query?: {
+                /** @description Номер страницы */
+                page?: number;
+                /** @description Элементов на страницу */
+                limit?: number;
+                /** @description Поиск по названию */
+                name?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenrePaginationResponseDto"];
+                };
+            };
+            /** @description Запись с указанным ID не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    GenresController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["IdParamDto"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Жанр найден */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetGenreByIdDto"];
+                };
+            };
+            /** @description Запись с указанным ID не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Внутренняя ошибка сервера (база данных недоступна или баг в коде) */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    GenresController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Жанр успешно удален */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GenresController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["IdParamDto"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateGenreDto"];
+            };
+        };
+        responses: {
+            /** @description Жанр успешно обновлен */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UpdateGenreDto"];
+                };
+            };
+            /** @description Ошибка валидации (неверный формат данных) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "statusCode": 404,
+                     *       "error": "Not Found",
+                     *       "message": "Genre not found",
+                     *       "timestamp": "2024-03-31T...",
+                     *       "path": "/api/genres/1",
+                     *       "method": "GET"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    GenresController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateGenreDto"];
+            };
+        };
+        responses: {
+            /** @description Жанр успешно создан */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateGenreDto"];
+                };
+            };
+            /** @description Ошибка валидации (неверный формат данных) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "statusCode": 404,
+                     *       "error": "Not Found",
+                     *       "message": "Genre not found",
+                     *       "timestamp": "2024-03-31T...",
+                     *       "path": "/api/genres/1",
+                     *       "method": "GET"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description JWT токен невалиден или отсутствует */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Недостаточно прав для выполнения операции */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    GenresController_importExcel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Excel файл */
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["FileUploadDto"];
+            };
+        };
+        responses: {
+            /** @description Данные успешно импортированы */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Ошибка валидации (неверный формат данных) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "statusCode": 404,
+                     *       "error": "Not Found",
+                     *       "message": "Genre not found",
+                     *       "timestamp": "2024-03-31T...",
+                     *       "path": "/api/genres/1",
+                     *       "method": "GET"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    CountriesController_sendProgress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Стрим событий прогресса */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example 50 */
+                            progress?: number;
+                            /** @example processing */
+                            status?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    CountriesController_getInfinite: {
+        parameters: {
+            query?: {
+                /** @description Номер страницы */
+                page?: number;
+                /** @description Элементов на страницу */
+                limit?: number;
+                /** @description Поиск по названию */
+                name?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Успешное получение списка */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description JWT токен невалиден или отсутствует */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    CountriesController_getWithPages: {
+        parameters: {
+            query?: {
+                /** @description Номер страницы */
+                page?: number;
+                /** @description Элементов на страницу */
+                limit?: number;
+                /** @description Поиск по названию */
+                name?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CountriesPaginationResponseDto"];
+                };
+            };
+            /** @description Запись с указанным ID не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    CountriesController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["IdParamDto"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Жанр найден */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetCountryByIdDto"];
+                };
+            };
+            /** @description Запись с указанным ID не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Внутренняя ошибка сервера (база данных недоступна или баг в коде) */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    CountriesController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Запись о стране успешно удалена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CountriesController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["IdParamDto"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateGenreDto"];
+            };
+        };
+        responses: {
+            /** @description Страна успешно обновлена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UpdateCountryDto"];
+                };
+            };
+            /** @description Ошибка валидации (неверный формат данных) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "statusCode": 404,
+                     *       "error": "Not Found",
+                     *       "message": "Genre not found",
+                     *       "timestamp": "2024-03-31T...",
+                     *       "path": "/api/genres/1",
+                     *       "method": "GET"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    CountriesController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateGenreDto"];
+            };
+        };
+        responses: {
+            /** @description Страна успешно добавлена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateCountryDto"];
+                };
+            };
+            /** @description Ошибка валидации (неверный формат данных) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "statusCode": 404,
+                     *       "error": "Not Found",
+                     *       "message": "Genre not found",
+                     *       "timestamp": "2024-03-31T...",
+                     *       "path": "/api/genres/1",
+                     *       "method": "GET"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description JWT токен невалиден или отсутствует */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Недостаточно прав для выполнения операции */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    CountriesController_importExcel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Excel файл */
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["FileUploadDto"];
+            };
+        };
+        responses: {
+            /** @description Данные успешно импортированы */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Ошибка валидации (неверный формат данных) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "statusCode": 404,
+                     *       "error": "Not Found",
+                     *       "message": "Genre not found",
+                     *       "timestamp": "2024-03-31T...",
+                     *       "path": "/api/genres/1",
+                     *       "method": "GET"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AgeRatingController_sendProgress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Стрим событий прогресса */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example 50 */
+                            progress?: number;
+                            /** @example processing */
+                            status?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    AgeRatingController_getInfinite: {
+        parameters: {
+            query?: {
+                /** @description Номер страницы */
+                page?: number;
+                /** @description Элементов на страницу */
+                limit?: number;
+                /** @description Поиск по названию */
+                name?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Успешное получение списка */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description JWT токен невалиден или отсутствует */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AgeRatingController_getWithPages: {
+        parameters: {
+            query?: {
+                /** @description Номер страницы */
+                page?: number;
+                /** @description Элементов на страницу */
+                limit?: number;
+                /** @description Поиск по названию */
+                name?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgeRatingPaginationResponseDto"];
+                };
+            };
+            /** @description Запись с указанным ID не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AgeRatingController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["IdParamDto"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Запись найдена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetAgeRatingByIdDto"];
+                };
+            };
+            /** @description Запись с указанным ID не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Внутренняя ошибка сервера (база данных недоступна или баг в коде) */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AgeRatingController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Запись успешно удалена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AgeRatingController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["IdParamDto"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateAgeRatingDto"];
+            };
+        };
+        responses: {
+            /** @description Запись успешно обновлена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UpdateAgeRatingDto"];
+                };
+            };
+            /** @description Ошибка валидации (неверный формат данных) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "statusCode": 404,
+                     *       "error": "Not Found",
+                     *       "message": "Record not found",
+                     *       "timestamp": "2024-03-31T...",
+                     *       "path": "/api/genres/1",
+                     *       "method": "GET"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AgeRatingController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAgeRatingDto"];
+            };
+        };
+        responses: {
+            /** @description Запись успешно добавлена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateAgeRatingDto"];
+                };
+            };
+            /** @description Ошибка валидации (неверный формат данных) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "statusCode": 404,
+                     *       "error": "Not Found",
+                     *       "message": "Record not found",
+                     *       "timestamp": "2024-03-31T...",
+                     *       "path": "/api/genres/1",
+                     *       "method": "GET"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description JWT токен невалиден или отсутствует */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Недостаточно прав для выполнения операции */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AgeRatingController_importExcel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Excel файл */
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["FileUploadDto"];
+            };
+        };
+        responses: {
+            /** @description Данные успешно импортированы */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Ошибка валидации (неверный формат данных) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "statusCode": 404,
+                     *       "error": "Not Found",
+                     *       "message": "Record not found",
+                     *       "timestamp": "2024-03-31T...",
+                     *       "path": "/api/genres/1",
+                     *       "method": "GET"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AwardsController_sendProgress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Стрим событий прогресса */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example 50 */
+                            progress?: number;
+                            /** @example processing */
+                            status?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    AwardsController_getInfinite: {
+        parameters: {
+            query?: {
+                /** @description Номер страницы */
+                page?: number;
+                /** @description Элементов на страницу */
+                limit?: number;
+                /** @description Поиск по названию */
+                name?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Успешное получение списка */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description JWT токен невалиден или отсутствует */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AwardsController_getWithPages: {
+        parameters: {
+            query?: {
+                /** @description Номер страницы */
+                page?: number;
+                /** @description Элементов на страницу */
+                limit?: number;
+                /** @description Поиск по названию */
+                name?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AwardPaginationResponseDto"];
+                };
+            };
+            /** @description Запись с указанным ID не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AwardsController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["IdParamDto"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Запись найдена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetAwardByIdDto"];
+                };
+            };
+            /** @description Запись с указанным ID не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Внутренняя ошибка сервера (база данных недоступна или баг в коде) */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AwardsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Запись успешно удалена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AwardsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["IdParamDto"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateAwardDto"];
+            };
+        };
+        responses: {
+            /** @description Запись успешно обновлена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UpdateAwardDto"];
+                };
+            };
+            /** @description Ошибка валидации (неверный формат данных) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "statusCode": 404,
+                     *       "error": "Not Found",
+                     *       "message": "Record not found",
+                     *       "timestamp": "2024-03-31T...",
+                     *       "path": "/api/genres/1",
+                     *       "method": "GET"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AwardsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAwardDto"];
+            };
+        };
+        responses: {
+            /** @description Запись успешно добавлена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateAwardDto"];
+                };
+            };
+            /** @description Ошибка валидации (неверный формат данных) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "statusCode": 404,
+                     *       "error": "Not Found",
+                     *       "message": "Record not found",
+                     *       "timestamp": "2024-03-31T...",
+                     *       "path": "/api/genres/1",
+                     *       "method": "GET"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description JWT токен невалиден или отсутствует */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Недостаточно прав для выполнения операции */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AwardsController_importExcel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Excel файл */
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["FileUploadDto"];
+            };
+        };
+        responses: {
+            /** @description Данные успешно импортированы */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Ошибка валидации (неверный формат данных) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "statusCode": 404,
+                     *       "error": "Not Found",
+                     *       "message": "Record not found",
+                     *       "timestamp": "2024-03-31T...",
+                     *       "path": "/api/genres/1",
+                     *       "method": "GET"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ContentTypeController_sendProgress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Стрим событий прогресса */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example 50 */
+                            progress?: number;
+                            /** @example processing */
+                            status?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    ContentTypeController_getInfinite: {
+        parameters: {
+            query?: {
+                /** @description Номер страницы */
+                page?: number;
+                /** @description Элементов на страницу */
+                limit?: number;
+                /** @description Поиск по названию */
+                name?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Успешное получение списка */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description JWT токен невалиден или отсутствует */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ContentTypeController_getWithPages: {
+        parameters: {
+            query?: {
+                /** @description Номер страницы */
+                page?: number;
+                /** @description Элементов на страницу */
+                limit?: number;
+                /** @description Поиск по названию */
+                name?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContentTypePaginationResponseDto"];
+                };
+            };
+            /** @description Запись с указанным ID не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ContentTypeController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["IdParamDto"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Запись найдена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetContentTypeByIdDto"];
+                };
+            };
+            /** @description Запись с указанным ID не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Внутренняя ошибка сервера (база данных недоступна или баг в коде) */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ContentTypeController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Запись успешно удалена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ContentTypeController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["IdParamDto"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateContentTypeDto"];
+            };
+        };
+        responses: {
+            /** @description Запись успешно обновлена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UpdateContentTypeDto"];
+                };
+            };
+            /** @description Ошибка валидации (неверный формат данных) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "statusCode": 404,
+                     *       "error": "Not Found",
+                     *       "message": "Record not found",
+                     *       "timestamp": "2024-03-31T...",
+                     *       "path": "/api/genres/1",
+                     *       "method": "GET"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ContentTypeController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateContentTypeDto"];
+            };
+        };
+        responses: {
+            /** @description Запись успешно добавлена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateContentTypeDto"];
+                };
+            };
+            /** @description Ошибка валидации (неверный формат данных) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "statusCode": 404,
+                     *       "error": "Not Found",
+                     *       "message": "Record not found",
+                     *       "timestamp": "2024-03-31T...",
+                     *       "path": "/api/genres/1",
+                     *       "method": "GET"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description JWT токен невалиден или отсутствует */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Недостаточно прав для выполнения операции */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ContentTypeController_importExcel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Excel файл */
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["FileUploadDto"];
+            };
+        };
+        responses: {
+            /** @description Данные успешно импортированы */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Ошибка валидации (неверный формат данных) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "statusCode": 404,
+                     *       "error": "Not Found",
+                     *       "message": "Record not found",
+                     *       "timestamp": "2024-03-31T...",
+                     *       "path": "/api/genres/1",
+                     *       "method": "GET"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AwardCategoryController_sendProgress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Стрим событий прогресса */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** @example 50 */
+                            progress?: number;
+                            /** @example processing */
+                            status?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    AwardCategoryController_getInfinite: {
+        parameters: {
+            query?: {
+                /** @description Номер страницы */
+                page?: number;
+                /** @description Элементов на страницу */
+                limit?: number;
+                /** @description Поиск по названию категории */
+                name?: string;
+                keyword?: string;
+                /** @description ID родительской премии */
+                awardId?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Успешное получение списка */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description JWT токен невалиден или отсутствует */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AwardCategoryController_getWithPages: {
+        parameters: {
+            query?: {
+                /** @description Номер страницы */
+                page?: number;
+                /** @description Элементов на страницу */
+                limit?: number;
+                /** @description Поиск по названию категории */
+                name?: string;
+                keyword?: string;
+                /** @description ID родительской премии */
+                awardId?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CountriesPaginationResponseDto"];
+                };
+            };
+            /** @description Запись с указанным ID не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AwardCategoryController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["IdParamDto"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Жанр найден */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetAwardCategoryByIdDto"];
+                };
+            };
+            /** @description Запись с указанным ID не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Внутренняя ошибка сервера (база данных недоступна или баг в коде) */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AwardCategoryController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Запись о стране успешно удалена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AwardCategoryController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["IdParamDto"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateAwardCategoryDto"];
+            };
+        };
+        responses: {
+            /** @description Страна успешно обновлена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UpdateAwardCategoryDto"];
+                };
+            };
+            /** @description Ошибка валидации (неверный формат данных) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "statusCode": 404,
+                     *       "error": "Not Found",
+                     *       "message": "Genre not found",
+                     *       "timestamp": "2024-03-31T...",
+                     *       "path": "/api/genres/1",
+                     *       "method": "GET"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AwardCategoryController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAwardCategoryDto"];
+            };
+        };
+        responses: {
+            /** @description Страна успешно добавлена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateAwardCategoryDto"];
+                };
+            };
+            /** @description Ошибка валидации (неверный формат данных) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "statusCode": 404,
+                     *       "error": "Not Found",
+                     *       "message": "Genre not found",
+                     *       "timestamp": "2024-03-31T...",
+                     *       "path": "/api/genres/1",
+                     *       "method": "GET"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description JWT токен невалиден или отсутствует */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Недостаточно прав для выполнения операции */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AwardCategoryController_importExcel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Excel файл */
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["FileUploadDto"];
+            };
+        };
+        responses: {
+            /** @description Данные успешно импортированы */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Ошибка валидации (неверный формат данных) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "statusCode": 404,
+                     *       "error": "Not Found",
+                     *       "message": "Genre not found",
+                     *       "timestamp": "2024-03-31T...",
+                     *       "path": "/api/genres/1",
+                     *       "method": "GET"
+                     *     }
+                     */
                     "application/json": components["schemas"]["ErrorResponseDto"];
                 };
             };

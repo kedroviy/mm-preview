@@ -16,16 +16,14 @@ export async function AuthController_login(body: any) {
 
 
 /**
- * Refresh access token
- * Generates a new access token using a valid refresh token. Refresh token is read from HTTP-only cookie (refresh_token). If cookie is not available, token can be provided in request body (for testing only).
- * @param body - Request body
+ * POST /api/v1/auth/refresh
  * @returns any
  */
-export async function AuthController_refreshToken(body: any) {
+export async function AuthController_refreshToken() {
   const url = `/api/v1/auth/refresh`;
   const fullUrl = url;
   
-  const response = await api.post<any>(url, body);
+  const response = await api.post<any>(url);
   return response;
 }
 
@@ -40,5 +38,20 @@ export async function AuthController_logout() {
   const fullUrl = url;
   
   const response = await api.post<any>(url);
+  return response;
+}
+
+
+/**
+ * Admin login by email
+ * Authenticates admin and sets JWT tokens in secure cookies.
+ * @param body - Request body
+ * @returns any
+ */
+export async function AuthController_adminLogin(body: any) {
+  const url = `/api/v1/auth/admin/login`;
+  const fullUrl = url;
+  
+  const response = await api.post<any>(url, body);
   return response;
 }

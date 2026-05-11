@@ -2,7 +2,7 @@
 import * as v from "valibot";
 
 export const loginDtoSchema = v.object({
-  name: v.pipe(v.string(), v.minLength(1)),
+  name: v.string(),
 });
 export type LoginDto = v.InferOutput<typeof loginDtoSchema>;
 
@@ -22,13 +22,11 @@ export const errorResponseDtoSchema = v.object({
 });
 export type ErrorResponseDto = v.InferOutput<typeof errorResponseDtoSchema>;
 
-export const refreshTokenDtoSchema = v.object({
-  refreshToken: v.optional(v.string()),
+export const adminLoginDtoSchema = v.object({
+  email: v.string(),
+  password: v.string(),
 });
-export type RefreshTokenDto = v.InferOutput<typeof refreshTokenDtoSchema>;
-
-export const authResponseDtoSchema = v.object({});
-export type AuthResponseDto = v.InferOutput<typeof authResponseDtoSchema>;
+export type AdminLoginDto = v.InferOutput<typeof adminLoginDtoSchema>;
 
 export const createRedisUserDtoSchema = v.object({
   name: v.optional(v.pipe(v.string(), v.minLength(1), v.maxLength(100))),
@@ -40,7 +38,7 @@ export const redisUserResponseDtoSchema = v.object({
   userId: v.string(),
   name: v.string(),
   lastActive: v.number(),
-  role: v.picklist(["user", "admin"]),
+  role: v.picklist(["USER", "ADMIN"]),
   recentRooms: v.optional(v.array(v.string())),
 });
 export type RedisUserResponseDto = v.InferOutput<typeof redisUserResponseDtoSchema>;
@@ -73,6 +71,18 @@ export const userProfileResponseDtoSchema = v.object({
 });
 export type UserProfileResponseDto = v.InferOutput<typeof userProfileResponseDtoSchema>;
 
+export const userResponseDtoSchema = v.object({
+  id: v.string(),
+  email: v.object({}),
+  name: v.object({}),
+  role: v.picklist(["USER", "ADMIN"]),
+  avatarUrl: v.optional(v.object({})),
+  createdAt: v.string(),
+  updatedAt: v.string(),
+  lastActive: v.number(),
+});
+export type UserResponseDto = v.InferOutput<typeof userResponseDtoSchema>;
+
 export const createRoomDtoSchema = v.object({
   name: v.optional(v.string()),
 });
@@ -92,6 +102,211 @@ export const roomMembersResponseDtoSchema = v.object({
 })),
 });
 export type RoomMembersResponseDto = v.InferOutput<typeof roomMembersResponseDtoSchema>;
+
+export const createGenreDtoSchema = v.object({
+  name: v.string(),
+  slug: v.string(),
+  description: v.optional(v.string()),
+  keywords: v.optional(v.array(v.string())),
+});
+export type CreateGenreDto = v.InferOutput<typeof createGenreDtoSchema>;
+
+export const genrePaginationResponseDtoSchema = v.object({
+  data: v.array(createGenreDtoSchema),
+  totalItems: v.number(),
+  totalPages: v.number(),
+  page: v.number(),
+  limit: v.number(),
+});
+export type GenrePaginationResponseDto = v.InferOutput<typeof genrePaginationResponseDtoSchema>;
+
+export const idParamDtoSchema = v.object({
+  id: v.number(),
+});
+export type IdParamDto = v.InferOutput<typeof idParamDtoSchema>;
+
+export const getGenreByIdDtoSchema = v.object({
+  id: v.number(),
+  name: v.string(),
+  slug: v.string(),
+  createdAt: v.string(),
+});
+export type GetGenreByIdDto = v.InferOutput<typeof getGenreByIdDtoSchema>;
+
+export const updateGenreDtoSchema = v.object({
+  name: v.optional(v.string()),
+  slug: v.optional(v.string()),
+  description: v.optional(v.string()),
+  keywords: v.optional(v.array(v.string())),
+});
+export type UpdateGenreDto = v.InferOutput<typeof updateGenreDtoSchema>;
+
+export const fileUploadDtoSchema = v.object({
+  file: v.string(),
+});
+export type FileUploadDto = v.InferOutput<typeof fileUploadDtoSchema>;
+
+export const createCountryDtoSchema = v.object({
+  name: v.string(),
+  slug: v.string(),
+  description: v.optional(v.string()),
+  keywords: v.optional(v.array(v.string())),
+});
+export type CreateCountryDto = v.InferOutput<typeof createCountryDtoSchema>;
+
+export const countriesPaginationResponseDtoSchema = v.object({
+  data: v.array(createCountryDtoSchema),
+  totalItems: v.number(),
+  totalPages: v.number(),
+  page: v.number(),
+  limit: v.number(),
+});
+export type CountriesPaginationResponseDto = v.InferOutput<typeof countriesPaginationResponseDtoSchema>;
+
+export const getCountryByIdDtoSchema = v.object({
+  id: v.number(),
+  name: v.string(),
+  slug: v.string(),
+  createdAt: v.string(),
+});
+export type GetCountryByIdDto = v.InferOutput<typeof getCountryByIdDtoSchema>;
+
+export const updateCountryDtoSchema = v.object({
+  name: v.optional(v.string()),
+  slug: v.optional(v.string()),
+  description: v.optional(v.string()),
+  keywords: v.optional(v.array(v.string())),
+});
+export type UpdateCountryDto = v.InferOutput<typeof updateCountryDtoSchema>;
+
+export const createAgeRatingDtoSchema = v.object({
+  name: v.string(),
+  slug: v.string(),
+  description: v.optional(v.string()),
+  keywords: v.optional(v.array(v.string())),
+});
+export type CreateAgeRatingDto = v.InferOutput<typeof createAgeRatingDtoSchema>;
+
+export const ageRatingPaginationResponseDtoSchema = v.object({
+  data: v.array(createAgeRatingDtoSchema),
+  totalItems: v.number(),
+  totalPages: v.number(),
+  page: v.number(),
+  limit: v.number(),
+});
+export type AgeRatingPaginationResponseDto = v.InferOutput<typeof ageRatingPaginationResponseDtoSchema>;
+
+export const getAgeRatingByIdDtoSchema = v.object({
+  id: v.number(),
+  name: v.string(),
+  slug: v.string(),
+  createdAt: v.string(),
+});
+export type GetAgeRatingByIdDto = v.InferOutput<typeof getAgeRatingByIdDtoSchema>;
+
+export const updateAgeRatingDtoSchema = v.object({
+  name: v.optional(v.string()),
+  slug: v.optional(v.string()),
+  description: v.optional(v.string()),
+  keywords: v.optional(v.array(v.string())),
+});
+export type UpdateAgeRatingDto = v.InferOutput<typeof updateAgeRatingDtoSchema>;
+
+export const createAwardDtoSchema = v.object({
+  name: v.string(),
+  slug: v.string(),
+  description: v.optional(v.string()),
+  keywords: v.optional(v.array(v.string())),
+});
+export type CreateAwardDto = v.InferOutput<typeof createAwardDtoSchema>;
+
+export const awardPaginationResponseDtoSchema = v.object({
+  data: v.array(createAwardDtoSchema),
+  totalItems: v.number(),
+  totalPages: v.number(),
+  page: v.number(),
+  limit: v.number(),
+});
+export type AwardPaginationResponseDto = v.InferOutput<typeof awardPaginationResponseDtoSchema>;
+
+export const getAwardByIdDtoSchema = v.object({
+  id: v.number(),
+  name: v.string(),
+  slug: v.string(),
+  createdAt: v.string(),
+});
+export type GetAwardByIdDto = v.InferOutput<typeof getAwardByIdDtoSchema>;
+
+export const updateAwardDtoSchema = v.object({
+  name: v.optional(v.string()),
+  slug: v.optional(v.string()),
+  description: v.optional(v.string()),
+  keywords: v.optional(v.array(v.string())),
+});
+export type UpdateAwardDto = v.InferOutput<typeof updateAwardDtoSchema>;
+
+export const createContentTypeDtoSchema = v.object({
+  name: v.string(),
+  slug: v.string(),
+  description: v.optional(v.string()),
+  keywords: v.optional(v.array(v.string())),
+});
+export type CreateContentTypeDto = v.InferOutput<typeof createContentTypeDtoSchema>;
+
+export const contentTypePaginationResponseDtoSchema = v.object({
+  data: v.array(createContentTypeDtoSchema),
+  totalItems: v.number(),
+  totalPages: v.number(),
+  page: v.number(),
+  limit: v.number(),
+});
+export type ContentTypePaginationResponseDto = v.InferOutput<typeof contentTypePaginationResponseDtoSchema>;
+
+export const getContentTypeByIdDtoSchema = v.object({
+  id: v.number(),
+  name: v.string(),
+  slug: v.string(),
+  createdAt: v.string(),
+});
+export type GetContentTypeByIdDto = v.InferOutput<typeof getContentTypeByIdDtoSchema>;
+
+export const updateContentTypeDtoSchema = v.object({
+  name: v.optional(v.string()),
+  slug: v.optional(v.string()),
+  description: v.optional(v.string()),
+  keywords: v.optional(v.array(v.string())),
+});
+export type UpdateContentTypeDto = v.InferOutput<typeof updateContentTypeDtoSchema>;
+
+export const getAwardCategoryByIdDtoSchema = v.object({
+  id: v.number(),
+  name: v.string(),
+  slug: v.string(),
+  awardId: v.number(),
+  createdAt: v.string(),
+  updatedAt: v.string(),
+  description: v.optional(v.string()),
+  keywords: v.array(v.string()),
+});
+export type GetAwardCategoryByIdDto = v.InferOutput<typeof getAwardCategoryByIdDtoSchema>;
+
+export const createAwardCategoryDtoSchema = v.object({
+  name: v.string(),
+  slug: v.string(),
+  awardId: v.number(),
+  description: v.optional(v.string()),
+  keywords: v.optional(v.array(v.string())),
+});
+export type CreateAwardCategoryDto = v.InferOutput<typeof createAwardCategoryDtoSchema>;
+
+export const updateAwardCategoryDtoSchema = v.object({
+  name: v.optional(v.string()),
+  slug: v.optional(v.string()),
+  awardId: v.optional(v.number()),
+  description: v.optional(v.string()),
+  keywords: v.optional(v.array(v.string())),
+});
+export type UpdateAwardCategoryDto = v.InferOutput<typeof updateAwardCategoryDtoSchema>;
 
 export const usersController_updateNameBodySchema = v.object({
   name: v.pipe(v.string(), v.minLength(1), v.maxLength(100)),
@@ -132,3 +347,51 @@ export const roomsController_muteUserBodySchema = v.object({
   durationMinutes: v.picklist([1, 5, 10]),
 });
 export type RoomsController_muteUserBody = v.InferOutput<typeof roomsController_muteUserBodySchema>;
+
+export const genresController_sendProgressResponseSchema = v.object({
+  data: v.optional(v.object({
+  progress: v.optional(v.number()),
+  status: v.optional(v.string()),
+})),
+});
+export type GenresController_sendProgressResponse = v.InferOutput<typeof genresController_sendProgressResponseSchema>;
+
+export const countriesController_sendProgressResponseSchema = v.object({
+  data: v.optional(v.object({
+  progress: v.optional(v.number()),
+  status: v.optional(v.string()),
+})),
+});
+export type CountriesController_sendProgressResponse = v.InferOutput<typeof countriesController_sendProgressResponseSchema>;
+
+export const ageRatingController_sendProgressResponseSchema = v.object({
+  data: v.optional(v.object({
+  progress: v.optional(v.number()),
+  status: v.optional(v.string()),
+})),
+});
+export type AgeRatingController_sendProgressResponse = v.InferOutput<typeof ageRatingController_sendProgressResponseSchema>;
+
+export const awardsController_sendProgressResponseSchema = v.object({
+  data: v.optional(v.object({
+  progress: v.optional(v.number()),
+  status: v.optional(v.string()),
+})),
+});
+export type AwardsController_sendProgressResponse = v.InferOutput<typeof awardsController_sendProgressResponseSchema>;
+
+export const contentTypeController_sendProgressResponseSchema = v.object({
+  data: v.optional(v.object({
+  progress: v.optional(v.number()),
+  status: v.optional(v.string()),
+})),
+});
+export type ContentTypeController_sendProgressResponse = v.InferOutput<typeof contentTypeController_sendProgressResponseSchema>;
+
+export const awardCategoryController_sendProgressResponseSchema = v.object({
+  data: v.optional(v.object({
+  progress: v.optional(v.number()),
+  status: v.optional(v.string()),
+})),
+});
+export type AwardCategoryController_sendProgressResponse = v.InferOutput<typeof awardCategoryController_sendProgressResponseSchema>;
