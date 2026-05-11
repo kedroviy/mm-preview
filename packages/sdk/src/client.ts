@@ -12,8 +12,6 @@ class ApiClient {
     timeout?: number;
     headers?: HeadersInit;
   }) {
-    // Используем утилиту для определения правильного URL
-    // В продакшене с прокси вернет /api, иначе прямой URL
     this.baseURL = config?.baseURL || getClientApiUrl();
     this.timeout = config?.timeout || 30000;
     this.defaultHeaders = {
@@ -23,12 +21,7 @@ class ApiClient {
   }
 
   private buildURL(url: string, params?: RequestConfig["params"]): string {
-    // Если baseURL заканчивается на /api/v1, а url начинается с /api/v1, убираем дублирование
-    let base = this.baseURL;
-    if (base.endsWith("/api/v1") && url.startsWith("/api/v1")) {
-      base = base.replace(/\/api\/v1\/?$/, "");
-    }
-
+    const base = this.baseURL;
     const fullURL = url.startsWith("http") ? url : `${base}${url}`;
 
     if (!params || Object.keys(params).length === 0) {

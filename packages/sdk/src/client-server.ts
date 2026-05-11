@@ -20,11 +20,7 @@ class ServerApiClient implements Client {
   }
 
   private buildURL(url: string, params?: RequestConfig["params"]): string {
-    let base = this.baseURL;
-    if (base.endsWith("/api/v1") && url.startsWith("/api/v1")) {
-      base = base.replace(/\/api\/v1\/?$/, "");
-    }
-
+    const base = this.baseURL;
     const fullURL = url.startsWith("http") ? url : `${base}${url}`;
 
     if (!params || Object.keys(params).length === 0) {

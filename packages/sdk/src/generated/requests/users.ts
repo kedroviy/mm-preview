@@ -1,94 +1,58 @@
-import { api } from '../../client';
+import { api } from "../../client";
 
-/**
- * Create a new user
- * Creates a new user in PostgreSQL and sets JWT token in cookie. If userId is not provided, a new UUID will be generated.
- * @param body - Request body
- * @returns any
- */
-export async function UsersController_createUser(body: any) {
-  const url = `/api/v1/users`;
-  const fullUrl = url;
-  
-  const response = await api.post<any>(url, body);
+/** movie-match: POST /auth/register */
+export async function UsersController_createUser(body: {
+  email: string;
+  password: string;
+}) {
+  const url = `/auth/register`;
+  const response = await api.post<{ message: string }>(url, body);
   return response;
 }
 
-
-/**
- * Get current user profile
- * Retrieves the profile of the authenticated user (userId from JWT token) with their rooms. Requires authentication.
- * @returns any
- */
+/** movie-match: GET /user/me */
 export async function UsersController_getProfile() {
-  const url = `/api/v1/users/profile`;
-  const fullUrl = url;
-  
-  const response = await api.get<any>(url);
+  const url = `/user/me`;
+  const response = await api.get<{
+    id: number;
+    email: string;
+    username: string;
+  }>(url);
   return response;
 }
 
-
-/**
- * Get all user by params (admin only)
- * Retrieves all users by params. Requires authentication. Only admins can view other users' data.
- * @param params - Request parameters
- * @returns any[]
- */
-export async function UsersController_getAllUsers(params?: { id?: any, name?: any }) {
-  const url = `/api/v1/users/all`;
-  const searchParams = new URLSearchParams();
-  if (params?.id !== undefined) searchParams.append('id', String(params.id));
-  if (params?.name !== undefined) searchParams.append('name', String(params.name));
-  const queryString = searchParams.toString();
-  const fullUrl = queryString ? `${url}?${queryString}` : url;
-  
-  const response = await api.get<any[]>(fullUrl);
-  return response;
+export async function UsersController_getAllUsers(_params?: {
+  id?: unknown;
+  name?: unknown;
+}) {
+  throw new Error(
+    "UsersController_getAllUsers is not available on movie-match backend",
+  );
 }
 
-
-/**
- * Get user by ID (admin only)
- * Retrieves a user by their userId (UUID). Requires authentication. Only admins can view other users' data.
- * @param params - Request parameters
- * @returns any
- */
-export async function UsersController_getUser(path: { userId: string }) {
-  const url = `/api/v1/users/${path.userId}`;
-  const fullUrl = url;
-  
-  const response = await api.get<any>(url);
-  return response;
+export async function UsersController_getUser(_path: { userId: string }) {
+  throw new Error(
+    "UsersController_getUser is not available on movie-match backend",
+  );
 }
 
-
-/**
- * Delete user
- * Deletes a user by their userId (UUID). Requires authentication. Users can only delete themselves unless they are admin.
- * @param params - Request parameters
- * @returns any
- */
+/** movie-match: DELETE /user/:email */
 export async function UsersController_deleteUser(path: { userId: string }) {
-  const url = `/api/v1/users/${path.userId}`;
-  const fullUrl = url;
-  
-  const response = await api.delete<any>(url);
+  const email = encodeURIComponent(path.userId);
+  const url = `/user/${email}`;
+  const response = await api.delete<{ message: string }>(url);
   return response;
 }
 
-
-/**
- * Update user name
- * Updates the name of an existing user. Requires authentication. Users can only update their own name unless they are admin.
- * @param params - Request parameters
- * @param body - Request body
- * @returns any
- */
-export async function UsersController_updateName(path: { userId: string }, body: any) {
-  const url = `/api/v1/users/${path.userId}/name`;
-  const fullUrl = url;
-  
-  const response = await api.patch<any>(url, body);
+/** movie-match: PATCH /user/update-username */
+export async function UsersController_updateName(
+  path: { userId: string },
+  body: { newUsername: string },
+) {
+  const url = `/user/update-username`;
+  const response = await api.patch(url, {
+    userId: path.userId,
+    newUsername: body.newUsername,
+  });
   return response;
 }

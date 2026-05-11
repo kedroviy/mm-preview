@@ -32,10 +32,6 @@ const nextConfig: NextConfig = {
     const backendUrl =
       process.env.BACKEND_URL || "https://movie-api.moviematch.space";
     return [
-      {
-        source: "/api/v1/:path*",
-        destination: `${backendUrl}/api/v1/:path*`,
-      },
       // WebSocket rewrites (для локальной разработки)
       // Внимание: Vercel не поддерживает WebSocket через rewrites
       // В продакшене WebSocket должен использовать прямой URL к бэкенду

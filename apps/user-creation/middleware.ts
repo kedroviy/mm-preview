@@ -54,8 +54,16 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const { decodeJWT, getServerApiUrl } = await import("@mm-preview/sdk");
-  const apiUrl = getServerApiUrl();
+  const { decodeJWT } = await import("@mm-preview/sdk");
+
+  // When frontend and backend are on the same domain, prefer the current origin
+  // (still allow explicit NEXT_PUBLIC_API_URL if it exists).
+  const apiBase =
+    typeof process !== "undefined" &&
+    typeof process.env !== "undefined" &&
+    process.env.NEXT_PUBLIC_API_URL
+      ? process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "")
+      : request.nextUrl.origin;
 
   // 3. Сценарий: Есть валидный Access Token — сразу редирект
   if (accessToken) {
@@ -71,50 +79,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 4. Сценарий: Access нет, но есть Refresh — пробуем обновить
-  if (refreshToken) {
-    try {
-      const refreshResponse = await fetch(`${apiUrl}/auth/refresh`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Cookie: `refresh_token=${refreshToken}`,
-        },
-        // Важно: в Middleware fetch не пробрасывает куки автоматически
-      });
-
-      if (refreshResponse.ok) {
-        // Извлекаем Set-Cookie от бэкенда
-        const setCookies = refreshResponse.headers.getSetCookie();
-        const newAccess = setCookies
-          .find((c) => c.includes("access_token="))
-          ?.match(/access_token=([^;]+)/)?.[1];
-
-        if (newAccess) {
-          const decoded = decodeJWT(newAccess);
-          const userId =
-            decoded?.sub ?? decoded?.userId ?? decoded?.id ?? undefined;
-
-          if (userId !== undefined && userId !== null && `${userId}`.length > 0) {
-            const dashboardUrl = getDashboardUrl(request);
-            const response = NextResponse.redirect(
-              new URL(`${dashboardUrl}/${userId}`, request.url),
-            );
-
-            // ПЕРЕНОСИМ КУКИ: Чтобы браузер получил новые токены,
-            // нужно скопировать Set-Cookie из ответа бэкенда в ответ Middleware
-            setCookies.forEach((cookie) => {
-              response.headers.append("Set-Cookie", cookie);
-            });
-
-            return response;
-          }
-        }
-      }
-    } catch (e) {
-      console.error("[Middleware] Refresh error:", e);
-    }
-  }
+  // 4. movie-match has no refresh-token flow; ignore orphan refresh cookies.
 
   // 5. Если мы здесь — токены были, но они битые. Чистим и показываем форму.
   const response = NextResponse.next();

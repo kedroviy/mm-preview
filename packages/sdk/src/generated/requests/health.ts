@@ -1,26 +1,12 @@
-import { api } from '../../client';
+import type { ApiResponse } from "../../types";
 
-/**
- * Health check endpoint
- * @returns any
- */
-export async function AppController_getHello() {
-  const url = `/api/v1`;
-  const fullUrl = url;
-  
-  const response = await api.get<any>(url);
-  return response;
+/** Stubs — movie-match has no dedicated `/` or `/health` REST routes for this app. */
+export async function AppController_getHello(): Promise<ApiResponse<{ ok: true }>> {
+  return { data: { ok: true }, status: 200, statusText: "OK" };
 }
 
-
-/**
- * Health check for monitoring
- * @returns any
- */
-export async function AppController_healthCheck() {
-  const url = `/api/v1/health`;
-  const fullUrl = url;
-  
-  const response = await api.get<any>(url);
-  return response;
+export async function AppController_healthCheck(): Promise<
+  ApiResponse<{ ok: true }>
+> {
+  return AppController_getHello();
 }

@@ -1,13 +1,6 @@
 /**
- * Утилита для определения правильного API URL
- *
- * В продакшене (Vercel):
- * - Клиентские запросы используют /api (проксируется через Vercel rewrites)
- * - Серверные запросы (middleware, server components) используют прямой URL
- * - WebSocket использует прямой URL (не может быть проксирован)
- *
- * В разработке:
- * - Все запросы используют NEXT_PUBLIC_API_URL или localhost
+ * Базовый URL для movie-match (Nest): без префикса `/api/v1`.
+ * Задаётся `NEXT_PUBLIC_API_URL` / `BACKEND_URL` / `API_URL` или дефолт для dev.
  */
 
 /**
@@ -21,20 +14,8 @@ export function getClientApiUrl(): string {
   const publicApiUrl = process.env.NEXT_PUBLIC_API_URL;
   const isProduction = process.env.NODE_ENV === "production";
 
-  // Прокси используем ТОЛЬКО когда это явно указано.
-  // В Vercel/Next "production" может быть без rewrites для /auth/* и т.п.,
-  // поэтому безопаснее по умолчанию ходить на полный backend URL.
-  const useProxy =
-    process.env.NEXT_PUBLIC_USE_API_PROXY === "true" ||
-    (publicApiUrl ? publicApiUrl.startsWith("/") : false);
-
-  if (useProxy) {
-    // При прокси возвращаем пустую строку, чтобы запросы были относительными к домену
-    return "";
-  }
-
-  // В продакшене по умолчанию используем реальный API домен.
-  // В деве — localhost, если переменная не задана.
+  // No proxy mode: always return a real API base (or the provided one).
+  // This avoids sending requests to the frontend host by mistake (404 on /auth/*).
   const apiUrl =
     publicApiUrl ||
     (isProduction ? "https://movie-api.moviematch.space" : "http://localhost:4000");
@@ -80,8 +61,12 @@ export function getWebSocketRoomsUrl(): string {
   let baseUrl: string;
   
   if (isProduction) {
-    // В продакшене отдаем приоритет BACKEND_URL, но если его нет — фиксированному адресу
-    baseUrl = process.env.BACKEND_URL || "https://movie-api.moviematch.space";
+    const publicApiUrl = process.env.NEXT_PUBLIC_API_URL;
+    baseUrl =
+      process.env.BACKEND_URL ||
+      (publicApiUrl && !publicApiUrl.startsWith("/")
+        ? publicApiUrl.replace(/\/api\/v1\/?$/, "")
+        : "https://movie-api.moviematch.space");
   } else {
     const publicApiUrl = process.env.NEXT_PUBLIC_API_URL;
     baseUrl = publicApiUrl && !publicApiUrl.startsWith("/")

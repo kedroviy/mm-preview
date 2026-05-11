@@ -1,30 +1,27 @@
 import { api } from "../client";
+import type { ApiResponse } from "../types";
 
 export interface LoginRequest {
-  name: string;
+  email: string;
+  password: string;
 }
 
 export interface LoginResponse {
-  userId: string;
-  name: string;
+  token: string;
 }
 
 export const authApi = {
   /**
-   * Login by name: POST /api/v1/auth/login -> { userId, name }
-   *
-   * Backend sets JWT tokens in HTTP-only cookies.
+   * movie-match: POST /auth/login → `{ token }`
    */
   login: async (data: LoginRequest) => {
-    return api.post<LoginResponse>("/api/v1/auth/login", data);
+    return api.post<LoginResponse>("/auth/login", data);
   },
 
   /**
-   * Logout: POST /api/v1/auth/logout
-   *
-   * Clears auth cookies on the backend.
+   * movie-match has no logout endpoint; tokens are cleared client-side.
    */
-  logout: async () => {
-    return api.post<void>("/api/v1/auth/logout");
+  logout: async (): Promise<ApiResponse<void>> => {
+    return { data: undefined, status: 204, statusText: "No Content" };
   },
 };

@@ -14,6 +14,18 @@ function canUseStorage(): boolean {
 }
 
 export function getCookie(_name: string): string | null {
+  if (typeof document === "undefined") return null;
+
+  // document.cookie format: "k1=v1; k2=v2; ..."
+  const cookies = document.cookie.split(";").map((c) => c.trim());
+  for (const cookie of cookies) {
+    const [key, ...rest] = cookie.split("=");
+    if (key === _name) {
+      const value = rest.join("=");
+      return value ? decodeURIComponent(value) : "";
+    }
+  }
+
   return null;
 }
 
@@ -49,7 +61,13 @@ export function getAccessToken(): string | null {
   try {
     const token = localStorage.getItem(ACCESS_TOKEN_KEY);
     if (token) inMemoryAccessToken = token;
-    return token;
+    if (token) return token;
+
+    // Fallback for cross-subdomain navigation:
+    // `user-creation` stores JWT in `access_token` cookie.
+    const cookieToken = getCookie("access_token");
+    if (cookieToken) inMemoryAccessToken = cookieToken;
+    return cookieToken;
   } catch {
     return null;
   }

@@ -2,15 +2,28 @@
 import * as v from "valibot";
 
 export const loginDtoSchema = v.object({
-  name: v.string(),
+  email: v.string(),
+  password: v.string(),
 });
 export type LoginDto = v.InferOutput<typeof loginDtoSchema>;
 
+/** movie-match POST /auth/login returns `{ token: string }` */
 export const loginResponseDtoSchema = v.object({
-  userId: v.string(),
-  name: v.string(),
+  token: v.string(),
 });
 export type LoginResponseDto = v.InferOutput<typeof loginResponseDtoSchema>;
+
+/** movie-match POST /auth/register */
+export const registerUserDtoSchema = v.object({
+  email: v.string(),
+  password: v.string(),
+});
+export type RegisterUserDto = v.InferOutput<typeof registerUserDtoSchema>;
+
+export const successMessageDtoSchema = v.object({
+  message: v.string(),
+});
+export type SuccessMessageDto = v.InferOutput<typeof successMessageDtoSchema>;
 
 export const errorResponseDtoSchema = v.object({
   statusCode: v.number(),
@@ -67,7 +80,8 @@ export const userProfileResponseDtoSchema = v.object({
   role: v.optional(v.picklist(["user", "admin"])),
   lastActive: v.optional(v.number()),
   recentRooms: v.optional(v.array(v.string())),
-  rooms: v.array(roomResponseDtoSchema),
+  /** Filled when using Redis API; movie-match `/user/me` has no rooms — use `[]`. */
+  rooms: v.optional(v.array(roomResponseDtoSchema)),
 });
 export type UserProfileResponseDto = v.InferOutput<typeof userProfileResponseDtoSchema>;
 
@@ -309,7 +323,7 @@ export const updateAwardCategoryDtoSchema = v.object({
 export type UpdateAwardCategoryDto = v.InferOutput<typeof updateAwardCategoryDtoSchema>;
 
 export const usersController_updateNameBodySchema = v.object({
-  name: v.pipe(v.string(), v.minLength(1), v.maxLength(100)),
+  newUsername: v.pipe(v.string(), v.minLength(1), v.maxLength(100)),
 });
 export type UsersController_updateNameBody = v.InferOutput<typeof usersController_updateNameBodySchema>;
 

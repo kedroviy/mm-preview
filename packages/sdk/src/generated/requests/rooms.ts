@@ -1,167 +1,64 @@
-import { api } from '../../client';
-
-/**
- * Create a new room
- * Creates a new room with a unique 6-digit public code and broadcasts the event via WebSocket. Requires authentication.
- * @param body - Request body
- * @returns any
- */
-export async function RoomsController_createRoom(body: any) {
-  const url = `/api/v1/rooms`;
-  const fullUrl = url;
-  
-  const response = await api.post<any>(url, body);
-  return response;
+function notSupported(name: string): never {
+  throw new Error(
+    `${name} is not wired to movie-match; use roomsApi from @mm-preview/sdk`,
+  );
 }
 
+export async function RoomsController_createRoom(_body: unknown) {
+  return notSupported("RoomsController_createRoom");
+}
 
-/**
- * Get current user rooms
- * Retrieves all rooms where the current user is a member. Requires authentication.
- * @returns any[]
- */
 export async function RoomsController_getMyRooms() {
-  const url = `/api/v1/rooms/my-rooms`;
-  const fullUrl = url;
-  
-  const response = await api.get<any[]>(url);
-  return response;
+  return notSupported("RoomsController_getMyRooms");
 }
 
-
-/**
- * Get room by ID
- * Retrieves room data by room ID. Requires authentication.
- * @param params - Request parameters
- * @returns any
- */
-export async function RoomsController_getRoom(path: { id: string }) {
-  const url = `/api/v1/rooms/${path.id}`;
-  const fullUrl = url;
-  
-  const response = await api.get<any>(url);
-  return response;
+export async function RoomsController_getRoom(_path: { id: string }) {
+  return notSupported("RoomsController_getRoom");
 }
 
-
-/**
- * Join a room by public code
- * Adds a user to a room using 6-digit public code and broadcasts the update via WebSocket. Requires authentication.
- * @param body - Request body
- * @returns any
- */
-export async function RoomsController_joinRoom(body: any) {
-  const url = `/api/v1/rooms/join`;
-  const fullUrl = url;
-  
-  const response = await api.post<any>(url, body);
-  return response;
+export async function RoomsController_joinRoom(_body: unknown) {
+  return notSupported("RoomsController_joinRoom");
 }
 
-
-/**
- * Leave a room
- * Removes a user from a room and broadcasts the update via WebSocket. Requires authentication.
- * @param params - Request parameters
- * @param body - Request body
- * @returns any
- */
-export async function RoomsController_leaveRoom(path: { id: string }, body: any) {
-  const url = `/api/v1/rooms/${path.id}/leave`;
-  const fullUrl = url;
-  
-  const response = await api.post<any>(url, body);
-  return response;
+export async function RoomsController_leaveRoom(
+  _path: { id: string },
+  _body: unknown,
+) {
+  return notSupported("RoomsController_leaveRoom");
 }
 
-
-/**
- * Choose a movie
- * Records a user's movie choice and broadcasts the update via WebSocket. Requires authentication.
- * @param params - Request parameters
- * @param body - Request body
- * @returns any
- */
-export async function RoomsController_chooseMovie(path: { id: string }, body: any) {
-  const url = `/api/v1/rooms/${path.id}/choice`;
-  const fullUrl = url;
-  
-  const response = await api.post<any>(url, body);
-  return response;
+export async function RoomsController_chooseMovie(
+  _path: { id: string },
+  _body: unknown,
+) {
+  return notSupported("RoomsController_chooseMovie");
 }
 
-
-/**
- * Get room members
- * Retrieves list of room members with their roles and names. Only room members can view this list. Requires authentication.
- * @param params - Request parameters
- * @returns any
- */
-export async function RoomsController_getRoomMembers(path: { id: string }) {
-  const url = `/api/v1/rooms/${path.id}/members`;
-  const fullUrl = url;
-  
-  const response = await api.get<any>(url);
-  return response;
+export async function RoomsController_getRoomMembers(_path: { id: string }) {
+  return notSupported("RoomsController_getRoomMembers");
 }
 
-
-/**
- * Remove user from room
- * Removes a user from the room. Only the room creator can remove users. Requires authentication.
- * @param params - Request parameters
- * @returns any
- */
-export async function RoomsController_removeUserFromRoom(path: { id: string, userId: string }) {
-  const url = `/api/v1/rooms/${path.id}/members/${path.userId}`;
-  const fullUrl = url;
-  
-  const response = await api.delete<any>(url);
-  return response;
+export async function RoomsController_removeUserFromRoom(_path: {
+  id: string;
+  userId: string;
+}) {
+  return notSupported("RoomsController_removeUserFromRoom");
 }
 
-
-/**
- * Get chat history (WebSocket recommended)
- * Retrieves chat history for a room. Note: Chat history is automatically sent via WebSocket when joining a room. This HTTP endpoint is provided for reference. Requires authentication and room membership.
- * @param params - Request parameters
- * @returns any
- */
-export async function RoomsController_getChatHistory(path: { id: string }) {
-  const url = `/api/v1/rooms/${path.id}/chat/history`;
-  const fullUrl = url;
-  
-  const response = await api.get<any>(url);
-  return response;
+export async function RoomsController_getChatHistory(_path: { id: string }) {
+  return notSupported("RoomsController_getChatHistory");
 }
 
-
-/**
- * Mute a user in room chat
- * Mutes a user in the room chat for specified duration (1, 5, or 10 minutes). Only the room creator can mute users. Requires authentication.
- * @param params - Request parameters
- * @param body - Request body
- * @returns any
- */
-export async function RoomsController_muteUser(path: { id: string, userId: string }, body: any) {
-  const url = `/api/v1/rooms/${path.id}/members/${path.userId}/mute`;
-  const fullUrl = url;
-  
-  const response = await api.post<any>(url, body);
-  return response;
+export async function RoomsController_muteUser(
+  _path: { id: string; userId: string },
+  _body: unknown,
+) {
+  return notSupported("RoomsController_muteUser");
 }
 
-
-/**
- * Unmute a user in room chat
- * Removes mute from a user in the room chat. Only the room creator can unmute users. Requires authentication.
- * @param params - Request parameters
- * @returns any
- */
-export async function RoomsController_unmuteUser(path: { id: string, userId: string }) {
-  const url = `/api/v1/rooms/${path.id}/members/${path.userId}/mute`;
-  const fullUrl = url;
-  
-  const response = await api.delete<any>(url);
-  return response;
+export async function RoomsController_unmuteUser(_path: {
+  id: string;
+  userId: string;
+}) {
+  return notSupported("RoomsController_unmuteUser");
 }
