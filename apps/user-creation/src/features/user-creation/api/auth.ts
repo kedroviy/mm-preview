@@ -59,9 +59,13 @@ function parseErrorMessage(payload?: AuthErrorResponse): string {
 }
 
 async function postAuth<T>(path: string, payload: unknown): Promise<T> {
+  // movie-match auth endpoints return JSON only (no Set-Cookie). Using
+  // credentials: "include" forces credentialed CORS: ACAO cannot be "*",
+  // which breaks with Nest's default `origin: '*'` until the API sets
+  // explicit origins + credentials: true.
   const response = await fetch(getAuthUrl(path), {
     method: "POST",
-    credentials: "include",
+    credentials: "omit",
     headers: {
       "Content-Type": "application/json",
     },
