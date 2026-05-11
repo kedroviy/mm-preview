@@ -27,10 +27,10 @@ describe("getServerApiUrl", () => {
     expect(getServerApiUrl()).toBe("https://api.example.com");
   });
 
-  it("strips trailing /api/v1 from NEXT_PUBLIC_API_URL", () => {
+  it("uses NEXT_PUBLIC_API_URL as-is (trailing slash trimmed only)", () => {
     delete process.env.BACKEND_URL;
     process.env.NEXT_PUBLIC_API_URL = "https://host.test/api/v1/";
-    expect(getServerApiUrl()).toBe("https://host.test");
+    expect(getServerApiUrl()).toBe("https://host.test/api/v1");
   });
 
   it("falls back to API_URL or localhost", () => {
@@ -44,17 +44,17 @@ describe("getServerApiUrl", () => {
 });
 
 describe("getClientApiUrl", () => {
-  it("returns empty string when proxy mode in production", () => {
+  it("returns default production API host when not using proxy", () => {
     process.env.NODE_ENV = "production";
     delete process.env.NEXT_PUBLIC_USE_API_PROXY;
     delete process.env.NEXT_PUBLIC_API_URL;
-    expect(getClientApiUrl()).toBe("");
+    expect(getClientApiUrl()).toBe("https://movie-api.moviematch.space");
   });
 
-  it("returns base without /api/v1 in dev", () => {
+  it("returns NEXT_PUBLIC_API_URL in dev (trailing slash trimmed)", () => {
     process.env.NODE_ENV = "development";
     process.env.NEXT_PUBLIC_API_URL = "http://localhost:4000/api/v1";
-    expect(getClientApiUrl()).toBe("http://localhost:4000");
+    expect(getClientApiUrl()).toBe("http://localhost:4000/api/v1");
   });
 });
 
