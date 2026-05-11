@@ -43,7 +43,7 @@ function createStubs() {
       '  UsersController_getProfile: () => [...usersKeys.all, "getProfile"] as const,',
       "};",
       "",
-      "export function useUsersController_getProfile(options?: UseQueryOptions<any>) {",
+      "export function useUsersController_getProfile(options?: Partial<UseQueryOptions<any>>) {",
       "  return useQuery({",
       "    queryKey: usersKeys.UsersController_getProfile(),",
       "    queryFn: async () => null,",

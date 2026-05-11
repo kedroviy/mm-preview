@@ -61,7 +61,7 @@ export function DashboardClient({
   useTokenRefresh();
 
   const queryResult = useUsersController_getProfile(
-    initialProfile ? ({ enabled: false } as { enabled: boolean }) : undefined,
+    initialProfile ? { enabled: false } : undefined,
   );
 
   type ProfileType = {

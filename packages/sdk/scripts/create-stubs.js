@@ -78,7 +78,7 @@ export {};
 import { useQuery, type UseQueryOptions, type UseQueryResult } from '@tanstack/react-query';
 
 export function useUsersController_getProfile(
-  options?: UseQueryOptions<unknown, Error, unknown, readonly unknown[]>
+  options?: Partial<UseQueryOptions<unknown, Error, unknown, readonly unknown[]>>
 ): UseQueryResult<unknown, Error> {
   return useQuery({
     queryKey: ['users', 'UsersController_getProfile', '__stub__'],
