@@ -131,6 +131,11 @@ export function UserCreationForm({ mode }: UserCreationFormProps) {
     window.location.href = `${dashboardUrl}/${userId}`;
   }, []);
 
+  const redirectToDashboardRoot = useCallback(() => {
+    const dashboardUrl = getAppUrls().DASHBOARD;
+    window.location.href = `${dashboardUrl}`;
+  }, []);
+
   const runLogin = async (email: string, password: string) => {
     const response = await loginMutation.mutateAsync({ email, password });
 
@@ -163,9 +168,10 @@ export function UserCreationForm({ mode }: UserCreationFormProps) {
       }
 
       notificationService.showSuccess(successMessage);
-      redirectToDashboard(userId);
+      // For Google auth we redirect to dashboard root (Google redirect URI whitelist expects this exact URL).
+      redirectToDashboardRoot();
     },
-    [redirectToDashboard, t],
+    [redirectToDashboardRoot, t],
   );
 
   const applyAuthError = useCallback(
