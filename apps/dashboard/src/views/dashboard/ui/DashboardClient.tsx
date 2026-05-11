@@ -56,12 +56,22 @@ export function DashboardClient({
   initialProfile,
 }: DashboardClientProps) {
   const [tab, setTab] = useState<DashboardTab>("discover");
+  /** Avoid running `/user/me` during SSR: no `document.cookie` / localStorage on the server. */
+  const [clientReady, setClientReady] = useState(false);
   const { navigate, isPending } = useViewTransition();
 
   useTokenRefresh();
 
+  useEffect(() => {
+    setClientReady(true);
+  }, []);
+
   const queryResult = useUsersController_getProfile(
-    initialProfile ? { enabled: false } : undefined,
+    initialProfile
+      ? { enabled: false }
+      : clientReady
+        ? undefined
+        : { enabled: false },
   );
 
   type ProfileType = {
@@ -77,7 +87,9 @@ export function DashboardClient({
     | ProfileType
     | null
     | undefined;
-  const isLoading = initialProfile ? false : queryResult.isLoading;
+  const isLoading = initialProfile
+    ? false
+    : !clientReady || queryResult.isPending;
   const error = initialProfile ? null : queryResult.error;
   const profileUserId = profile?.userId || userId;
 
