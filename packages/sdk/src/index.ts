@@ -1,5 +1,6 @@
 /** Runtime helpers */
 export { getClientApiUrl, getPublicApiBaseUrl } from "./runtime/public-api-url";
+export { decodeJWT, getCookieDomain } from "./runtime/token-utils";
 export {
 	createServerQueryClient,
 	defaultQueryClient,
