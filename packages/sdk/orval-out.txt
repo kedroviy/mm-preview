@@ -1,0 +1,32 @@
+
+> @mm-preview/sdk@0.1.0 generate
+> orval --config orval.config.js
+
+🍻 orval v7.13.2 - A swagger client generator for typescript
+movieApi: Cleaning output folder
+🛑 movieApi - TypeError: Cannot read properties of undefined (reading 'paths')
+    at getApiBuilder (c:\work\1\mm-preview\node_modules\orval\dist\generate-CUyLFvwS.js:210:96)
+    at importOpenApi (c:\work\1\mm-preview\node_modules\orval\dist\generate-CUyLFvwS.js:291:20)
+    at async generateSpec (c:\work\1\mm-preview\node_modules\orval\dist\generate-CUyLFvwS.js:1275:27)
+    at async generateSpecs (c:\work\1\mm-preview\node_modules\orval\dist\generate-CUyLFvwS.js:1298:4)
+    at async Object.generateConfig (c:\work\1\mm-preview\node_modules\orval\dist\generate-CUyLFvwS.js:1316:2)
+    at async Command.<anonymous> (c:\work\1\mm-preview\node_modules\orval\dist\bin\orval.js:46:9)
+    at async Command.parseAsync (c:\work\1\mm-preview\node_modules\orval\node_modules\commander\lib\command.js:1122:5)
+c:\work\1\mm-preview\node_modules\orval\dist\generate-CUyLFvwS.js:1304
+	if (hasErrors) throw new Error("One or more project failed, see above for details");
+	                     ^
+
+Error: One or more project failed, see above for details
+    at generateSpecs (c:\work\1\mm-preview\node_modules\orval\dist\generate-CUyLFvwS.js:1304:23)
+    at async Object.generateConfig (c:\work\1\mm-preview\node_modules\orval\dist\generate-CUyLFvwS.js:1316:2)
+    at async Command.<anonymous> (c:\work\1\mm-preview\node_modules\orval\dist\bin\orval.js:46:9)
+    at async Command.parseAsync (c:\work\1\mm-preview\node_modules\orval\node_modules\commander\lib\command.js:1122:5)
+
+Node.js v22.22.0
+npm error Lifecycle script `generate` failed with error:
+npm error code 1
+npm error path c:\work\1\mm-preview\packages\sdk
+npm error workspace @mm-preview/sdk@0.1.0
+npm error location c:\work\1\mm-preview\packages\sdk
+npm error command failed
+npm error command C:\Windows\system32\cmd.exe /d /s /c orval --config orval.config.js

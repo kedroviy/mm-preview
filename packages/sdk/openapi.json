@@ -1,0 +1,2389 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Something went wrong."
+          },
+          "409": {
+            "description": "User with this email or username already exists"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BearerToken"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Incorrect email or password."
+          },
+          "403": {
+            "description": "Exceeded the maximum attempts. Please try again in 59s."
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/verify-id-token": {
+      "post": {
+        "operationId": "AuthController_verifyIdToken",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BearerToken"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Something went wrong."
+          },
+          "404": {
+            "description": "invalid google token."
+          },
+          "409": {
+            "description": "User with this email already exists without google provider."
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/send-code-to-email": {
+      "post": {
+        "operationId": "AuthController_sendCode",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessage"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/verify-code": {
+      "post": {
+        "operationId": "AuthController_verifyCode",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Verification code not found or has expired or invalid"
+          },
+          "404": {
+            "description": "Verification code not found"
+          },
+          "409": {
+            "description": "User with this email not exists"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/change-password": {
+      "post": {
+        "operationId": "AuthController_changePassword",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessage"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/user/me": {
+      "get": {
+        "operationId": "UserController_getMe",
+        "parameters": [
+          {
+            "name": "userEmail",
+            "required": true,
+            "in": "query",
+            "description": "User Email",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User information successfully retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetMeType"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User is not found"
+          }
+        },
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/user/update-username": {
+      "patch": {
+        "operationId": "UserController_updateUsername",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Options for updating username",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUsernameDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "404": {
+            "description": "User is not found"
+          },
+          "500": {
+            "description": "Failed to update. Please try again later"
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/{email}": {
+      "delete": {
+        "operationId": "UserController_deleteUser",
+        "summary": "Delete a user account",
+        "parameters": [
+          {
+            "name": "email",
+            "required": true,
+            "in": "path",
+            "description": "User Email",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account successfully deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Account successfully deleted"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User is not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "User is not found"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while deleting the account"
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/match/like": {
+      "post": {
+        "operationId": "MatchController_likeMovie",
+        "summary": "Like a movie",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LikeMovieDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Movie liked successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        },
+        "tags": [
+          "Match"
+        ]
+      }
+    },
+    "/match/{roomKey}/user-status/{userId}": {
+      "get": {
+        "operationId": "MatchController_getUserStatus",
+        "summary": "Get User Status By User ID",
+        "parameters": [
+          {
+            "name": "roomKey",
+            "required": true,
+            "in": "path",
+            "description": "The key of the room to which the user belongs",
+            "example": "1234",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the user whose status is being queried",
+            "example": 5678,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User status retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "userId": 5678,
+                    "userStatus": "WAITING"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User status not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "statusCode": 404,
+                    "message": "User status not found",
+                    "error": "Not Found"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Match"
+        ]
+      }
+    },
+    "/match/user-status": {
+      "patch": {
+        "operationId": "MatchController_updateUserStatus",
+        "summary": "Update user status in a match",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Details to update user status",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserStatusDto"
+              },
+              "examples": {
+                "example1": {
+                  "summary": "Valid input",
+                  "description": "A valid input example",
+                  "value": {
+                    "roomKey": "123456",
+                    "userId": 1,
+                    "userStatus": "ACTIVE"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User status updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "User status updated successfully"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "statusCode": 400,
+                    "message": "Invalid input data",
+                    "error": "Bad Request"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Match not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "statusCode": 404,
+                    "message": "Match not found",
+                    "error": "Not Found"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Match"
+        ]
+      }
+    },
+    "/match/check-status/{roomKey}": {
+      "post": {
+        "operationId": "MatchController_checkStatus",
+        "summary": "Check and broadcast status if needed",
+        "parameters": [
+          {
+            "name": "roomKey",
+            "required": true,
+            "in": "path",
+            "description": "The key of the room to check the status for",
+            "example": "1234",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "User ID and optional idempotency key (same key + settled round → no-op)",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "number",
+                    "description": "The ID of the user",
+                    "example": 5678
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "description": "Client-generated key for this deck-round check",
+                    "example": "uuid-or-ulid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Status checked and broadcasted successfully if needed"
+          },
+          "404": {
+            "description": "Match not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "statusCode": 404,
+                    "message": "Match not found",
+                    "error": "Not Found"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Match"
+        ]
+      }
+    },
+    "/match/specific-key-info/{roomKey}": {
+      "get": {
+        "operationId": "MatchController_getSpecificMatchData",
+        "summary": "Get data from a specific room",
+        "parameters": [
+          {
+            "name": "roomKey",
+            "required": true,
+            "in": "path",
+            "description": "The key of the room",
+            "example": "1234",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Match data received successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": 333,
+                    "roomId": "11111111-6666-0000-1111-e1356a43612c",
+                    "userName": "Jhon Week",
+                    "role": "killer",
+                    "roomKey": "123456",
+                    "vote": false,
+                    "userId": 0,
+                    "userStatus": "ACTIVE",
+                    "movieId": [
+                      "123456",
+                      "654321"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Match with this key was not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "statusCode": 404,
+                    "message": "Match with this key was not found",
+                    "error": "Not Found"
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "Match"
+        ]
+      }
+    },
+    "/match/{userId}": {
+      "get": {
+        "operationId": "MatchController_getMatchByUserId",
+        "summary": "Get information about a user by his user ID",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "User ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User record found or message indicating user is not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "Match"
+        ]
+      }
+    },
+    "/rooms/my/memberships": {
+      "get": {
+        "operationId": "RoomsController_getMyRoomMemberships",
+        "summary": "Rooms the user is in (author or participant)",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserRoomMembershipDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Rooms"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/rooms/my/leave": {
+      "post": {
+        "operationId": "RoomsController_leaveMyRoom",
+        "summary": "Leave a room (participant) or close room (author)",
+        "description": "Participants remove only their match row. Room authors delete the whole room and all participants.",
+        "parameters": [],
+        "responses": {
+          "400": {
+            "description": "roomKey is required"
+          }
+        },
+        "tags": [
+          "Rooms"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/rooms/create": {
+      "post": {
+        "operationId": "RoomsController_createRoom",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoomDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateRoomKeyResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed to create room"
+          },
+          "409": {
+            "description": "Room already exists for this user"
+          }
+        },
+        "tags": [
+          "Rooms"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/rooms/join/{key}": {
+      "post": {
+        "operationId": "RoomsController_joinRoom",
+        "summary": "Join an existing room",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successfully joined the room"
+          },
+          "400": {
+            "description": "User already joined this room"
+          },
+          "404": {
+            "description": "Room not found"
+          }
+        },
+        "tags": [
+          "Rooms"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/rooms/user/{userId}/hasRoom": {
+      "get": {
+        "operationId": "RoomsController_doesUserHaveRoom",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "ID пользователя",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Статус комнаты для пользователя",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HasRoomResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Пользователь не найден"
+          }
+        },
+        "tags": [
+          "Rooms"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/rooms/leave/{key}": {
+      "post": {
+        "operationId": "RoomsController_leaveRoom",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Rooms"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/rooms/leave-from-match": {
+      "post": {
+        "operationId": "RoomsController_leaveMatch",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Rooms"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/rooms/{key}/start-match": {
+      "post": {
+        "operationId": "RoomsController_startMatchController",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Rooms"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/rooms/{id}/filters": {
+      "put": {
+        "operationId": "RoomsController_updateFilters",
+        "summary": "Update room filters",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Filters updated successfully."
+          },
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "Room not found or No matches found in room."
+          },
+          "500": {
+            "description": "Internal Server Error."
+          }
+        },
+        "tags": [
+          "Rooms"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/rooms/{key}/get-filters": {
+      "get": {
+        "operationId": "RoomsController_getRoomFilters",
+        "summary": "Get room filters",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "description": "Unique room key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved filters."
+          },
+          "404": {
+            "description": "Room not found"
+          },
+          "409": {
+            "description": "Failed to parse filters"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "Rooms"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/rooms/{roomKey}/state": {
+      "get": {
+        "operationId": "RoomsController_getRoomState",
+        "summary": "Room aggregate: phase, version, participants, deck summary",
+        "parameters": [
+          {
+            "name": "roomKey",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomStateDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Rooms"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/rooms/{roomKey}/get-movies": {
+      "get": {
+        "operationId": "RoomsController_getNextMovie",
+        "summary": "Get current movies data",
+        "parameters": [
+          {
+            "name": "roomKey",
+            "required": true,
+            "in": "path",
+            "description": "Unique room key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MoviesResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Room or user not found"
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "Rooms"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/movie/search": {
+      "get": {
+        "operationId": "MovieController_searchMovies",
+        "parameters": [
+          {
+            "name": "query",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/favorite/add/{movieId}": {
+      "post": {
+        "operationId": "FavoriteController_addFavorite",
+        "parameters": [
+          {
+            "name": "movieId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "User is not found."
+          },
+          "409": {
+            "description": "Movie is already in favorites"
+          }
+        },
+        "tags": [
+          "Favorite"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/favorite": {
+      "get": {
+        "operationId": "FavoriteController_getMyFavorite",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MyFavoriteResponse"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User's favorites not found"
+          },
+          "500": {
+            "description": "Failed to fetch movie information"
+          }
+        },
+        "tags": [
+          "Favorite"
+        ]
+      }
+    },
+    "/favorite/delete/{movieId}": {
+      "delete": {
+        "operationId": "FavoriteController_deleteFromFavorite",
+        "parameters": [
+          {
+            "name": "movieId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Movie has not found in favorites"
+          }
+        },
+        "tags": [
+          "Favorite"
+        ]
+      }
+    },
+    "/filters": {
+      "get": {
+        "operationId": "FiltersController_getFilters",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/i18n/landing": {
+      "get": {
+        "operationId": "I18nController_getLandingDictionary",
+        "summary": "Landing dictionary by locale (SSR friendly)",
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "description": "Requested locale code. Supported: en, ru, es, de, ja",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "i18n"
+        ]
+      }
+    },
+    "/feedback": {
+      "post": {
+        "operationId": "FeedbackController_createFeedbackMessage",
+        "summary": "Create feedback message (token required)",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFeedbackMessageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackMessageResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Feedback"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "FeedbackController_getFeedbackMessages",
+        "summary": "List feedback messages (admin only)",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "example": 20,
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "email",
+            "required": false,
+            "in": "query",
+            "example": "user@example.com",
+            "description": "Exact match (optional)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "emailQuery",
+            "required": false,
+            "in": "query",
+            "example": "example.com",
+            "description": "Substring search in email (optional)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "example": "NEW",
+            "schema": {
+              "enum": [
+                "NEW",
+                "IN_PROGRESS",
+                "ANSWERED"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdFrom",
+            "required": false,
+            "in": "query",
+            "example": "2026-05-01T00:00:00.000Z",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdTo",
+            "required": false,
+            "in": "query",
+            "example": "2026-05-06T23:59:59.999Z",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "example": "createdAt:desc",
+            "description": "Sorting format: createdAt:asc|desc",
+            "schema": {
+              "default": "createdAt:desc",
+              "type": "string"
+            }
+          },
+          {
+            "name": "hasReply",
+            "required": false,
+            "in": "query",
+            "example": true,
+            "description": "If true: only messages with admin reply",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackMessagesPageResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Feedback"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/feedback/my": {
+      "get": {
+        "operationId": "FeedbackController_getMyFeedbackMessages",
+        "summary": "List my feedback messages (token required)",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FeedbackMessageResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Feedback"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/feedback/my/{id}": {
+      "get": {
+        "operationId": "FeedbackController_getMyFeedbackMessageById",
+        "summary": "Get my feedback message by id (token required)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "example": 123,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackMessageResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Feedback"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/feedback/{id}": {
+      "get": {
+        "operationId": "FeedbackController_getFeedbackMessageById",
+        "summary": "Get feedback message by id (admin only)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "example": 123,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackMessageResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Feedback"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "FeedbackController_updateFeedbackMessage",
+        "summary": "Update feedback status / reply (admin only)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "example": 123,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFeedbackMessageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackMessageResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Feedback"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Match-movie example",
+    "description": "The Match-Movie API description",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "movie",
+      "description": ""
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "RegisterUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "rehmat.sayani@gmail.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "Qwerty12345+"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "SuccessMessage": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "rehmat.sayani@gmail.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "Qwerty12345+"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "BearerToken": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "IdTokenDto": {
+        "type": "object",
+        "properties": {
+          "idToken": {
+            "type": "string",
+            "example": "1q2w2e3e32e23d323rfwf"
+          }
+        },
+        "required": [
+          "idToken"
+        ]
+      },
+      "GetMeType": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "email": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "username"
+        ]
+      },
+      "UpdateUsernameDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "LikeMovieDto": {
+        "type": "object",
+        "properties": {
+          "roomKey": {
+            "type": "string",
+            "example": "room123",
+            "description": "Unique key of the room"
+          },
+          "userId": {
+            "type": "number",
+            "example": 1,
+            "description": "ID of the user"
+          },
+          "movieId": {
+            "type": "number",
+            "example": 12345,
+            "description": "ID of the movie"
+          }
+        },
+        "required": [
+          "roomKey",
+          "userId",
+          "movieId"
+        ]
+      },
+      "UpdateUserStatusDto": {
+        "type": "object",
+        "properties": {
+          "roomKey": {
+            "type": "string",
+            "example": "123456",
+            "description": "Key of the room"
+          },
+          "userId": {
+            "type": "number",
+            "example": 1,
+            "description": "ID of the user"
+          },
+          "userStatus": {
+            "type": "string",
+            "example": "ACTIVE",
+            "description": "Status of the user",
+            "enum": [
+              "ACTIVE",
+              "WAITING",
+              "CLOSED"
+            ]
+          }
+        },
+        "required": [
+          "roomKey",
+          "userId",
+          "userStatus"
+        ]
+      },
+      "UserRoomMembershipDto": {
+        "type": "object",
+        "properties": {
+          "roomKey": {
+            "type": "string",
+            "example": "482931"
+          },
+          "roomId": {
+            "type": "string",
+            "example": "1"
+          },
+          "role": {
+            "type": "string",
+            "example": "admin",
+            "enum": [
+              "admin",
+              "participant"
+            ]
+          },
+          "isAuthor": {
+            "type": "boolean",
+            "description": "True if this user created the room (room.authorId)"
+          },
+          "userStatus": {
+            "type": "string",
+            "example": "ACTIVE"
+          },
+          "matchPhase": {
+            "type": "string",
+            "example": "LOBBY"
+          },
+          "roomStatus": {
+            "type": "string",
+            "example": "PENDING"
+          },
+          "roomName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "roomKey",
+          "roomId",
+          "role",
+          "isAuthor",
+          "userStatus",
+          "matchPhase",
+          "roomStatus",
+          "roomName"
+        ]
+      },
+      "CreateRoomDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "My Room",
+            "description": "The name of the room"
+          },
+          "filters": {
+            "type": "object",
+            "example": {
+              "genre": "Action"
+            },
+            "description": "Filters to apply to the room"
+          }
+        },
+        "required": [
+          "name",
+          "filters"
+        ]
+      },
+      "CreateRoomKeyResponse": {
+        "type": "object",
+        "properties": {
+          "roomKey": {
+            "type": "string",
+            "example": "room-key-123",
+            "description": "The key of the created room"
+          }
+        },
+        "required": [
+          "roomKey"
+        ]
+      },
+      "Match": {
+        "type": "object",
+        "properties": {}
+      },
+      "HasRoomResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Message"
+          },
+          "match": {
+            "description": "List of matches",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Match"
+            }
+          },
+          "key": {
+            "type": "string",
+            "description": "Room key"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "RoomParticipantStateDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "number"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "userStatus": {
+            "type": "string"
+          },
+          "likedCount": {
+            "type": "number",
+            "description": "Count of liked movie ids this round"
+          }
+        },
+        "required": [
+          "userId",
+          "userName",
+          "role",
+          "userStatus"
+        ]
+      },
+      "RoomDeckSummaryDto": {
+        "type": "object",
+        "properties": {
+          "docCount": {
+            "type": "number"
+          },
+          "firstMovieId": {
+            "type": "number"
+          },
+          "lastMovieId": {
+            "type": "number"
+          },
+          "hasDeck": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "hasDeck"
+        ]
+      },
+      "RoomStateDto": {
+        "type": "object",
+        "properties": {
+          "roomKey": {
+            "type": "string"
+          },
+          "roomId": {
+            "type": "string"
+          },
+          "matchPhase": {
+            "type": "string",
+            "enum": [
+              "LOBBY",
+              "SWIPING",
+              "WAITING_ROUND",
+              "FINAL_PICK"
+            ]
+          },
+          "roomStatus": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "SET",
+              "EXCEPTION"
+            ]
+          },
+          "aggregateVersion": {
+            "type": "number",
+            "description": "Monotonic; bump on deck / critical room changes"
+          },
+          "participants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoomParticipantStateDto"
+            }
+          },
+          "deck": {
+            "$ref": "#/components/schemas/RoomDeckSummaryDto"
+          },
+          "hasFilters": {
+            "type": "boolean",
+            "description": "Whether room has saved filters JSON"
+          },
+          "serverTime": {
+            "type": "string",
+            "description": "Echo for stale snapshot detection on client"
+          }
+        },
+        "required": [
+          "roomKey",
+          "roomId",
+          "matchPhase",
+          "roomStatus",
+          "aggregateVersion",
+          "participants",
+          "deck",
+          "hasFilters"
+        ]
+      },
+      "Poster": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL постера"
+          },
+          "previewUrl": {
+            "type": "string",
+            "description": "URL превью постера",
+            "nullable": true
+          }
+        },
+        "required": [
+          "url",
+          "previewUrl"
+        ]
+      },
+      "Backdrop": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL заднего плана",
+            "nullable": true
+          },
+          "previewUrl": {
+            "type": "string",
+            "description": "URL превью заднего плана",
+            "nullable": true
+          }
+        },
+        "required": [
+          "url",
+          "previewUrl"
+        ]
+      },
+      "Genre": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Название жанра"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "Country": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Название страны"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "ReleaseYear": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "number",
+            "description": "Начало выпуска",
+            "nullable": true
+          },
+          "end": {
+            "type": "number",
+            "description": "Конец выпуска",
+            "nullable": true
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ]
+      },
+      "Rating": {
+        "type": "object",
+        "properties": {
+          "kp": {
+            "type": "number",
+            "description": "Рейтинг KP",
+            "nullable": true
+          },
+          "imdb": {
+            "type": "number",
+            "description": "Рейтинг IMDB",
+            "nullable": true
+          },
+          "filmCritics": {
+            "type": "number",
+            "description": "Рейтинг кинокритиков",
+            "nullable": true
+          },
+          "russianFilmCritics": {
+            "type": "number",
+            "description": "Рейтинг российских кинокритиков",
+            "nullable": true
+          },
+          "await": {
+            "type": "number",
+            "description": "Ожидание рейтинга",
+            "nullable": true
+          }
+        },
+        "required": [
+          "kp",
+          "imdb",
+          "filmCritics",
+          "russianFilmCritics",
+          "await"
+        ]
+      },
+      "Votes": {
+        "type": "object",
+        "properties": {
+          "kp": {
+            "type": "number",
+            "description": "Голоса KP",
+            "nullable": true
+          },
+          "imdb": {
+            "type": "number",
+            "description": "Голоса IMDB",
+            "nullable": true
+          },
+          "filmCritics": {
+            "type": "number",
+            "description": "Голоса кинокритиков",
+            "nullable": true
+          },
+          "russianFilmCritics": {
+            "type": "number",
+            "description": "Голоса российских кинокритиков",
+            "nullable": true
+          },
+          "await": {
+            "type": "number",
+            "description": "Ожидание голосов",
+            "nullable": true
+          }
+        },
+        "required": [
+          "kp",
+          "imdb",
+          "filmCritics",
+          "russianFilmCritics",
+          "await"
+        ]
+      },
+      "Movie": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "ID фильма"
+          },
+          "name": {
+            "type": "string",
+            "description": "Название фильма",
+            "nullable": true
+          },
+          "alternativeName": {
+            "type": "string",
+            "description": "Альтернативное название фильма",
+            "nullable": true
+          },
+          "enName": {
+            "type": "string",
+            "description": "Английское название фильма",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "description": "Тип фильма"
+          },
+          "typeNumber": {
+            "type": "number",
+            "description": "Номер типа"
+          },
+          "year": {
+            "type": "number",
+            "description": "Год выпуска",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Описание фильма",
+            "nullable": true
+          },
+          "shortDescription": {
+            "type": "string",
+            "description": "Короткое описание фильма",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "description": "Статус фильма",
+            "nullable": true
+          },
+          "movieLength": {
+            "type": "number",
+            "description": "Длина фильма",
+            "nullable": true
+          },
+          "totalSeriesLength": {
+            "type": "number",
+            "description": "Общая длина сериала",
+            "nullable": true
+          },
+          "seriesLength": {
+            "type": "number",
+            "description": "Длина серии",
+            "nullable": true
+          },
+          "ageRating": {
+            "type": "number",
+            "description": "Возрастной рейтинг",
+            "nullable": true
+          },
+          "poster": {
+            "description": "Постер фильма",
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Poster"
+              }
+            ]
+          },
+          "backdrop": {
+            "description": "Задний план фильма",
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Backdrop"
+              }
+            ]
+          },
+          "genres": {
+            "description": "Жанры фильма",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Genre"
+            }
+          },
+          "countries": {
+            "description": "Страны производства",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Country"
+            }
+          },
+          "releaseYears": {
+            "description": "Годы выпуска",
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReleaseYear"
+            }
+          },
+          "rating": {
+            "description": "Рейтинг фильма",
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Rating"
+              }
+            ]
+          },
+          "votes": {
+            "description": "Голоса",
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Votes"
+              }
+            ]
+          },
+          "top10": {
+            "type": "number",
+            "description": "Популярность в топ-10",
+            "nullable": true
+          },
+          "top250": {
+            "type": "number",
+            "description": "Популярность в топ-250",
+            "nullable": true
+          },
+          "ticketsOnSale": {
+            "type": "boolean",
+            "description": "Доступность билетов",
+            "nullable": true
+          },
+          "isSeries": {
+            "type": "boolean",
+            "description": "Является ли сериалом"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "alternativeName",
+          "enName",
+          "type",
+          "typeNumber",
+          "year",
+          "description",
+          "shortDescription",
+          "status",
+          "movieLength",
+          "totalSeriesLength",
+          "seriesLength",
+          "ageRating",
+          "poster",
+          "backdrop",
+          "genres",
+          "countries",
+          "releaseYears",
+          "rating",
+          "votes",
+          "top10",
+          "top250",
+          "ticketsOnSale",
+          "isSeries"
+        ]
+      },
+      "MoviesResponse": {
+        "type": "object",
+        "properties": {
+          "docs": {
+            "description": "Объекты фильмов",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Movie"
+            }
+          },
+          "total": {
+            "type": "number",
+            "description": "Общее количество фильмов"
+          },
+          "limit": {
+            "type": "number",
+            "description": "Лимит"
+          },
+          "page": {
+            "type": "number",
+            "description": "Текущая страница"
+          },
+          "pages": {
+            "type": "number",
+            "description": "Общее количество страниц"
+          }
+        },
+        "required": [
+          "docs",
+          "total",
+          "limit",
+          "page",
+          "pages"
+        ]
+      },
+      "MyFavoriteResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "posterUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "posterUrl"
+        ]
+      },
+      "CreateFeedbackMessageDto": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "example": "Очень нравится приложение, но не хватает фильтра по актёрам."
+          }
+        },
+        "required": [
+          "text"
+        ]
+      },
+      "FeedbackMessageResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 123
+          },
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "text": {
+            "type": "string",
+            "example": "Очень нравится приложение, но не хватает фильтра по актёрам."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "NEW",
+              "IN_PROGRESS",
+              "ANSWERED"
+            ],
+            "example": "NEW"
+          },
+          "adminReply": {
+            "type": "string",
+            "nullable": true,
+            "example": "Спасибо! Уже взяли в работу."
+          },
+          "adminRepliedAt": {
+            "type": "string",
+            "nullable": true,
+            "example": "2026-05-06T10:40:00.000Z"
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2026-05-06T10:33:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "example": "2026-05-06T10:41:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "text",
+          "status",
+          "adminReply",
+          "adminRepliedAt",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "FeedbackMessagesPageResponse": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number",
+            "example": 1
+          },
+          "limit": {
+            "type": "number",
+            "example": 20
+          },
+          "total": {
+            "type": "number",
+            "example": 123
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeedbackMessageResponse"
+            }
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total",
+          "items"
+        ]
+      },
+      "UpdateFeedbackMessageDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "NEW",
+              "IN_PROGRESS",
+              "ANSWERED"
+            ],
+            "example": "IN_PROGRESS"
+          },
+          "adminReply": {
+            "type": "string",
+            "example": "Спасибо! Уже взяли в работу. Ожидайте обновление в следующем релизе."
+          }
+        }
+      }
+    }
+  }
+}

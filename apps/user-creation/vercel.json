@@ -1,5 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npm run -C ../../packages/sdk generate:all && turbo run build",
+  "buildCommand": "npm run -C ../../packages/sdk generate && turbo run build",
   "framework": "nextjs"
 }
