@@ -14,15 +14,10 @@ export const axiosInstance = axios.create({
 });
 
 /**
- * Orval `react-query` + `axios` mutator: full response for status discriminated types.
+ * Orval `react-query` + `axios` mutator: returns response body (standard Orval + axios).
  */
 export const customInstance = <T>(config: AxiosRequestConfig): Promise<T> => {
-  return axiosInstance.request(config).then(
-    (response: AxiosResponse) =>
-      ({
-        data: response.data,
-        status: response.status,
-        headers: response.headers,
-      }) as T,
-  );
+	return axiosInstance
+		.request(config)
+		.then((response: AxiosResponse) => response.data as T);
 };

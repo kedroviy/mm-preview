@@ -20,7 +20,7 @@ export function useWebSocketMyRooms(userId: string, enabled = true) {
     };
 
     const handleError = (error: {
-      message: string;
+      message?: string;
       code: string;
       event?: string;
     }) => {

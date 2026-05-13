@@ -14,7 +14,7 @@ interface UseWebSocketChatOptions {
   onRoomUpdate?: (data: {
     roomId: string;
     room: Room;
-    event: string;
+    event?: string;
     userId?: string;
   }) => void;
   onError?: (error: Error) => void;
@@ -180,7 +180,7 @@ export function useWebSocketChat({
     const handleRoomUpdate = (data: {
       roomId: string;
       room?: Room;
-      event: string;
+      event?: string;
       userId?: string;
     }) => {
       if (roomId && data.roomId === roomId) {
@@ -195,7 +195,7 @@ export function useWebSocketChat({
     };
 
     const handleError = (error: {
-      message: string;
+      message?: string;
       code: string;
       event?: string;
     }) => {
