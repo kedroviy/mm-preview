@@ -69,15 +69,13 @@ function parseRetryAfterSeconds(error: AxiosError): number | undefined {
 }
 
 function unwrapBearer(res: unknown): AuthTokenResponse {
-	const payload = res as {
-		data?: { token?: string };
-		status?: number;
-	};
-	const token = payload.data?.token;
+	// customInstance already returns response.data (BearerToken), not AxiosResponse.
+	const payload = res as { token?: string; data?: { token?: string } };
+	const token = payload.token ?? payload.data?.token;
 	if (!token) {
 		throw new AuthApiError({
 			message: "Authorization failed",
-			status: typeof payload.status === "number" ? payload.status : 0,
+			status: 0,
 			code: "AUTH_NO_TOKEN",
 		});
 	}
