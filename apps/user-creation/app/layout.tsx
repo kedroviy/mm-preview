@@ -5,7 +5,6 @@ import "./globals.css";
 import { generateMetadataFromHeaders } from "@/src/shared/config/metadata";
 import { Provider } from "@/src/shared/config/providers/Provider";
 
-// Генерация метаданных на основе языка из заголовков
 export async function generateMetadata(): Promise<Metadata> {
   return generateMetadataFromHeaders();
 }

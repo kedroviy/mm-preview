@@ -15,7 +15,7 @@ export {
   type BadgeProps as BadgePropsShadcn,
   badgeVariants,
 } from "./badge-shadcn";
-export * from "./button";
+export { Button, type ButtonProps, type ButtonSize } from "./button";
 // New shadcn/ui based components
 export {
   Button as ButtonShadcn,
@@ -24,7 +24,7 @@ export {
 } from "./button-shadcn/button";
 export {
   Button as ButtonShadcnWrapper,
-  type ButtonProps,
+  type ButtonProps as ButtonPropsShadcnWrapper,
 } from "./button-shadcn/button-wrapper";
 export * from "./card";
 export {

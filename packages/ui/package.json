@@ -16,9 +16,19 @@
       "import": "./dist/export-light.mjs",
       "require": "./dist/export-light.js"
     },
+    "./button": "./dist/button.mjs",
+    "./button.d.ts": "./dist/button.d.ts",
+    "./button.js": "./dist/button.js",
+    "./button.mjs": "./dist/button.mjs",
+    "./button.cjs": "./dist/button.cjs",
+    "./button.esm.js": "./dist/button.esm.js",
+    "./button.esm.mjs": "./dist/button.esm.mjs",
+    "./button.esm.cjs": "./dist/button.esm.cjs",
+    "./button.esm.d.ts": "./dist/button.esm.d.ts",
     "./styles": "./dist/styles.css"
   },
   "scripts": {
+    "prepare": "npm run build",
     "lint": "biome check",
     "type-check": "tsc --noEmit",
     "test": "vitest run",

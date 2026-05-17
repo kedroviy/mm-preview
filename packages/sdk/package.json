@@ -7,7 +7,8 @@
 	"exports": {
 		".": "./src/index.ts",
 		"./query-client": "./src/query-client.ts",
-		"./react-query/next": "./src/react-query/next.ts"
+		"./react-query/next": "./src/react-query/next.ts",
+		"./token-utils": "./src/runtime/token-utils.ts"
 	},
 	"scripts": {
 		"lint": "biome check",

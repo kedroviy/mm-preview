@@ -1,7 +1,18 @@
-import { type ButtonHTMLAttributes, forwardRef, type ReactNode } from "react";
+import {
+  type ButtonHTMLAttributes,
+  type ComponentProps,
+  forwardRef,
+  type ForwardRefExoticComponent,
+  type ReactNode,
+  type Ref,
+  type RefAttributes,
+} from "react";
+import { cn } from "../../lib/utils";
 import { Badge } from "../badge";
+import { type ButtonSize, getButtonSizeClassName } from "./button-sizes";
 
-// Define ButtonProps manually to avoid TypeScript resolution issues
+export type { ButtonSize };
+
 export interface ButtonProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> {
   children?: ReactNode;
@@ -27,17 +38,20 @@ export interface ButtonProps
   badgeSeverity?: "success" | "info" | "warning" | "danger";
   tooltip?: string;
   tooltipOptions?: any;
-  size?: "small" | "large";
+  size?: ButtonSize;
   link?: boolean;
-  [key: string]: any; // Allow any other props from PrimeReact Button
 }
 
 // Static import - webpack will resolve this from the app's node_modules
 // TypeScript may show an error here, but webpack will resolve it correctly at build time
 import { Button as PrimeButton } from "primereact/button";
 
-export const Button = forwardRef<any, ButtonProps>(
-  ({ children, icon, className, badge, badgeSeverity, ...props }, ref) => {
+type PrimeButtonProps = ComponentProps<typeof PrimeButton>;
+
+export const Button = forwardRef(function Button(
+  { children, icon, className, badge, badgeSeverity, size, ...props }: ButtonProps,
+  ref: Ref<HTMLButtonElement>,
+) {
     // If icon is a React element (not a string), render it as children
     // Otherwise, pass it as icon prop to PrimeButton
     const isIconOnly = !children && !props.label && !!icon;
@@ -69,15 +83,15 @@ export const Button = forwardRef<any, ButtonProps>(
 
     return (
       <PrimeButton
-        ref={ref}
-        className={className}
+        ref={ref as Ref<never>}
+        className={cn(getButtonSizeClassName(size, isIconOnly), className)}
         icon={iconString}
         aria-label={
           isIconOnly && !props["aria-label"]
             ? props.label || "Button"
             : props["aria-label"]
         }
-        {...props}
+        {...(props as PrimeButtonProps)}
       >
         {shouldRenderChildren
           ? props.label
@@ -86,7 +100,6 @@ export const Button = forwardRef<any, ButtonProps>(
           : undefined}
       </PrimeButton>
     );
-  },
-);
+}) as ForwardRefExoticComponent<ButtonProps & RefAttributes<HTMLButtonElement>>;
 
 Button.displayName = "Button";

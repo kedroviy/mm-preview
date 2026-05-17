@@ -25,6 +25,10 @@ const meta = {
     disabled: {
       control: "boolean",
     },
+    size: {
+      control: "select",
+      options: ["xs", "s", "m", "l", "xl"],
+    },
   },
 } satisfies Meta<typeof Button>;
 
@@ -52,17 +56,25 @@ export const Text: Story = {
   },
 };
 
-export const Large: Story = {
+export const SizeXs: Story = {
   args: {
-    children: "Large Button",
-    className: "text-lg px-6 py-3",
+    children: "Extra small",
+    size: "xs",
   },
 };
 
-export const Small: Story = {
+export const SizeL: Story = {
   args: {
-    children: "Small Button",
-    className: "text-sm px-3 py-1",
+    children: "Large",
+    size: "l",
+  },
+};
+
+export const IconOnly: Story = {
+  args: {
+    size: "m",
+    icon: "pi pi-check",
+    "aria-label": "Confirm",
   },
 };
 

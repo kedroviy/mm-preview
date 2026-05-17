@@ -68,7 +68,6 @@ function parseRetryAfterSeconds(error: AxiosError): number | undefined {
 	return Number.isNaN(n) ? undefined : n;
 }
 
-/** Orval mutator returns `{ data, status, headers }`; BearerToken is nested under `data`. */
 function unwrapBearer(res: unknown): AuthTokenResponse {
 	const payload = res as {
 		data?: { token?: string };
