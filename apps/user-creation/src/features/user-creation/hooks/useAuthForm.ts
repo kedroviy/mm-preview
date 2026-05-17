@@ -34,11 +34,13 @@ export function useAuthForm(mode: AuthMode) {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const isGoogleAuthLoading = googleAuthMutation.isPending;
+
   const isLoading =
     isSubmitting ||
     loginMutation.isPending ||
     registerMutation.isPending ||
-    googleAuthMutation.isPending;
+    isGoogleAuthLoading;
 
   const isLoadingRef = useRef(isLoading);
   isLoadingRef.current = isLoading;
@@ -170,6 +172,7 @@ export function useAuthForm(mode: AuthMode) {
     form,
     mode,
     isLoading,
+    isGoogleAuthLoading,
     isLoadingRef,
     onSubmit,
     switchMode,

@@ -7,6 +7,7 @@ import { useGoogleSignIn } from "../hooks/useGoogleSignIn";
 import type { AuthMode } from "../types/auth";
 import { AuthCredentialsForm } from "./AuthCredentialsForm";
 import { AuthFormLayout } from "./AuthFormLayout";
+import { AuthGoogleLoading } from "./AuthGoogleLoading";
 import { AuthModeSwitch } from "./AuthModeSwitch";
 
 interface UserCreationFormProps {
@@ -18,6 +19,7 @@ export function UserCreationForm({ mode }: UserCreationFormProps) {
   const {
     form,
     isLoading,
+    isGoogleAuthLoading,
     isLoadingRef,
     onSubmit,
     switchMode,
@@ -42,24 +44,35 @@ export function UserCreationForm({ mode }: UserCreationFormProps) {
   const switchLabel =
     mode === "login" ? t("switchToRegister") : t("switchToLogin");
 
+  const showGoogleAuthLoading = mode === "login" && isGoogleAuthLoading;
+
   return (
     <AuthFormLayout title={title}>
-      <FormProvider {...form}>
-        <AuthCredentialsForm
-          mode={mode}
-          isLoading={isLoading}
-          onSubmit={onSubmit}
-          translate={t}
-          onGoogleSignIn={signInWithGoogle}
-          isClientIdMissing={isClientIdMissing}
+      {showGoogleAuthLoading ? (
+        <AuthGoogleLoading
+          title={t("googleAuthLoading")}
+          hint={t("googleAuthLoadingHint")}
         />
-      </FormProvider>
+      ) : (
+        <>
+          <FormProvider {...form}>
+            <AuthCredentialsForm
+              mode={mode}
+              isLoading={isLoading}
+              onSubmit={onSubmit}
+              translate={t}
+              onGoogleSignIn={signInWithGoogle}
+              isClientIdMissing={isClientIdMissing}
+            />
+          </FormProvider>
 
-      <AuthModeSwitch
-        label={switchLabel}
-        isLoading={isLoading}
-        onSwitch={switchMode}
-      />
+          <AuthModeSwitch
+            label={switchLabel}
+            isLoading={isLoading}
+            onSwitch={switchMode}
+          />
+        </>
+      )}
     </AuthFormLayout>
   );
 }

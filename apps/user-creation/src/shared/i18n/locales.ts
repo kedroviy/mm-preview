@@ -39,6 +39,8 @@ export const translations = {
     googleInitError: "Failed to initialize Google Sign-In.",
     googleClientIdMissing:
       "Google Sign-In is not configured. Missing client id.",
+    googleAuthLoading: "Signing in with Google…",
+    googleAuthLoadingHint: "You will be redirected shortly.",
   },
   ru: {
     titleLogin: "Вход",
@@ -79,6 +81,8 @@ export const translations = {
     googleButtonText: "Продолжить через Google",
     googleInitError: "Не удалось инициализировать Google авторизацию.",
     googleClientIdMissing: "Google авторизация не настроена. Нет client id.",
+    googleAuthLoading: "Вход через Google…",
+    googleAuthLoadingHint: "Скоро вы будете перенаправлены.",
   },
 } as const;
 
