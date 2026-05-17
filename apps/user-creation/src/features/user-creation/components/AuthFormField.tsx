@@ -1,20 +1,17 @@
 "use client";
 
 import { InputText } from "@mm-preview/ui";
-import {
-  Controller,
-  type FieldPath,
-  type RegisterOptions,
-  useFormContext,
-} from "react-hook-form";
+import { Controller, type RegisterOptions, useFormContext } from "react-hook-form";
 import type { AuthFormData } from "../types/auth";
 
+type AuthCredentialFieldName = "email" | "password" | "confirmPassword";
+
 interface AuthFormFieldProps {
-  name: FieldPath<AuthFormData>;
+  name: AuthCredentialFieldName;
   label: string;
   type?: "email" | "password" | "text";
   placeholder: string;
-  rules?: RegisterOptions<AuthFormData, FieldPath<AuthFormData>>;
+  rules?: RegisterOptions<AuthFormData, AuthCredentialFieldName>;
   disabled?: boolean;
 }
 
