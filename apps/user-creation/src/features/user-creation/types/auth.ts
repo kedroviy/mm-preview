@@ -1,9 +1,16 @@
 export type AuthMode = "login" | "register";
 
+export type AuthFormModeStatus = "idle" | "submitting" | "doneAuthorize";
+
+export interface AuthFormModeState {
+  status: AuthFormModeStatus;
+}
+
 export interface AuthFormData {
   email: string;
   password: string;
   confirmPassword: string;
+  mode: AuthFormModeState;
 }
 
 export type GoogleCredentialResponse = {

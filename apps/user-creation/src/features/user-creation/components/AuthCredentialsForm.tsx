@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@mm-preview/ui";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 import type { TranslationKey } from "@/src/shared/i18n/locales";
 import { GoogleSignInSection } from "./GoogleSignInSection";
 import {
@@ -11,30 +11,35 @@ import {
   PASSWORD_MIN_LENGTH,
 } from "../constants/validation";
 import type { AuthFormData, AuthMode } from "../types/auth";
+import { AUTH_FORM_MODE } from "../utils/auth-form-mode";
 import { AuthFormField } from "./AuthFormField";
 
 interface AuthCredentialsFormProps {
-  mode: AuthMode;
-  isLoading: boolean;
+  authMode: AuthMode;
   onSubmit: (values: AuthFormData) => Promise<void>;
   translate: (key: TranslationKey) => string;
   onGoogleSignIn: () => void;
   isClientIdMissing: boolean;
+  isMutationPending: boolean;
 }
 
 export function AuthCredentialsForm({
-  mode,
-  isLoading,
+  authMode,
   onSubmit,
   translate,
   onGoogleSignIn,
   isClientIdMissing,
+  isMutationPending,
 }: AuthCredentialsFormProps) {
   const {
     handleSubmit,
     getValues,
     formState: { errors },
   } = useFormContext<AuthFormData>();
+
+  const formMode = useWatch({ name: "mode" });
+  const isDisabled =
+    formMode.status !== AUTH_FORM_MODE.IDLE || isMutationPending;
 
   return (
     <form
@@ -47,7 +52,7 @@ export function AuthCredentialsForm({
         label={translate("emailLabel")}
         type="email"
         placeholder={translate("emailPlaceholder")}
-        disabled={isLoading}
+        disabled={isDisabled}
         rules={{
           required: translate("emailRequired"),
           maxLength: {
@@ -66,7 +71,7 @@ export function AuthCredentialsForm({
         label={translate("passwordLabel")}
         type="password"
         placeholder={translate("passwordPlaceholder")}
-        disabled={isLoading}
+        disabled={isDisabled}
         rules={{
           required: translate("passwordRequired"),
           minLength: {
@@ -80,13 +85,13 @@ export function AuthCredentialsForm({
         }}
       />
 
-      {mode === "register" && (
+      {authMode === "register" && (
         <AuthFormField
           name="confirmPassword"
           label={translate("confirmPasswordLabel")}
           type="password"
           placeholder={translate("confirmPasswordPlaceholder")}
-          disabled={isLoading}
+          disabled={isDisabled}
           rules={{
             required: translate("confirmPasswordRequired"),
             validate: (value) =>
@@ -102,26 +107,24 @@ export function AuthCredentialsForm({
         </small>
       )}
 
-      <div className="flex flex-col mm-auth-actions relative flex min-h-[60px] items-center">
+      <div className="mm-auth-actions relative flex min-h-[60px] flex-col items-center">
         <div className="flex flex-1 justify-center">
           <Button
             type="submit"
-            disabled={isLoading}
+            disabled={isDisabled}
             className="mm-auth-submit h-10 min-h-10 px-8 text-sm"
           >
-            {isLoading
-              ? translate("loading")
-              : mode === "login"
-                ? translate("submitLogin")
-                : translate("submitRegister")}
+            {authMode === "login"
+              ? translate("submitLogin")
+              : translate("submitRegister")}
           </Button>
         </div>
-        {mode === "login" && (
+        {authMode === "login" && (
           <div className="self-end">
             <GoogleSignInSection
               onGoogleSignIn={onGoogleSignIn}
               isClientIdMissing={isClientIdMissing}
-              isDisabled={isLoading}
+              isDisabled={isDisabled}
               clientIdMissingText={translate("googleClientIdMissing")}
             />
           </div>

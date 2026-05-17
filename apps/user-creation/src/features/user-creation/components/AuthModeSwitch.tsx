@@ -1,25 +1,25 @@
 "use client";
 
 import { Button } from "@mm-preview/ui";
+import { useWatch } from "react-hook-form";
+import { AUTH_FORM_MODE } from "../utils/auth-form-mode";
 
 interface AuthModeSwitchProps {
   label: string;
-  isLoading: boolean;
   onSwitch: () => void;
 }
 
-export function AuthModeSwitch({
-  label,
-  isLoading,
-  onSwitch,
-}: AuthModeSwitchProps) {
+export function AuthModeSwitch({ label, onSwitch }: AuthModeSwitchProps) {
+  const formMode = useWatch({ name: "mode" });
+  const isDisabled = formMode.status !== AUTH_FORM_MODE.IDLE;
+
   return (
     <Button
       type="button"
       severity="secondary"
       text
       onClick={onSwitch}
-      disabled={isLoading}
+      disabled={isDisabled}
       className="w-full"
     >
       {label}

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef } from "react";
 import type { TranslationKey } from "@/src/shared/i18n/locales";
 import type { GoogleCredentialResponse } from "../types/auth";
 import { loadGoogleScript } from "../utils/google-script";
+import { AUTH_FORM_MODE } from "../utils/auth-form-mode";
 import type { UseAuthFormReturn } from "./useAuthForm";
 
 let googleSignInInitialized = false;
@@ -14,8 +15,9 @@ type UseGoogleSignInParams = Pick<
   | "applyAuthError"
   | "clearRootError"
   | "googleAuth"
-  | "isLoadingRef"
+  | "isAuthBusy"
   | "runTokenLogin"
+  | "setFormMode"
   | "setRootError"
 > & {
   translate: (key: TranslationKey) => string;
@@ -25,8 +27,9 @@ export function useGoogleSignIn({
   applyAuthError,
   clearRootError,
   googleAuth,
-  isLoadingRef,
+  isAuthBusy,
   runTokenLogin,
+  setFormMode,
   setRootError,
   translate,
 }: UseGoogleSignInParams) {
@@ -37,8 +40,9 @@ export function useGoogleSignIn({
     applyAuthError,
     clearRootError,
     googleAuth,
-    isLoadingRef,
+    isAuthBusy,
     runTokenLogin,
+    setFormMode,
     setRootError,
     translate,
   });
@@ -46,8 +50,9 @@ export function useGoogleSignIn({
     applyAuthError,
     clearRootError,
     googleAuth,
-    isLoadingRef,
+    isAuthBusy,
     runTokenLogin,
+    setFormMode,
     setRootError,
     translate,
   };
@@ -74,7 +79,7 @@ export function useGoogleSignIn({
           callback: async (response: GoogleCredentialResponse) => {
             const handlers = handlersRef.current;
 
-            if (handlers.isLoadingRef.current) {
+            if (handlers.isAuthBusy()) {
               return;
             }
 
@@ -87,6 +92,8 @@ export function useGoogleSignIn({
               return;
             }
 
+            handlers.setFormMode(AUTH_FORM_MODE.SUBMITTING);
+
             try {
               const authResponse = await handlers.googleAuth.mutateAsync({
                 idToken: response.credential,
@@ -97,6 +104,7 @@ export function useGoogleSignIn({
               );
             } catch (error) {
               handlers.applyAuthError(error);
+              handlers.setFormMode(AUTH_FORM_MODE.IDLE);
             }
           },
         });
@@ -115,7 +123,7 @@ export function useGoogleSignIn({
   }, [googleClientId, setRootError, translate]);
 
   const signInWithGoogle = useCallback(() => {
-    if (!googleClientId || isLoadingRef.current) {
+    if (!googleClientId || isAuthBusy()) {
       return;
     }
 
@@ -128,7 +136,7 @@ export function useGoogleSignIn({
 
     clearRootError();
     window.google.accounts.id.prompt();
-  }, [clearRootError, googleClientId, isLoadingRef, setRootError, translate]);
+  }, [clearRootError, googleClientId, isAuthBusy, setRootError, translate]);
 
   return {
     signInWithGoogle,

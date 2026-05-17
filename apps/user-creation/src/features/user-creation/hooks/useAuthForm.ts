@@ -2,12 +2,17 @@
 
 import { notificationService } from "@mm-preview/ui";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { getAppUrls } from "@/src/shared/config/constants";
 import { useTranslation } from "@/src/shared/i18n/useTranslation";
-import type { AuthFormData, AuthMode } from "../types/auth";
+import type { AuthFormData, AuthFormModeStatus, AuthMode } from "../types/auth";
 import { getAuthErrorCode, getAuthErrorMessage } from "../utils/error";
+import {
+  AUTH_FORM_MODE,
+  defaultAuthFormMode,
+  selectAuthUiState,
+} from "../utils/auth-form-mode";
 import { getUserIdFromAccessToken, saveAccessToken } from "../utils/user";
 import { useGoogleAuth, useLogin, useRegister } from "./useAuth";
 
@@ -15,9 +20,10 @@ const defaultValues: AuthFormData = {
   email: "",
   password: "",
   confirmPassword: "",
+  mode: defaultAuthFormMode,
 };
 
-export function useAuthForm(mode: AuthMode) {
+export function useAuthForm(authMode: AuthMode) {
   const router = useRouter();
   const { t } = useTranslation();
   const loginMutation = useLogin();
@@ -30,20 +36,31 @@ export function useAuthForm(mode: AuthMode) {
     reValidateMode: "onChange",
   });
 
-  const { setError, clearErrors, resetField } = form;
+  const { setError, clearErrors, resetField, setValue, getValues, watch } = form;
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const formMode = watch("mode");
 
-  const isGoogleAuthLoading = googleAuthMutation.isPending;
-
-  const isLoading =
-    isSubmitting ||
+  const isMutationPending =
     loginMutation.isPending ||
     registerMutation.isPending ||
-    isGoogleAuthLoading;
+    googleAuthMutation.isPending;
 
-  const isLoadingRef = useRef(isLoading);
-  isLoadingRef.current = isLoading;
+  const { isDoneAuthorize, isLoading, isInteractionBlocked } = useMemo(
+    () => selectAuthUiState(formMode, isMutationPending),
+    [formMode, isMutationPending],
+  );
+
+  const setFormMode = useCallback(
+    (status: AuthFormModeStatus) => {
+      setValue("mode", { status });
+    },
+    [setValue],
+  );
+
+  const isAuthBusy = useCallback(() => {
+    const { mode } = getValues();
+    return selectAuthUiState(mode, isMutationPending).isInteractionBlocked;
+  }, [getValues, isMutationPending]);
 
   const redirectToDashboard = useCallback((userId: string) => {
     const dashboardUrl = getAppUrls().DASHBOARD;
@@ -77,6 +94,10 @@ export function useAuthForm(mode: AuthMode) {
     [setError, t],
   );
 
+  const markAuthorizeDone = useCallback(() => {
+    setFormMode(AUTH_FORM_MODE.DONE_AUTHORIZE);
+  }, [setFormMode]);
+
   const runLogin = useCallback(
     async (email: string, password: string) => {
       const response = await loginMutation.mutateAsync({ email, password });
@@ -92,10 +113,11 @@ export function useAuthForm(mode: AuthMode) {
         throw new Error(t("genericError"));
       }
 
+      markAuthorizeDone();
       notificationService.showSuccess(t("successLogin"));
       redirectToDashboard(userId);
     },
-    [loginMutation, redirectToDashboard, t],
+    [loginMutation, markAuthorizeDone, redirectToDashboard, t],
   );
 
   const runTokenLogin = useCallback(
@@ -111,23 +133,24 @@ export function useAuthForm(mode: AuthMode) {
         throw new Error(t("genericError"));
       }
 
+      markAuthorizeDone();
       notificationService.showSuccess(successMessage);
       redirectToDashboardRoot();
     },
-    [redirectToDashboardRoot, t],
+    [markAuthorizeDone, redirectToDashboardRoot, t],
   );
 
   const onSubmit = useCallback(
     async (values: AuthFormData) => {
-      if (isLoadingRef.current) {
+      if (isAuthBusy()) {
         return;
       }
 
-      setIsSubmitting(true);
+      setFormMode(AUTH_FORM_MODE.SUBMITTING);
       clearErrors("root.serverError");
 
       try {
-        if (mode === "register") {
+        if (authMode === "register") {
           await registerMutation.mutateAsync({
             email: values.email,
             password: values.password,
@@ -139,27 +162,39 @@ export function useAuthForm(mode: AuthMode) {
       } catch (error) {
         applyAuthError(error);
       } finally {
-        setIsSubmitting(false);
+        if (getValues("mode").status !== AUTH_FORM_MODE.DONE_AUTHORIZE) {
+          setFormMode(AUTH_FORM_MODE.IDLE);
+        }
       }
     },
-    [applyAuthError, clearErrors, mode, registerMutation, runLogin, t],
+    [
+      applyAuthError,
+      authMode,
+      clearErrors,
+      getValues,
+      isAuthBusy,
+      registerMutation,
+      runLogin,
+      setFormMode,
+      t,
+    ],
   );
 
   const switchMode = useCallback(() => {
-    if (isLoading) {
+    if (isInteractionBlocked) {
       return;
     }
 
     resetField("password");
     resetField("confirmPassword");
 
-    if (mode === "login") {
+    if (authMode === "login") {
       router.push("/auth/register");
       return;
     }
 
     router.push("/auth/login");
-  }, [isLoading, mode, resetField, router]);
+  }, [authMode, isInteractionBlocked, resetField, router]);
 
   const googleAuth = useMemo(
     () => ({
@@ -170,10 +205,13 @@ export function useAuthForm(mode: AuthMode) {
 
   return {
     form,
-    mode,
+    authMode,
+    formMode,
+    isMutationPending,
     isLoading,
-    isGoogleAuthLoading,
-    isLoadingRef,
+    isDoneAuthorize,
+    isAuthBusy,
+    setFormMode,
     onSubmit,
     switchMode,
     applyAuthError,

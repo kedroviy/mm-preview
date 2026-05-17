@@ -41,6 +41,8 @@ export const translations = {
       "Google Sign-In is not configured. Missing client id.",
     googleAuthLoading: "Signing in with Google…",
     googleAuthLoadingHint: "You will be redirected shortly.",
+    authDoneTitle: "Signed in successfully",
+    authDoneHint: "You will be redirected shortly.",
   },
   ru: {
     titleLogin: "Вход",
@@ -83,6 +85,8 @@ export const translations = {
     googleClientIdMissing: "Google авторизация не настроена. Нет client id.",
     googleAuthLoading: "Вход через Google…",
     googleAuthLoadingHint: "Скоро вы будете перенаправлены.",
+    authDoneTitle: "Вход выполнен успешно",
+    authDoneHint: "Скоро вы будете перенаправлены.",
   },
 } as const;
 

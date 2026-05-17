@@ -5,8 +5,10 @@ import { useTranslation } from "@/src/shared/i18n/useTranslation";
 import { useAuthForm } from "../hooks/useAuthForm";
 import { useGoogleSignIn } from "../hooks/useGoogleSignIn";
 import type { AuthMode } from "../types/auth";
+import { selectAuthUiState } from "../utils/auth-form-mode";
 import { AuthCredentialsForm } from "./AuthCredentialsForm";
 import { AuthFormLayout } from "./AuthFormLayout";
+import { AuthFormLoadingOverlay } from "./AuthFormLoadingOverlay";
 import { AuthGoogleLoading } from "./AuthGoogleLoading";
 import { AuthModeSwitch } from "./AuthModeSwitch";
 
@@ -14,13 +16,13 @@ interface UserCreationFormProps {
   mode: AuthMode;
 }
 
-export function UserCreationForm({ mode }: UserCreationFormProps) {
+export function UserCreationForm({ mode: authMode }: UserCreationFormProps) {
   const { t } = useTranslation();
   const {
     form,
-    isLoading,
-    isGoogleAuthLoading,
-    isLoadingRef,
+    formMode,
+    isMutationPending,
+    isAuthBusy,
     onSubmit,
     switchMode,
     applyAuthError,
@@ -28,50 +30,53 @@ export function UserCreationForm({ mode }: UserCreationFormProps) {
     googleAuth,
     clearRootError,
     setRootError,
-  } = useAuthForm(mode);
+    setFormMode,
+  } = useAuthForm(authMode);
+
+  const { isDoneAuthorize, isLoading } = selectAuthUiState(
+    formMode,
+    isMutationPending,
+  );
 
   const { signInWithGoogle, isClientIdMissing } = useGoogleSignIn({
     applyAuthError,
     clearRootError,
     googleAuth,
-    isLoadingRef,
+    isAuthBusy,
     runTokenLogin,
+    setFormMode,
     setRootError,
     translate: t,
   });
 
-  const title = mode === "login" ? t("titleLogin") : t("titleRegister");
+  const title = authMode === "login" ? t("titleLogin") : t("titleRegister");
   const switchLabel =
-    mode === "login" ? t("switchToRegister") : t("switchToLogin");
-
-  const showGoogleAuthLoading = mode === "login" && isGoogleAuthLoading;
+    authMode === "login" ? t("switchToRegister") : t("switchToLogin");
 
   return (
     <AuthFormLayout title={title}>
-      {showGoogleAuthLoading ? (
+      {isDoneAuthorize ? (
         <AuthGoogleLoading
-          title={t("googleAuthLoading")}
-          hint={t("googleAuthLoadingHint")}
+          title={t("authDoneTitle")}
+          hint={t("authDoneHint")}
         />
       ) : (
-        <>
+        <div className="relative">
           <FormProvider {...form}>
             <AuthCredentialsForm
-              mode={mode}
-              isLoading={isLoading}
+              authMode={authMode}
               onSubmit={onSubmit}
               translate={t}
               onGoogleSignIn={signInWithGoogle}
               isClientIdMissing={isClientIdMissing}
+              isMutationPending={isMutationPending}
             />
+
+            <AuthModeSwitch label={switchLabel} onSwitch={switchMode} />
           </FormProvider>
 
-          <AuthModeSwitch
-            label={switchLabel}
-            isLoading={isLoading}
-            onSwitch={switchMode}
-          />
-        </>
+          {isLoading && <AuthFormLoadingOverlay />}
+        </div>
       )}
     </AuthFormLayout>
   );
