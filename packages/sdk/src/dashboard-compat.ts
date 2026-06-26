@@ -26,7 +26,7 @@ import type { UserControllerGetMeParams } from "./generated/orval/models/userCon
 import type { RoomParticipantStateDto } from "./generated/orval/models/roomParticipantStateDto";
 import type { RoomStateDto } from "./generated/orval/models/roomStateDto";
 import type { UserRoomMembershipDto } from "./generated/orval/models/userRoomMembershipDto";
-import type { UserRoomMembershipDtoRole } from "./generated/orval/models/userRoomMembershipDtoRole";
+import { UserRoomMembershipDtoRole } from "./generated/orval/models/userRoomMembershipDtoRole";
 import {
 	checkStatus,
 	getMovieData,
@@ -251,7 +251,12 @@ export function useCreateRoom() {
 				throw new Error("Create room response missing roomKey");
 			}
 			const state = await roomsControllerGetRoomState(created.roomKey);
-			seedRoomCaches(queryClient, state, "admin", true);
+			seedRoomCaches(
+				queryClient,
+				state,
+				UserRoomMembershipDtoRole.admin,
+				true,
+			);
 			return {
 				roomId: String(state.roomId),
 				publicCode: state.roomKey,
@@ -273,7 +278,9 @@ export function useJoinRoom() {
 			seedRoomCaches(
 				queryClient,
 				state,
-				isAuthor ? "admin" : "participant",
+				isAuthor
+					? UserRoomMembershipDtoRole.admin
+					: UserRoomMembershipDtoRole.participant,
 				isAuthor,
 			);
 			return mapStateToRoom(state, uid);
