@@ -3,9 +3,10 @@
  * Keeps app imports stable when Orval names change.
  */
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import {
+	getRoomsControllerGetMyRoomMembershipsQueryKey,
 	getRoomsControllerGetRoomStateQueryKey,
 	roomsControllerCreateRoom,
 	roomsControllerGetRoomState,
@@ -101,15 +102,55 @@ function mapMembershipToRoom(m: UserRoomMembershipDto): Room {
 	};
 }
 
+/** Room keys are 6-digit public codes; route ids are numeric DB ids. */
+const ROOM_PUBLIC_CODE_PATTERN = /^\d{6}$/;
+
 function resolveRoomKey(
 	list: UserRoomMembershipDto[] | undefined,
 	roomRouteId: string,
-): string {
-	if (!list?.length) return roomRouteId;
-	const hit = list.find(
+	isMembershipsLoading: boolean,
+): string | null {
+	if (ROOM_PUBLIC_CODE_PATTERN.test(roomRouteId)) {
+		return roomRouteId;
+	}
+	if (isMembershipsLoading) {
+		return null;
+	}
+	const hit = list?.find(
 		(r) => r.roomId === roomRouteId || r.roomKey === roomRouteId,
 	);
-	return hit?.roomKey ?? roomRouteId;
+	return hit?.roomKey ?? null;
+}
+
+function seedRoomCaches(
+	queryClient: ReturnType<typeof useQueryClient>,
+	state: RoomStateDto,
+	role: string,
+	isAuthor: boolean,
+): void {
+	queryClient.setQueryData(
+		getRoomsControllerGetRoomStateQueryKey(state.roomKey),
+		state,
+	);
+	queryClient.setQueryData<UserRoomMembershipDto[]>(
+		getRoomsControllerGetMyRoomMembershipsQueryKey(),
+		(prev) => {
+			const entry: UserRoomMembershipDto = {
+				roomKey: state.roomKey,
+				roomId: String(state.roomId),
+				role,
+				isAuthor,
+				userStatus: "ACTIVE",
+				matchPhase: state.matchPhase,
+				roomStatus: state.roomStatus,
+				roomName: null,
+			};
+			const rest = (prev ?? []).filter(
+				(m) => m.roomId !== entry.roomId && m.roomKey !== entry.roomKey,
+			);
+			return [entry, ...rest];
+		},
+	);
 }
 
 /** My rooms list for the rooms table (matches legacy SDK shape). */
@@ -131,6 +172,7 @@ export function useMyRooms(options?: { enabled?: boolean }) {
 }
 
 export function useCreateRoom() {
+	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (vars?: { name?: string }) => {
 			const body: CreateRoomDto = {
@@ -138,9 +180,13 @@ export function useCreateRoom() {
 				filters: {},
 			};
 			const created = await roomsControllerCreateRoom(body);
+			if (!created.roomKey) {
+				throw new Error("Create room response missing roomKey");
+			}
 			const state = await roomsControllerGetRoomState(created.roomKey);
+			seedRoomCaches(queryClient, state, "admin", true);
 			return {
-				roomId: state.roomId,
+				roomId: String(state.roomId),
 				publicCode: state.roomKey,
 			};
 		},
@@ -148,10 +194,12 @@ export function useCreateRoom() {
 }
 
 export function useJoinRoom() {
+	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (vars: { publicCode: string }) => {
 			await roomsControllerJoinRoom(vars.publicCode);
 			const state = await roomsControllerGetRoomState(vars.publicCode);
+			seedRoomCaches(queryClient, state, "participant", false);
 			const token =
 				typeof document !== "undefined" ? getAccessToken() : null;
 			const uid = getUserIdFromToken(token);
@@ -167,14 +215,21 @@ export function useRoom(roomRouteId: string) {
 	const currentUserId = getUserIdFromToken(token);
 
 	const resolvedKey = useMemo(
-		() => resolveRoomKey(listQuery.data, roomRouteId),
-		[listQuery.data, roomRouteId],
+		() =>
+			resolveRoomKey(
+				listQuery.data,
+				roomRouteId,
+				listQuery.isPending,
+			),
+		[listQuery.data, roomRouteId, listQuery.isPending],
 	);
 
-	const stateQuery = useRoomsControllerGetRoomState(resolvedKey, {
+	const stateQuery = useRoomsControllerGetRoomState(resolvedKey ?? "", {
 		query: {
 			enabled: !!resolvedKey,
-			queryKey: getRoomsControllerGetRoomStateQueryKey(resolvedKey),
+			queryKey: resolvedKey
+				? getRoomsControllerGetRoomStateQueryKey(resolvedKey)
+				: getRoomsControllerGetRoomStateQueryKey("__pending__"),
 		},
 	});
 
@@ -183,22 +238,33 @@ export function useRoom(roomRouteId: string) {
 		return mapStateToRoom(stateQuery.data, currentUserId);
 	}, [stateQuery.data, currentUserId]);
 
+	const isResolvingKey = listQuery.isPending || (!resolvedKey && !listQuery.isFetched);
+
 	return {
 		...stateQuery,
 		data,
+		isPending: stateQuery.isPending || isResolvingKey,
+		isLoading: stateQuery.isPending || isResolvingKey,
 	};
 }
 
 export function useRoomMembers(roomRouteId: string) {
 	const listQuery = useRoomsControllerGetMyRoomMemberships();
 	const resolvedKey = useMemo(
-		() => resolveRoomKey(listQuery.data, roomRouteId),
-		[listQuery.data, roomRouteId],
+		() =>
+			resolveRoomKey(
+				listQuery.data,
+				roomRouteId,
+				listQuery.isPending,
+			),
+		[listQuery.data, roomRouteId, listQuery.isPending],
 	);
-	const stateQuery = useRoomsControllerGetRoomState(resolvedKey, {
+	const stateQuery = useRoomsControllerGetRoomState(resolvedKey ?? "", {
 		query: {
 			enabled: !!resolvedKey,
-			queryKey: getRoomsControllerGetRoomStateQueryKey(resolvedKey),
+			queryKey: resolvedKey
+				? getRoomsControllerGetRoomStateQueryKey(resolvedKey)
+				: getRoomsControllerGetRoomStateQueryKey("__pending__"),
 		},
 	});
 	const data = useMemo((): RoomMember[] | undefined => {
