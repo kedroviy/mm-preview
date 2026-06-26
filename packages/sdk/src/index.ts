@@ -18,9 +18,17 @@ export {
 	webSocketService,
 	type WebSocketServiceEvents,
 } from "./runtime/websocket-service";
+export {
+	matchWebSocketService,
+	type BroadcastMoviesPayload,
+	type MatchWebSocketEvents,
+} from "./runtime/match-websocket-service";
 
 /** Dashboard wrappers + domain types (Room, ChatMessage, …). */
 export * from "./dashboard-compat";
+
+/** Same REST calls as movieMatcher `features/match/match-service.ts`. */
+export * from "./match-api";
 
 /** OpenAPI + TanStack Query (Orval). Regenerate with `npm run sdk:generate` from repo root. */
 export * from "./generated/orval/api";

@@ -26,7 +26,8 @@ export function JoinRoomForm({
 
     try {
       const result = await joinRoom.mutateAsync({
-        publicCode: roomCode,
+        key: roomCode,
+        userId: Number(userId),
       });
       notificationService.showSuccess("Вы успешно присоединились к комнате!");
       onSuccess?.(result);

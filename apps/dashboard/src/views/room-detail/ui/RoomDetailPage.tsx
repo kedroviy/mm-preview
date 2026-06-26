@@ -2,23 +2,24 @@
 
 import {
   getAccessToken,
+  getRoomsControllerGetRoomStateQueryKey,
   getUserIdFromToken,
   useLeaveRoom,
   useRoom,
   useRoomMembers,
 } from "@mm-preview/sdk";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button, notificationService, ProgressSpinner } from "@mm-preview/ui";
 import { Suspense, useCallback, useMemo } from "react";
 import Loading from "@/app/loading";
 import { ChatWindow, useChat } from "@/src/features/chat";
+import { RoomJoinBanner, RoomMatchPanel } from "@/src/features/match";
 import {
   useViewTransition,
   ViewTransition,
 } from "@/src/shared/components/ViewTransition";
-import { RoomChoices } from "@/src/widgets/room-choices";
 import { RoomHeader } from "@/src/widgets/room-header";
 import { RoomMembers } from "@/src/widgets/room-members";
-import { RoomNotMember } from "@/src/widgets/room-not-member";
 
 type ViewConfig = {
   view: "loading" | "error" | "not-member" | "member";
@@ -31,12 +32,15 @@ interface RoomDetailPageProps {
 }
 
 function RoomContent({ userId, roomId }: RoomDetailPageProps) {
+  const queryClient = useQueryClient();
   const tokenUserId = getUserIdFromToken(getAccessToken());
   const effectiveUserId = tokenUserId ?? userId;
-  const { data: room, isLoading: roomLoading } = useRoom(roomId);
+  const { data: room, isLoading: roomLoading, refetch: refetchRoom } = useRoom(roomId);
   const { data: members } = useRoomMembers(roomId);
   const leaveRoom = useLeaveRoom();
   const { navigate, isPending } = useViewTransition();
+
+  const isMember = room?.isMember ?? false;
 
   const {
     messages: chatMessages,
@@ -48,7 +52,7 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
     roomId,
     publicCode: room?.publicCode,
     userId: effectiveUserId,
-    enabled: !!(roomId && room?.isMember && effectiveUserId),
+    enabled: !!(roomId && isMember && effectiveUserId),
   });
 
   const handleLeaveRoom = useCallback(async () => {
@@ -57,7 +61,10 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
     }
 
     try {
-      await leaveRoom.mutateAsync({ roomId, roomKey: room.publicCode });
+      await leaveRoom.mutateAsync({
+        roomKey: room.publicCode,
+        userId: Number(effectiveUserId),
+      });
       notificationService.showSuccess("Вы покинули комнату");
       navigate(`/${effectiveUserId}/rooms`);
     } catch (_error) {
@@ -69,6 +76,16 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
     () => navigate(`/${effectiveUserId}/rooms`),
     [navigate, effectiveUserId],
   );
+
+  const handleJoinedRoom = useCallback(() => {
+    if (room?.publicCode) {
+      queryClient.invalidateQueries({
+        queryKey: getRoomsControllerGetRoomStateQueryKey(room.publicCode),
+      });
+    }
+    void refetchRoom();
+  }, [queryClient, room?.publicCode, refetchRoom]);
+
   const handleRemoveMember = useCallback((_memberUserId: string) => {
     notificationService.showInfo("Функция удаления участника будет добавлена");
   }, []);
@@ -120,45 +137,14 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
       };
     }
 
-    if (!room.isMember) {
-      return {
-        view: "not-member",
-        render: () => (
-          <ViewTransition name="page">
-            <div className="min-h-screen p-8">
-              <div className="max-w-4xl mx-auto">
-                <RoomHeader
-                  room={room}
-                  userRole={room.currentUserRole}
-                  onBack={handleBack}
-                  onLeave={handleLeaveRoom}
-                  isLeaving={leaveRoom.isPending}
-                  isPending={isPending}
-                />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <RoomMembers
-                    room={room}
-                    members={members}
-                    currentUserId={userId}
-                    canManage={room.canManage}
-                    onRemoveMember={handleRemoveMember}
-                  />
-                  <RoomChoices room={room} currentUserId={userId} />
-                </div>
-                <RoomNotMember onBack={handleBack} isPending={isPending} />
-              </div>
-            </div>
-          </ViewTransition>
-        ),
-      };
-    }
+    const memberId = effectiveUserId;
 
     return {
-      view: "member",
+      view: isMember ? "member" : "not-member",
       render: () => (
         <ViewTransition name="page">
-          <div className="min-h-screen p-8">
-            <div className="max-w-4xl mx-auto">
+          <div className="min-h-screen p-4 md:p-8">
+            <div className="max-w-3xl mx-auto flex flex-col gap-6">
               <RoomHeader
                 room={room}
                 userRole={room.currentUserRole}
@@ -167,23 +153,38 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
                 isLeaving={leaveRoom.isPending}
                 isPending={isPending}
               />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <RoomMembers
-                  room={room}
-                  members={members}
-                  currentUserId={userId}
-                  canManage={room.canManage}
-                  onRemoveMember={handleRemoveMember}
+
+              {!isMember && room.publicCode ? (
+                <RoomJoinBanner
+                  publicCode={room.publicCode}
+                  userId={effectiveUserId}
+                  onJoined={handleJoinedRoom}
                 />
-                <RoomChoices room={room} currentUserId={userId} />
-              </div>
-              <ChatWindow
+              ) : null}
+
+              <RoomMatchPanel
+                room={room}
                 userId={effectiveUserId}
-                messages={chatMessages}
-                onSendMessage={sendChatMessage}
-                isLoading={!isChatConnected || !isReadyToSend}
-                isMuted={isMuted}
+                onBackToRooms={handleBack}
               />
+
+              <RoomMembers
+                room={room}
+                members={members}
+                currentUserId={memberId}
+                canManage={room.canManage}
+                onRemoveMember={handleRemoveMember}
+              />
+
+              {isMember ? (
+                <ChatWindow
+                  userId={effectiveUserId}
+                  messages={chatMessages}
+                  onSendMessage={sendChatMessage}
+                  isLoading={!isChatConnected || !isReadyToSend}
+                  isMuted={isMuted}
+                />
+              ) : null}
             </div>
           </div>
         </ViewTransition>
@@ -193,6 +194,7 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
     effectiveUserId,
     roomLoading,
     room,
+    isMember,
     members,
     chatMessages,
     isChatConnected,
@@ -202,6 +204,7 @@ function RoomContent({ userId, roomId }: RoomDetailPageProps) {
     isPending,
     handleBack,
     handleLeaveRoom,
+    handleJoinedRoom,
     handleRemoveMember,
   ]);
 
