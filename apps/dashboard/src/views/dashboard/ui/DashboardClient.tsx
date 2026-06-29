@@ -56,7 +56,6 @@ export function DashboardClient({
   initialProfile,
 }: DashboardClientProps) {
   const [tab, setTab] = useState<DashboardTab>("discover");
-  /** Avoid running `/user/me` during SSR: no `document.cookie` / localStorage on the server. */
   const [clientReady, setClientReady] = useState(false);
   const { navigate, isPending } = useViewTransition();
 
@@ -350,20 +349,6 @@ export function DashboardClient({
                     </p>
                   </div>
                 </div>
-                <dl className="grid grid-cols-1 gap-3 text-sm">
-                  <div className="flex justify-between gap-4 py-2 border-b border-slate-100">
-                    <dt className="text-slate-500">Роль</dt>
-                    <dd className="font-medium capitalize">
-                      {user.role ?? "user"}
-                    </dd>
-                  </div>
-                  <div className="flex justify-between gap-4 py-2 border-b border-slate-100">
-                    <dt className="text-slate-500">Активность</dt>
-                    <dd className="font-medium">
-                      {formatLastActive(user.lastActive)}
-                    </dd>
-                  </div>
-                </dl>
                 <Button
                   type="button"
                   label="Выйти"
