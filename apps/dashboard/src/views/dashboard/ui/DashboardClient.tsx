@@ -245,8 +245,7 @@ export function DashboardClient({
                   Вдохновение на вечер
                 </h2>
                 <p className="mt-2 text-slate-600 max-w-xl">
-                  Как в ленте Pinterest: быстрые «коллажи» настроения. Выберите
-                  комнату во вкладке «Матч» и соберите друзей.
+                  Не знаешь какой фильм выбрать? С нами ты выберешь идеальный фильм, для идеального вечера!
                 </p>
               </div>
               <div className="columns-2 sm:columns-3 gap-3 space-y-3">
