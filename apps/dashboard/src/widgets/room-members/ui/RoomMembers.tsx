@@ -55,7 +55,7 @@ export function RoomMembers({
                     )}
                     {canManage && !isCurrentUser && (
                       <Button
-                        size="small"
+                        size="s"
                         severity="danger"
                         text
                         onClick={() => onRemoveMember?.(member.userId)}
