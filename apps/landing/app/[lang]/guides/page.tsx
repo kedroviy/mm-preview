@@ -113,7 +113,9 @@ export default async function GuidesIndexPage({
         <h1 className="mt-6 font-[family-name:var(--font-syne)] text-3xl font-bold tracking-tight text-[var(--landing-ink)] sm:text-4xl">
           {g.indexH1}
         </h1>
-        <p className="mt-4 text-lg text-[var(--landing-muted)]">{g.indexIntro}</p>
+        <p className="mt-4 text-lg text-[var(--landing-muted)]">
+          {g.indexIntro}
+        </p>
         <p className="mt-6">
           <Link
             href={`/${locale}#download`}
@@ -140,14 +142,6 @@ export default async function GuidesIndexPage({
           ))}
         </ul>
       </main>
-      <footer className="border-t border-violet-100/80 py-10 text-center text-sm text-[var(--landing-muted)]">
-        <p>
-          {g.footerCopyright} {new Date().getFullYear()} Movie Match ·{" "}
-          <Link href={`/${locale}`} className="text-violet-600 hover:underline">
-            {g.home}
-          </Link>
-        </p>
-      </footer>
     </div>
   );
 }

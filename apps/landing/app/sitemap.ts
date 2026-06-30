@@ -80,5 +80,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
       };
     }),
     ...localizedGuides,
+    ...SUPPORTED_LOCALES.map((lang) => {
+      const alternates = buildLanguageAlternates(
+        Object.fromEntries(
+          SUPPORTED_LOCALES.map((locale) => [
+            HREFLANG_FOR_LOCALE[locale],
+            `${base}/${locale}/privacy`,
+          ]),
+        ),
+      );
+      return {
+        url: `${base}/${lang}/privacy`,
+        lastModified,
+        changeFrequency: "yearly" as const,
+        priority: 0.4,
+        alternates,
+      };
+    }),
   ];
 }

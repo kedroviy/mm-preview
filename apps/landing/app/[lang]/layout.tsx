@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { Outfit, Syne } from "next/font/google";
+import { notFound } from "next/navigation";
 import {
+  createLandingMetadata,
   SUPPORTED_LOCALES,
   type SupportedLocale,
-  createLandingMetadata,
 } from "@/src/shared/config/metadata";
 import { Provider } from "@/src/shared/config/providers/Provider";
+import { LandingFooter } from "@/src/shared/ui/footer/LandingFooter";
+import { YandexRtb } from "@/src/shared/ui/yandex-rtb/YandexRtb";
 
 export const dynamic = "force-static";
 export const dynamicParams = false;
@@ -62,15 +64,24 @@ export default async function LangLayout({
   const locale = lang as SupportedLocale;
 
   return (
-    <html lang={locale} className={`${fontDisplay.variable} ${fontSans.variable}`}>
-      <body className="landing-body font-[family-name:var(--font-outfit)] antialiased">
+    <html
+      lang={locale}
+      className={`${fontDisplay.variable} ${fontSans.variable}`}
+      suppressHydrationWarning
+    >
+      <body
+        className="landing-body font-[family-name:var(--font-outfit)] antialiased"
+        suppressHydrationWarning
+      >
         <a
           href="#top"
           className="fixed left-4 top-0 z-[9999] -translate-y-full rounded-b-lg bg-violet-900 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-transform focus:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-violet-900"
         >
           {skipLinkText[locale]}
         </a>
+        <YandexRtb />
         <Provider>{children}</Provider>
+        <LandingFooter lang={locale} />
       </body>
     </html>
   );

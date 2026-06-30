@@ -64,19 +64,47 @@ function GooglePlayBadge({
         {bottomLine}
       </text>
       <defs>
-        <linearGradient id="gp-a" x1="8" y1="40" x2="26" y2="22" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="gp-a"
+          x1="8"
+          y1="40"
+          x2="26"
+          y2="22"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop stopColor="#00D4FF" />
           <stop offset="1" stopColor="#00F076" />
         </linearGradient>
-        <linearGradient id="gp-b" x1="8" y1="10" x2="34" y2="24" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="gp-b"
+          x1="8"
+          y1="10"
+          x2="34"
+          y2="24"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop stopColor="#FFD800" />
           <stop offset="1" stopColor="#FF4E00" />
         </linearGradient>
-        <linearGradient id="gp-c" x1="10" y1="42" x2="34" y2="28" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="gp-c"
+          x1="10"
+          y1="42"
+          x2="34"
+          y2="28"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop stopColor="#FF4E00" />
           <stop offset="1" stopColor="#FC1964" />
         </linearGradient>
-        <linearGradient id="gp-d" x1="26" y1="20" x2="38" y2="32" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="gp-d"
+          x1="26"
+          y1="20"
+          x2="38"
+          y2="32"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop stopColor="#00F076" />
           <stop offset="1" stopColor="#00D4FF" />
         </linearGradient>
@@ -94,11 +122,12 @@ export function MainBlock({
 }) {
   const guides = getGuidesForLocale(lang);
   const t = (key: string) => getLandingMessage(messages, lang, key);
-  const badgeByLang: Record<SupportedLocale, { top: string; bottom: string }> = {
-    ru: { top: "GET IT ON", bottom: "Google Play" },
-    en: { top: "GET IT ON", bottom: "Google Play" },
-    es: { top: "DISPONIBLE EN", bottom: "Google Play" },
-  };
+  const badgeByLang: Record<SupportedLocale, { top: string; bottom: string }> =
+    {
+      ru: { top: "GET IT ON", bottom: "Google Play" },
+      en: { top: "GET IT ON", bottom: "Google Play" },
+      es: { top: "DISPONIBLE EN", bottom: "Google Play" },
+    };
 
   const handleCreateUser = () => {
     const urls = getAppUrls();
@@ -110,15 +139,47 @@ export function MainBlock({
     t(`hero.marquee.${index + 1}`),
   );
   const features = [
-    { title: t("features.item.1.title"), desc: t("features.item.1.desc"), icon: "pi-comment", span: "md:col-span-2" },
-    { title: t("features.item.2.title"), desc: t("features.item.2.desc"), icon: "pi-users", span: "md:col-span-1" },
-    { title: t("features.item.3.title"), desc: t("features.item.3.desc"), icon: "pi-heart", span: "md:col-span-1" },
-    { title: t("features.item.4.title"), desc: t("features.item.4.desc"), icon: "pi-android", span: "md:col-span-2" },
+    {
+      title: t("features.item.1.title"),
+      desc: t("features.item.1.desc"),
+      icon: "pi-comment",
+      span: "md:col-span-2",
+    },
+    {
+      title: t("features.item.2.title"),
+      desc: t("features.item.2.desc"),
+      icon: "pi-users",
+      span: "md:col-span-1",
+    },
+    {
+      title: t("features.item.3.title"),
+      desc: t("features.item.3.desc"),
+      icon: "pi-heart",
+      span: "md:col-span-1",
+    },
+    {
+      title: t("features.item.4.title"),
+      desc: t("features.item.4.desc"),
+      icon: "pi-android",
+      span: "md:col-span-2",
+    },
   ] as const;
   const reviews = [
-    { quote: t("reviews.item.1.quote"), name: t("reviews.item.1.name"), role: t("reviews.item.1.role") },
-    { quote: t("reviews.item.2.quote"), name: t("reviews.item.2.name"), role: t("reviews.item.2.role") },
-    { quote: t("reviews.item.3.quote"), name: t("reviews.item.3.name"), role: t("reviews.item.3.role") },
+    {
+      quote: t("reviews.item.1.quote"),
+      name: t("reviews.item.1.name"),
+      role: t("reviews.item.1.role"),
+    },
+    {
+      quote: t("reviews.item.2.quote"),
+      name: t("reviews.item.2.name"),
+      role: t("reviews.item.2.role"),
+    },
+    {
+      quote: t("reviews.item.3.quote"),
+      name: t("reviews.item.3.name"),
+      role: t("reviews.item.3.role"),
+    },
   ] as const;
 
   return (
@@ -142,10 +203,15 @@ export function MainBlock({
                 {t("hero.badge")}
               </p>
               <h1 className="font-[family-name:var(--font-syne)] text-4xl font-extrabold leading-[1.05] tracking-tight text-[var(--landing-ink)] sm:text-6xl lg:text-7xl">
-                {t("hero.title.before")} <span className="landing-headline-gradient">{t("hero.title.highlight")}</span>
+                {t("hero.title.before")}{" "}
+                <span className="landing-headline-gradient">
+                  {t("hero.title.highlight")}
+                </span>
                 <br className="hidden sm:block" /> {t("hero.title.after")}
               </h1>
-              <p className="mx-auto mt-6 max-w-2xl text-lg text-[var(--landing-muted)] sm:text-xl">{t("hero.description")}</p>
+              <p className="mx-auto mt-6 max-w-2xl text-lg text-[var(--landing-muted)] sm:text-xl">
+                {t("hero.description")}
+              </p>
               <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-5">
                 <ButtonShadcn
                   type="button"
@@ -172,12 +238,24 @@ export function MainBlock({
               <div className="landing-glass relative overflow-hidden rounded-3xl border border-violet-100 p-1 shadow-md shadow-violet-100/40">
                 <div className="landing-shimmer-line absolute inset-x-0 top-0 h-px" />
                 <div className="flex overflow-hidden rounded-[1.35rem] bg-gradient-to-r from-white via-violet-50/40 to-emerald-50/30 py-3">
-                  <div className="landing-marquee-track gap-12 pr-12 text-sm font-medium text-[var(--landing-muted)]" aria-hidden>
+                  <div
+                    className="landing-marquee-track gap-12 pr-12 text-sm font-medium text-[var(--landing-muted)]"
+                    aria-hidden
+                  >
                     {(["marquee-a", "marquee-b"] as const).map((marqueeKey) => (
-                      <div key={marqueeKey} className="flex shrink-0 items-center gap-12">
+                      <div
+                        key={marqueeKey}
+                        className="flex shrink-0 items-center gap-12"
+                      >
                         {heroMarquee.map((itemText) => (
-                          <span key={`${marqueeKey}-${itemText}`} className="flex items-center gap-2 whitespace-nowrap">
-                            <i className="pi pi-film text-violet-500" aria-hidden />
+                          <span
+                            key={`${marqueeKey}-${itemText}`}
+                            className="flex items-center gap-2 whitespace-nowrap"
+                          >
+                            <i
+                              className="pi pi-film text-violet-500"
+                              aria-hidden
+                            />
                             {itemText}
                           </span>
                         ))}
@@ -193,8 +271,12 @@ export function MainBlock({
                 <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-violet-300/35 blur-3xl" />
                 <div className="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
                   <div>
-                    <p className="text-sm font-medium text-violet-600">{t("hero.appScenarioLabel")}</p>
-                    <p className="mt-2 max-w-md text-2xl font-semibold text-[var(--landing-ink)] sm:text-3xl">{t("hero.appScenarioTitle")}</p>
+                    <p className="text-sm font-medium text-violet-600">
+                      {t("hero.appScenarioLabel")}
+                    </p>
+                    <p className="mt-2 max-w-md text-2xl font-semibold text-[var(--landing-ink)] sm:text-3xl">
+                      {t("hero.appScenarioTitle")}
+                    </p>
                   </div>
                   <div className="flex gap-3" aria-hidden>
                     <div className="h-24 w-20 rounded-2xl bg-gradient-to-br from-violet-100 to-violet-50 ring-1 ring-violet-200/80 transition hover:rotate-[-4deg]" />
@@ -205,20 +287,45 @@ export function MainBlock({
               </div>
               <div className="landing-glass landing-card-hover flex flex-col justify-between rounded-3xl p-8">
                 <div>
-                  <p className="text-4xl font-[family-name:var(--font-syne)] font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">Play</p>
-                  <p className="mt-1 text-sm text-[var(--landing-muted)]">{t("hero.playNote")}</p>
+                  <p className="text-4xl font-[family-name:var(--font-syne)] font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">
+                    Play
+                  </p>
+                  <p className="mt-1 text-sm text-[var(--landing-muted)]">
+                    {t("hero.playNote")}
+                  </p>
                 </div>
                 <div className="mt-8 space-y-3 border-t border-violet-100 pt-6">
-                  <div className="flex items-center gap-3 text-sm text-slate-700"><i className="pi pi-check-circle text-emerald-500" aria-hidden />{t("hero.playBullet.1")}</div>
-                  <div className="flex items-center gap-3 text-sm text-slate-700"><i className="pi pi-check-circle text-emerald-500" aria-hidden />{t("hero.playBullet.2")}</div>
-                  <div className="flex items-center gap-3 text-sm text-slate-700"><i className="pi pi-check-circle text-emerald-500" aria-hidden />{t("hero.playBullet.3")}</div>
+                  <div className="flex items-center gap-3 text-sm text-slate-700">
+                    <i
+                      className="pi pi-check-circle text-emerald-500"
+                      aria-hidden
+                    />
+                    {t("hero.playBullet.1")}
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-700">
+                    <i
+                      className="pi pi-check-circle text-emerald-500"
+                      aria-hidden
+                    />
+                    {t("hero.playBullet.2")}
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-700">
+                    <i
+                      className="pi pi-check-circle text-emerald-500"
+                      aria-hidden
+                    />
+                    {t("hero.playBullet.3")}
+                  </div>
                 </div>
               </div>
             </Reveal>
           </div>
         </section>
 
-        <section id="download" className="relative scroll-mt-28 py-12 sm:scroll-mt-32 sm:py-20">
+        <section
+          id="download"
+          className="relative scroll-mt-28 py-12 sm:scroll-mt-32 sm:py-20"
+        >
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-violet-100/40 to-emerald-50/30" />
           <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <Reveal>
@@ -227,28 +334,65 @@ export function MainBlock({
                   <div className="absolute left-1/2 top-0 h-40 w-[min(90%,480px)] -translate-x-1/2 rounded-full bg-violet-200/50 blur-[100px]" />
                   <div className="relative grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16">
                     <div className="min-w-0">
-                      <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-violet-800 ring-1 ring-violet-200/80">{t("download.badge")}</span>
+                      <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-violet-800 ring-1 ring-violet-200/80">
+                        {t("download.badge")}
+                      </span>
                       <h2 className="mt-5 font-[family-name:var(--font-syne)] text-3xl font-bold leading-[1.2] tracking-tight text-[var(--landing-ink)] sm:text-4xl sm:leading-[1.18] lg:text-5xl lg:leading-[1.15]">
-                        {t("download.title.before")} <span className="landing-gradient-clip bg-gradient-to-r from-emerald-600 to-teal-600">Movie Match</span> {t("download.title.after")}
+                        {t("download.title.before")}{" "}
+                        <span className="landing-gradient-clip bg-gradient-to-r from-emerald-600 to-teal-600">
+                          Movie Match
+                        </span>{" "}
+                        {t("download.title.after")}
                       </h2>
-                      <p className="mt-4 max-w-xl text-lg text-[var(--landing-muted)]">{t("download.description")}</p>
+                      <p className="mt-4 max-w-xl text-lg text-[var(--landing-muted)]">
+                        {t("download.description")}
+                      </p>
                     </div>
 
                     <div className="flex flex-col items-center justify-center gap-6">
                       <div className="relative flex w-full max-w-sm flex-col items-center rounded-2xl border border-violet-100 bg-gradient-to-b from-white to-violet-50/40 p-8 shadow-md shadow-violet-100/60 transition hover:border-violet-200">
                         <div className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br from-violet-100/60 via-transparent to-emerald-100/40" />
-                        <a href={playUrl} target="_blank" rel="noopener noreferrer" className="group flex w-full flex-col items-center gap-5 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400" aria-label={t("download.cardAria")}>
-                          <GooglePlayBadge className="h-14 w-auto drop-shadow-[0_12px_32px_rgba(0,0,0,0.5)] transition group-hover:scale-[1.03]" topLine={badgeByLang[lang].top} bottomLine={badgeByLang[lang].bottom} />
+                        <a
+                          href={playUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex w-full flex-col items-center gap-5 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+                          aria-label={t("download.cardAria")}
+                        >
+                          <GooglePlayBadge
+                            className="h-14 w-auto drop-shadow-[0_12px_32px_rgba(0,0,0,0.5)] transition group-hover:scale-[1.03]"
+                            topLine={badgeByLang[lang].top}
+                            bottomLine={badgeByLang[lang].bottom}
+                          />
                           <div className="hidden w-full grid-cols-[1fr_auto] items-center gap-4 rounded-2xl border border-violet-100/80 bg-white/70 p-4 md:grid">
-                            <span className="text-sm text-[var(--landing-muted)]">{t("download.qrHint")}</span>
+                            <span className="text-sm text-[var(--landing-muted)]">
+                              {t("download.qrHint")}
+                            </span>
                             <span className="rounded-xl bg-white p-2 shadow-sm">
-                              <img src="/qr-google-play.svg" alt={t("download.qrAlt")} width={104} height={104} loading="lazy" decoding="async" />
+                              <img
+                                src="/qr-google-play.svg"
+                                alt={t("download.qrAlt")}
+                                width={104}
+                                height={104}
+                                loading="lazy"
+                                decoding="async"
+                              />
                             </span>
                           </div>
-                          <span className="text-center text-sm text-[var(--landing-muted)]">{t("download.cardHint")}</span>
+                          <span className="text-center text-sm text-[var(--landing-muted)]">
+                            {t("download.cardHint")}
+                          </span>
                         </a>
                       </div>
-                      <a href={playUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-violet-600 underline-offset-4 hover:text-violet-800 hover:underline" aria-label={t("download.linkAria")}>{t("download.link")}</a>
+                      <a
+                        href={playUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-medium text-violet-600 underline-offset-4 hover:text-violet-800 hover:underline"
+                        aria-label={t("download.linkAria")}
+                      >
+                        {t("download.link")}
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -257,17 +401,35 @@ export function MainBlock({
           </div>
         </section>
 
-        <section id="features" className="scroll-mt-28 py-16 sm:scroll-mt-32 sm:py-24">
+        <section
+          id="features"
+          className="scroll-mt-28 py-16 sm:scroll-mt-32 sm:py-24"
+        >
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <Reveal className="mx-auto max-w-2xl text-center">
-              <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">{t("features.title")}</h2>
-              <p className="mt-3 text-[var(--landing-muted)]">{t("features.description")}</p>
+              <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
+                {t("features.title")}
+              </h2>
+              <p className="mt-3 text-[var(--landing-muted)]">
+                {t("features.description")}
+              </p>
             </Reveal>
             <div className="mt-12 grid gap-5 md:grid-cols-3">
               {features.map((f, i) => (
-                <Reveal key={f.title} delay={i * 70} className={`landing-glass landing-card-hover rounded-3xl p-8 ${f.span}`}>
-                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-fuchsia-100 ring-1 ring-violet-200/80"><i className={`pi ${f.icon} text-xl text-violet-600`} aria-hidden /></div>
-                  <h3 className="font-[family-name:var(--font-syne)] text-xl font-semibold text-[var(--landing-ink)]">{f.title}</h3>
+                <Reveal
+                  key={f.title}
+                  delay={i * 70}
+                  className={`landing-glass landing-card-hover rounded-3xl p-8 ${f.span}`}
+                >
+                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-fuchsia-100 ring-1 ring-violet-200/80">
+                    <i
+                      className={`pi ${f.icon} text-xl text-violet-600`}
+                      aria-hidden
+                    />
+                  </div>
+                  <h3 className="font-[family-name:var(--font-syne)] text-xl font-semibold text-[var(--landing-ink)]">
+                    {f.title}
+                  </h3>
                   <p className="mt-2 text-[var(--landing-muted)]">{f.desc}</p>
                 </Reveal>
               ))}
@@ -277,27 +439,50 @@ export function MainBlock({
 
         <ScenarioPicker lang={lang} messages={messages} />
 
-        <section id="guides" className="scroll-mt-28 border-t border-violet-100/90 py-16 sm:scroll-mt-32 sm:py-24">
+        <section
+          id="guides"
+          className="scroll-mt-28 border-t border-violet-100/90 py-16 sm:scroll-mt-32 sm:py-24"
+        >
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <Reveal className="mx-auto max-w-2xl text-center">
-              <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">{t("guides.sectionTitle")}</h2>
-              <p className="mt-3 text-[var(--landing-muted)]">{t("guides.sectionDescription")}</p>
+              <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
+                {t("guides.sectionTitle")}
+              </h2>
+              <p className="mt-3 text-[var(--landing-muted)]">
+                {t("guides.sectionDescription")}
+              </p>
             </Reveal>
-            <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label={t("guides.sectionAria")}>
+            <ul
+              className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+              aria-label={t("guides.sectionAria")}
+            >
               {guides.map((g, i) => (
                 <li key={g.slug} className="min-h-0">
                   <Reveal delay={i * 40} className="h-full">
-                    <Link href={`/${lang}/guides/${g.slug}`} className="landing-glass landing-card-hover flex h-full min-h-0 flex-col rounded-2xl border border-violet-100/90 p-6 no-underline transition hover:border-violet-200">
-                      <span className="font-[family-name:var(--font-syne)] text-lg font-semibold text-[var(--landing-ink)]">{g.h1}</span>
-                      <span className="mt-2 line-clamp-3 text-sm text-[var(--landing-muted)]">{g.metaDescription}</span>
-                      <span className="mt-4 text-sm font-medium text-violet-600">{t("guides.readMore")}</span>
+                    <Link
+                      href={`/${lang}/guides/${g.slug}`}
+                      className="landing-glass landing-card-hover flex h-full min-h-0 flex-col rounded-2xl border border-violet-100/90 p-6 no-underline transition hover:border-violet-200"
+                    >
+                      <span className="font-[family-name:var(--font-syne)] text-lg font-semibold text-[var(--landing-ink)]">
+                        {g.h1}
+                      </span>
+                      <span className="mt-2 line-clamp-3 text-sm text-[var(--landing-muted)]">
+                        {g.metaDescription}
+                      </span>
+                      <span className="mt-4 text-sm font-medium text-violet-600">
+                        {t("guides.readMore")}
+                      </span>
                     </Link>
                   </Reveal>
                 </li>
               ))}
             </ul>
             <p className="mt-8 text-center">
-              <Link href={`/${lang}/guides`} className="text-sm font-semibold text-violet-600 underline-offset-4 hover:text-violet-800 hover:underline" aria-label={t("guides.allGuidesAria")}>
+              <Link
+                href={`/${lang}/guides`}
+                className="text-sm font-semibold text-violet-600 underline-offset-4 hover:text-violet-800 hover:underline"
+                aria-label={t("guides.allGuidesAria")}
+              >
                 {t("guides.allGuides")}
               </Link>
             </p>
@@ -306,22 +491,44 @@ export function MainBlock({
 
         <LandingFaq lang={lang} messages={messages} />
 
-        <section id="reviews" className="scroll-mt-28 border-t border-violet-100/90 py-16 sm:scroll-mt-32 sm:py-24">
+        <section
+          id="reviews"
+          className="scroll-mt-28 border-t border-violet-100/90 py-16 sm:scroll-mt-32 sm:py-24"
+        >
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <Reveal className="mx-auto max-w-2xl text-center">
-              <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">{t("reviews.title")}</h2>
-              <p className="mt-3 text-[var(--landing-muted)]">{t("reviews.description")}</p>
+              <h2 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
+                {t("reviews.title")}
+              </h2>
+              <p className="mt-3 text-[var(--landing-muted)]">
+                {t("reviews.description")}
+              </p>
             </Reveal>
             <div className="mt-12 grid auto-rows-fr gap-6 md:grid-cols-3">
               {reviews.map((r, i) => (
-                <Reveal key={`${r.name}-${i}`} delay={i * 80} className="h-full min-h-0">
+                <Reveal
+                  key={`${r.name}-${i}`}
+                  delay={i * 80}
+                  className="h-full min-h-0"
+                >
                   <blockquote className="landing-glass landing-card-hover flex h-full min-h-0 flex-col rounded-3xl p-8">
-                    <p className="text-lg leading-relaxed text-slate-700">«{r.quote}»</p>
+                    <p className="text-lg leading-relaxed text-slate-700">
+                      «{r.quote}»
+                    </p>
                     <footer className="mt-auto flex items-center gap-3 border-t border-violet-100 pt-6">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 text-sm font-bold text-white" aria-hidden>{r.name[0]}</div>
+                      <div
+                        className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 text-sm font-bold text-white"
+                        aria-hidden
+                      >
+                        {r.name[0]}
+                      </div>
                       <div>
-                        <cite className="not-italic font-semibold text-[var(--landing-ink)]">{r.name}</cite>
-                        <p className="text-sm text-[var(--landing-muted)]">{r.role}</p>
+                        <cite className="not-italic font-semibold text-[var(--landing-ink)]">
+                          {r.name}
+                        </cite>
+                        <p className="text-sm text-[var(--landing-muted)]">
+                          {r.role}
+                        </p>
                       </div>
                     </footer>
                   </blockquote>
@@ -337,8 +544,12 @@ export function MainBlock({
               <div className="landing-glass relative overflow-hidden rounded-[2rem] px-8 py-14 sm:px-16">
                 <div className="pointer-events-none absolute -left-24 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-violet-200/60 blur-[90px]" />
                 <div className="pointer-events-none absolute -right-24 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-amber-100/80 blur-[90px]" />
-                <h2 className="relative font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">{t("cta.title")}</h2>
-                <p className="relative mx-auto mt-4 max-w-lg text-[var(--landing-muted)]">{t("cta.description")}</p>
+                <h2 className="relative font-[family-name:var(--font-syne)] text-3xl font-bold text-[var(--landing-ink)] sm:text-4xl">
+                  {t("cta.title")}
+                </h2>
+                <p className="relative mx-auto mt-4 max-w-lg text-[var(--landing-muted)]">
+                  {t("cta.description")}
+                </p>
                 <div className="relative mt-8 flex flex-wrap justify-center gap-4">
                   <ButtonShadcn
                     type="button"
@@ -363,9 +574,6 @@ export function MainBlock({
           </div>
         </section>
       </main>
-      <footer className="mx-auto mt-16 max-w-6xl px-4 pb-24 text-center text-sm text-[var(--landing-muted)] sm:px-6">
-        <p>© {new Date().getFullYear()} Movie Match</p>
-      </footer>
     </>
   );
 }
