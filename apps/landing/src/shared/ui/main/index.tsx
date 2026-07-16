@@ -365,6 +365,7 @@ export function MainBlock({
       </main>
       <footer className="mx-auto mt-16 max-w-6xl px-4 pb-24 text-center text-sm text-[var(--landing-muted)] sm:px-6">
         <p>© {new Date().getFullYear()} Movie Match</p>
+        <a href={'https://t.me/movie_match'}>Official Telegram Channel for Movie Match</a>
       </footer>
     </>
   );
