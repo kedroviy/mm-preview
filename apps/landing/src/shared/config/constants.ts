@@ -109,7 +109,7 @@ function getAppUrl(key: "LANDING" | "USER_CREATION" | "DASHBOARD"): string {
   const baseDomain = "vercel.app";
   const appNames: Record<string, string> = {
     LANDING: "moviematch.space",
-    USER_CREATION: "start.moviematch.space",
+    USER_CREATION: "cinema.moviematch.space",
     DASHBOARD: "dashboard.moviematch.space",
   };
 
