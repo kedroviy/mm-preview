@@ -21,7 +21,7 @@ function getAppUrl(key: "LANDING" | "USER_CREATION" | "DASHBOARD"): string {
     if (hostname.includes("moviematch.space")) {
       const appNames: Record<string, string> = {
         LANDING: "moviematch.space",
-        USER_CREATION: "start.moviematch.space",
+        USER_CREATION: "cinema.moviematch.space",
         DASHBOARD: "dashboard.moviematch.space",
       };
       return `https://${appNames[key]}`;
@@ -78,7 +78,7 @@ function getAppUrl(key: "LANDING" | "USER_CREATION" | "DASHBOARD"): string {
 
     const appNames: Record<string, string> = {
       LANDING: "moviematch.space",
-      USER_CREATION: "start.moviematch.space",
+      USER_CREATION: "cinema.moviematch.space",
       DASHBOARD: "dashboard.moviematch.space",
     };
 
@@ -109,7 +109,7 @@ function getAppUrl(key: "LANDING" | "USER_CREATION" | "DASHBOARD"): string {
   const baseDomain = "vercel.app";
   const appNames: Record<string, string> = {
     LANDING: "moviematch.space",
-    USER_CREATION: "start.moviematch.space",
+    USER_CREATION: "cinema.moviematch.space",
     DASHBOARD: "dashboard.moviematch.space",
   };
 
