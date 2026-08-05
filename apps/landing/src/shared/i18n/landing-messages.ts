@@ -37,7 +37,7 @@ export const FALLBACK_MESSAGES: Record<SupportedLocale, LandingMessages> = {
         'hero.title.after': 'с друзьями, парой или в соло',
         'hero.description':
             'Как в приложении в Google Play: лобби, приглашение и совместный выбор с друзьями или партнером - или соло-подбор, когда один человек подбирает себе кино на вечер без лобби и без второго участника.',
-        'hero.webCta': 'Создать аккаунт (веб)',
+        'hero.webCta': 'Войти через сайт',
         'hero.webCtaAria': 'Создать аккаунт Movie Match в браузере',
         'hero.playCta': 'Скачать в Google Play',
         'hero.playCtaAria': 'Скачать Movie Match в Google Play (откроется в новой вкладке)',
@@ -178,7 +178,7 @@ export const FALLBACK_MESSAGES: Record<SupportedLocale, LandingMessages> = {
         'hero.title.after': 'with friends, a partner, or solo',
         'hero.description':
             'Just like in the Google Play app listing: lobby, invite, and shared selection with friends or your partner - or a solo picker when you want a movie for yourself without a lobby or second participant.',
-        'hero.webCta': 'Create account (web)',
+        'hero.webCta': 'Open on website',
         'hero.webCtaAria': 'Create a Movie Match account in the browser',
         'hero.playCta': 'Download on Google Play',
         'hero.playCtaAria': 'Download Movie Match on Google Play (opens in a new tab)',
@@ -234,7 +234,7 @@ export const FALLBACK_MESSAGES: Record<SupportedLocale, LandingMessages> = {
         'hero.title.after': 'con amigos, en pareja o en solitario',
         'hero.description':
             'Como en la ficha de Google Play: sala, invitacion y eleccion conjunta con amigos o pareja - o un selector en solitario cuando quieres elegir una pelicula para ti sin sala ni segundo participante.',
-        'hero.webCta': 'Crear cuenta (web)',
+        'hero.webCta': 'Iniciar sesión en la web',
         'hero.webCtaAria': 'Crear una cuenta de Movie Match en el navegador',
         'hero.playCta': 'Descargar en Google Play',
         'hero.playCtaAria': 'Descargar Movie Match en Google Play (se abre en una nueva pestana)',
