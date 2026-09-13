@@ -2,7 +2,7 @@
 
 import { ButtonShadcn } from "@mm-preview/ui/light";
 import { usePathname, useRouter } from "next/navigation";
-import { getGooglePlayUrl } from "@/src/shared/config/constants";
+import { getAppUrls } from "@/src/shared/config/constants";
 import {
   type SupportedLocale,
 } from "@/src/shared/config/metadata";
@@ -39,9 +39,7 @@ export function Header({
     { href: `${base}#reviews`, label: text.reviews },
   ];
 
-  const handleStartGooglePlay = () => {
-    window.location.href = getGooglePlayUrl();
-  };
+  const authUrl = `${getAppUrls().USER_CREATION}/auth`;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
@@ -91,12 +89,12 @@ export function Header({
               ))}
             </select>
             <ButtonShadcn
-              type="button"
-              onClick={handleStartGooglePlay}
+              asChild
               className="rounded-full border-0 bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-110 sm:px-5"
-              aria-label={text.startAria}
             >
-              {text.start}
+              <a href={authUrl} aria-label={text.startAria}>
+                {text.start}
+              </a>
             </ButtonShadcn>
           </div>
         </div>
